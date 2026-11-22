@@ -1,0 +1,94 @@
+[
+  {
+    "id": "prod-1",
+    "sku": "AW-HD-001",
+    "name": "Оверсайз худи «Eclipse Heavy»",
+    "category": "Худи и свитшоты",
+    "collection": "SS26 Street",
+    "retail_price": 6900.0,
+    "sizes": [
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "color": "Графитовый черный",
+    "description": "Плотность футера 480 г/м², 100% хлопок пенье, спущенное плечо."
+  },
+  {
+    "id": "prod-2",
+    "sku": "AW-TS-002",
+    "name": "Футболка «Core Boxy Fit»",
+    "category": "Футболки",
+    "collection": "Basic Capsule",
+    "retail_price": 3200.0,
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "color": "Молочный экрю",
+    "description": "Плотный хлопок 260 г/м², свободный крой, усиленный ворот."
+  },
+  {
+    "id": "prod-3",
+    "sku": "AW-DN-003",
+    "name": "Джинсы Wide-Leg «Raw Indigo»",
+    "category": "Брюки и деним",
+    "collection": "SS26 Street",
+    "retail_price": 8500.0,
+    "sizes": [
+      "S",
+      "M",
+      "L"
+    ],
+    "color": "Темный индиго",
+    "description": "Японский селвидж-деним 14 oz, широкий силуэт."
+  },
+  {
+    "id": "prod-4",
+    "sku": "AW-JK-004",
+    "name": "Бомбер «Cyber Shell Waterproof»",
+    "category": "Верхняя одежда",
+    "collection": "Limited Drop",
+    "retail_price": 12900.0,
+    "sizes": [
+      "M",
+      "L",
+      "XL"
+    ],
+    "color": "Оливковый хаки",
+    "description": "Мембранная ткань с защитой от ветра и влаги, металлическая фурнитура."
+  },
+  {
+    "id": "prod-5",
+    "sku": "AW-SW-005",
+    "name": "Свитшот «Minimal Fog»",
+    "category": "Худи и свитшоты",
+    "collection": "Autumn Drop",
+    "retail_price": 5400.0,
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L"
+    ],
+    "color": "Холодный серый",
+    "description": "Мягкий хлопок с эффектом варки garment-dyed."
+  },
+  {
+    "id": "prod-6",
+    "sku": "AW-AC-006",
+    "name": "Кепка «AURA Vintage washed»",
+    "category": "Аксессуары",
+    "collection": "Basic Capsule",
+    "retail_price": 2400.0,
+    "sizes": [
+      "ONE SIZE"
+    ],
+    "color": "Винтажный серый",
+    "description": "100% твил, объемная вышивка логотипа бренда."
+  }
+]

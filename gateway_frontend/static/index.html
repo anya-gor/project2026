@@ -1,0 +1,1085 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AURA WEAR — Микросервисная система управления брендом одежды</title>
+  <style>
+    :root {
+      --bg: #0f1115;
+      --surface: #181b22;
+      --surface-2: #212631;
+      --border: #2e3444;
+      --text: #f3f4f6;
+      --muted: #9ca3af;
+      --accent: #a855f7;
+      --accent-hover: #9333ea;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --info: #3b82f6;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+      padding-bottom: 50px;
+    }
+    header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 16px 28px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .brand-logo {
+      background: linear-gradient(135deg, #a855f7, #6366f1);
+      color: #fff;
+      font-weight: 800;
+      letter-spacing: 2px;
+      padding: 10px 14px;
+      border-radius: 8px;
+      font-size: 18px;
+    }
+    .brand-title h1 {
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+    .brand-title p {
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .ms-badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .ms-badge {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      padding: 6px 12px;
+      border-radius: 999px;
+      font-size: 12px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--muted);
+    }
+    .dot.online { background: var(--success); box-shadow: 0 0 8px var(--success); }
+    .dot.offline { background: var(--danger); }
+
+    .container {
+      max-width: 1320px;
+      margin: 24px auto;
+      padding: 0 20px;
+    }
+    .tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 24px;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 14px;
+    }
+    .tab-btn {
+      background: var(--surface);
+      color: var(--text);
+      border: 1px solid var(--border);
+      padding: 10px 18px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 14px;
+      transition: 0.2s;
+    }
+    .tab-btn:hover { border-color: var(--accent); }
+    .tab-btn.active {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+    }
+
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+    .card h2 {
+      font-size: 17px;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+      gap: 18px;
+    }
+    .grid-4 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 14px;
+    }
+    @media (max-width: 900px) {
+      .grid-2 { grid-template-columns: 1fr; }
+    }
+
+    .filters-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: flex-end;
+    }
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      flex: 1;
+      min-width: 150px;
+    }
+    label {
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 600;
+    }
+    input, select {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 9px 12px;
+      border-radius: 8px;
+      font-size: 14px;
+    }
+    input:focus, select:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+    .btn {
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      padding: 10px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 14px;
+      transition: 0.2s;
+    }
+    .btn:hover { background: var(--accent-hover); }
+    .btn-secondary {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+    }
+    .btn-secondary:hover { border-color: var(--accent); background: var(--surface); }
+    .btn-danger { background: var(--danger); }
+    .btn-danger:hover { opacity: 0.9; }
+    .btn-warning { background: var(--warning); color: #111; }
+    .btn-sm { padding: 6px 10px; font-size: 12px; }
+
+    .product-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 14px;
+    }
+    .product-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 10px;
+    }
+    .sku-tag {
+      font-size: 11px;
+      color: var(--muted);
+      background: var(--surface-2);
+      padding: 3px 8px;
+      border-radius: 4px;
+    }
+    .collection-tag {
+      font-size: 11px;
+      color: #d8b4fe;
+      background: rgba(168, 85, 247, 0.16);
+      border: 1px solid rgba(168, 85, 247, 0.4);
+      padding: 3px 8px;
+      border-radius: 4px;
+    }
+    .price-tag {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--success);
+    }
+    .sizes-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 6px;
+    }
+    .size-pill {
+      font-size: 12px;
+      padding: 4px 9px;
+      border-radius: 6px;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+    }
+    .size-pill.has-stock {
+      border-color: var(--success);
+      color: #a7f3d0;
+    }
+    .size-pill.no-stock {
+      opacity: 0.45;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+    th, td {
+      text-align: left;
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--border);
+    }
+    th {
+      color: var(--muted);
+      font-weight: 600;
+      background: var(--surface-2);
+    }
+    .status-pill {
+      display: inline-block;
+      padding: 3px 9px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+    .status-ACTIVE { background: rgba(16, 185, 129, 0.15); color: #34d399; }
+    .status-EXPIRING_SOON { background: rgba(245, 158, 11, 0.2); color: #fbbf24; }
+    .status-EXPIRED { background: rgba(239, 68, 68, 0.2); color: #f87171; }
+    .status-DEPLETED { background: rgba(156, 163, 175, 0.15); color: #9ca3af; }
+
+    .stat-box {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 16px;
+    }
+    .stat-box .stat-label {
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+    .stat-box .stat-value {
+      font-size: 22px;
+      font-weight: 800;
+    }
+    .stat-box .stat-sub {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    #toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: var(--surface-2);
+      border: 1px solid var(--accent);
+      color: var(--text);
+      padding: 14px 20px;
+      border-radius: 10px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+      display: none;
+      z-index: 9999;
+      max-width: 440px;
+      font-size: 13px;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="brand">
+      <div class="brand-logo">AURA</div>
+      <div class="brand-title">
+        <h1>AURA WEAR — Brand Management & Storefront</h1>
+        <p>Микросервисная архитектура: Каталог • Склад партий (FIFO) • Заказы • Финансовая аналитика</p>
+      </div>
+    </div>
+    <div class="ms-badges" id="ms-status-bar">
+      <div class="ms-badge"><span class="dot"></span> Проверка микросервисов...</div>
+    </div>
+  </header>
+
+  <div class="container">
+    <div class="tabs">
+      <button class="tab-btn active" onclick="switchTab('store')">🛍️ 1. Витрина и Покупка одежды</button>
+      <button class="tab-btn" onclick="switchTab('warehouse')">🏭 2. Склад: Поставки от фабрик и Остатки</button>
+      <button class="tab-btn" onclick="switchTab('alerts')">⚠️ 3. Сроки коллекций и Списания</button>
+      <button class="tab-btn" onclick="switchTab('analytics')">📈 4. Финансовый отчет (Прибыль и Налоги)</button>
+    </div>
+
+    <!-- ВКЛАДКА 1: ВИТРИНА И ПОКУПКА -->
+    <div id="tab-store" class="tab-content active">
+      <div class="card">
+        <h2>🔍 Поиск и фильтрация моделей (Catalog Service :8001)</h2>
+        <div class="filters-bar">
+          <div class="form-group" style="flex: 2;">
+            <label>Поиск по названию, артикулу или составу</label>
+            <input type="text" id="filter-search" placeholder="Например: худи, деним, хлопок..." oninput="loadProducts()" />
+          </div>
+          <div class="form-group">
+            <label>Категория</label>
+            <select id="filter-category" onchange="loadProducts()">
+              <option value="">Все категории</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Коллекция / Дроп</label>
+            <select id="filter-collection" onchange="loadProducts()">
+              <option value="">Все коллекции</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Размер</label>
+            <select id="filter-size" onchange="loadProducts()">
+              <option value="">Любой размер</option>
+              <option value="XS">XS</option>
+              <option value="S">S</option>
+              <option value="M">M</option>
+              <option value="L">L</option>
+              <option value="XL">XL</option>
+              <option value="ONE SIZE">ONE SIZE</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Макс. цена (₽)</label>
+            <input type="number" id="filter-price" placeholder="15000" oninput="loadProducts()" />
+          </div>
+          <button class="btn btn-secondary" onclick="resetFilters()">Сбросить</button>
+        </div>
+      </div>
+
+      <div class="grid-3" id="products-grid"></div>
+
+      <div class="card" style="margin-top: 24px;">
+        <h2>➕ Добавить новую модель одежды в коллекцию бренда</h2>
+        <div class="filters-bar">
+          <div class="form-group">
+            <label>Артикул (SKU)</label>
+            <input type="text" id="new-prod-sku" placeholder="AW-TR-007" />
+          </div>
+          <div class="form-group" style="flex: 2;">
+            <label>Название модели</label>
+            <input type="text" id="new-prod-name" placeholder="Брюки Карго «Urban Tactical»" />
+          </div>
+          <div class="form-group">
+            <label>Категория</label>
+            <input type="text" id="new-prod-cat" placeholder="Брюки и деним" />
+          </div>
+          <div class="form-group">
+            <label>Коллекция</label>
+            <input type="text" id="new-prod-col" placeholder="SS26 Street" />
+          </div>
+          <div class="form-group">
+            <label>Розничная цена (₽)</label>
+            <input type="number" id="new-prod-price" placeholder="7400" />
+          </div>
+          <button class="btn" onclick="createNewProduct()">Добавить в каталог</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ВКЛАДКА 2: СКЛАД И ПОСТАВКИ -->
+    <div id="tab-warehouse" class="tab-content">
+      <div class="card">
+        <h2>🚚 Поступление новой партии товара от поставщика / швейной фабрики (Warehouse Service :8002)</h2>
+        <p style="font-size: 13px; color: var(--muted); margin-bottom: 14px;">
+          Разные партии одной и той же модели могут поступать от разных фабрик и иметь разную закупочную цену. При продаже система спишет товар по методу FIFO.
+        </p>
+        <div class="filters-bar">
+          <div class="form-group" style="flex: 2;">
+            <label>Модель одежды</label>
+            <select id="batch-product"></select>
+          </div>
+          <div class="form-group">
+            <label>Размер</label>
+            <select id="batch-size">
+              <option value="XS">XS</option>
+              <option value="S">S</option>
+              <option value="M" selected>M</option>
+              <option value="L">L</option>
+              <option value="XL">XL</option>
+              <option value="ONE SIZE">ONE SIZE</option>
+            </select>
+          </div>
+          <div class="form-group" style="flex: 1.5;">
+            <label>Поставщик / Швейная фабрика</label>
+            <input type="text" id="batch-supplier" value="ООО «Фабрика ТекстильПро»" />
+          </div>
+          <div class="form-group">
+            <label>Закупочная цена 1 шт. (₽)</label>
+            <input type="number" id="batch-price" value="2600" />
+          </div>
+          <div class="form-group">
+            <label>Кол-во (шт.)</label>
+            <input type="number" id="batch-qty" value="15" />
+          </div>
+          <div class="form-group">
+            <label>Срок реализации / сезона до</label>
+            <input type="date" id="batch-expiry" />
+          </div>
+          <button class="btn" onclick="createSupplyBatch()">Принять партию</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>📦 Партии товара на складе (с ценами поставщиков и сроками реализации)</h2>
+        <div style="overflow-x: auto;">
+          <table>
+            <thead>
+              <tr>
+                <th>Партия</th>
+                <th>Модель одежды</th>
+                <th>Размер</th>
+                <th>Поставщик (Фабрика)</th>
+                <th>Закупочная цена</th>
+                <th>Остаток / Приход</th>
+                <th>Дата прихода</th>
+                <th>Годен до (Конец сезона)</th>
+                <th>Статус срока</th>
+                <th>Действие (Списание)</th>
+              </tr>
+            </thead>
+            <tbody id="batches-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ВКЛАДКА 3: СРОКИ И СПИСАНИЯ -->
+    <div id="tab-alerts" class="tab-content">
+      <div class="grid-2">
+        <div class="card">
+          <h2>⏳ Товары, которые СКОРО выйдут из сезона / испортятся (≤ 14 дней)</h2>
+          <p style="font-size: 12px; color: var(--muted); margin-bottom: 12px;">
+            Сигнал для мерчандайзера: рекомендуется запустить распродажу до истечения срока реализации коллекции.
+          </p>
+          <table>
+            <thead>
+              <tr>
+                <th>Партия</th>
+                <th>Модель (Размер)</th>
+                <th>Поставщик</th>
+                <th>Остаток</th>
+                <th>Закуп. цена</th>
+                <th>Срок до</th>
+                <th>Осталось</th>
+              </tr>
+            </thead>
+            <tbody id="expiring-soon-tbody"></tbody>
+          </table>
+        </div>
+
+        <div class="card">
+          <h2>🚨 Просроченные партии на складе (Требуют списания)</h2>
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+            <p style="font-size: 12px; color: var(--muted);">
+              Партии с истекшим сроком заблокированы для продажи покупателям.
+            </p>
+            <button class="btn btn-danger btn-sm" onclick="autoWriteOffExpired()">Списать все просроченные партии</button>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>Партия</th>
+                <th>Модель (Размер)</th>
+                <th>Поставщик</th>
+                <th>Остаток</th>
+                <th>Убыток</th>
+                <th>Истек</th>
+                <th>Действие</th>
+              </tr>
+            </thead>
+            <tbody id="already-expired-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>📋 Реестр списанных товаров (Истечение срока годности/сезона и Производственный брак)</h2>
+        <div style="margin-bottom: 12px; display: flex; gap: 10px;">
+          <button class="btn btn-secondary btn-sm" onclick="loadWriteoffs('')">Все списания</button>
+          <button class="btn btn-secondary btn-sm" onclick="loadWriteoffs('EXPIRED')">Только по истечению срока годности/сезона</button>
+          <button class="btn btn-secondary btn-sm" onclick="loadWriteoffs('DEFECT')">Только брак / порча</button>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>ID акта</th>
+              <th>Дата</th>
+              <th>Партия</th>
+              <th>Модель одежды</th>
+              <th>Размер</th>
+              <th>Поставщик</th>
+              <th>Списано (шт.)</th>
+              <th>Закуп. цена</th>
+              <th>Сумма убытка</th>
+              <th>Причина списания</th>
+            </tr>
+          </thead>
+          <tbody id="writeoffs-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ВКЛАДКА 4: ФИНАНСОВЫЙ ОТЧЕТ -->
+    <div id="tab-analytics" class="tab-content">
+      <div class="card">
+        <h2>📊 Параметры финансового отчета за период (Analytics Service :8004)</h2>
+        <div class="filters-bar">
+          <div class="form-group">
+            <label>Начало периода</label>
+            <input type="date" id="rep-start" />
+          </div>
+          <div class="form-group">
+            <label>Конец периода</label>
+            <input type="date" id="rep-end" />
+          </div>
+          <div class="form-group">
+            <label>Налоговая ставка (% от выручки, УСН)</label>
+            <input type="number" id="rep-tax" value="6" step="0.5" />
+          </div>
+          <button class="btn" onclick="loadFinancialReport()">Подбить отчет за период</button>
+        </div>
+      </div>
+
+      <div class="grid-4" id="report-summary-cards" style="margin-bottom: 20px;"></div>
+
+      <div class="card">
+        <h2>👕 Поштучная и суммарная прибыль по каждой проданной модели одежды</h2>
+        <p style="font-size: 12px; color: var(--muted); margin-bottom: 12px;">
+          Расчет учитывает фактическую закупочную цену конкретных списанных партий от разных поставщиков (FIFO) и долю налога.
+        </p>
+        <table>
+          <thead>
+            <tr>
+              <th>Модель одежды</th>
+              <th>Продано за период (шт.)</th>
+              <th>Цена продажи (за 1 шт.)</th>
+              <th>Ср. закупочная цена поставщика (за 1 шт.)</th>
+              <th>Суммарная выручка</th>
+              <th>Издержки на закупку у поставщиков</th>
+              <th>Налог</th>
+              <th>Чистая прибыль (ПОШТУЧНО на 1 ед.)</th>
+              <th>Чистая прибыль (СУММАРНО)</th>
+            </tr>
+          </thead>
+          <tbody id="report-items-tbody"></tbody>
+        </table>
+      </div>
+
+      <div class="card">
+        <h2>🧾 История оформленных заказов покупателей за период (Order Service :8003)</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>№ Заказа</th>
+              <th>Дата</th>
+              <th>Покупатель</th>
+              <th>Модель одежды</th>
+              <th>Размер</th>
+              <th>Кол-во</th>
+              <th>Выручка</th>
+              <th>Издержки закупки (Партии поставщиков)</th>
+              <th>Валовая прибыль</th>
+            </tr>
+          </thead>
+          <tbody id="orders-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast"></div>
+
+  <script>
+    let allProducts = [];
+    let stockSummary = {};
+
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.innerHTML = msg;
+      t.style.display = 'block';
+      setTimeout(() => { t.style.display = 'none'; }, 5500);
+    }
+
+    function switchTab(tabName) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+      document.getElementById('tab-' + tabName).classList.add('active');
+      const idx = { store: 0, warehouse: 1, alerts: 2, analytics: 3 }[tabName];
+      document.querySelectorAll('.tab-btn')[idx].classList.add('active');
+
+      if (tabName === 'store') { loadStockAndProducts(); }
+      if (tabName === 'warehouse') { loadBatches(); }
+      if (tabName === 'alerts') { loadAlertsAndWriteoffs(); }
+      if (tabName === 'analytics') { loadFinancialReport(); }
+    }
+
+    async function checkMicroservicesHealth() {
+      try {
+        const res = await fetch('/api/system-status');
+        const data = await res.json();
+        const bar = document.getElementById('ms-status-bar');
+        bar.innerHTML = data.services.map(s => `
+          <div class="ms-badge">
+            <span class="dot ${s.online ? 'online' : 'offline'}"></span>
+            <span>${s.name} (:${s.port})</span>
+          </div>
+        `).join('');
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    async function loadFilters() {
+      const res = await fetch('/api/catalog/filters');
+      const data = await res.json();
+      const catSel = document.getElementById('filter-category');
+      catSel.innerHTML = '<option value="">Все категории</option>' +
+        data.categories.map(c => `<option value="${c}">${c}</option>`).join('');
+
+      const colSel = document.getElementById('filter-collection');
+      colSel.innerHTML = '<option value="">Все коллекции</option>' +
+        data.collections.map(c => `<option value="${c}">${c}</option>`).join('');
+    }
+
+    function resetFilters() {
+      document.getElementById('filter-search').value = '';
+      document.getElementById('filter-category').value = '';
+      document.getElementById('filter-collection').value = '';
+      document.getElementById('filter-size').value = '';
+      document.getElementById('filter-price').value = '';
+      loadProducts();
+    }
+
+    async function loadStockAndProducts() {
+      const sRes = await fetch('/api/warehouse/stock-summary');
+      stockSummary = await sRes.json();
+      await loadProducts();
+    }
+
+    async function loadProducts() {
+      const search = document.getElementById('filter-search').value;
+      const category = document.getElementById('filter-category').value;
+      const collection = document.getElementById('filter-collection').value;
+      const size = document.getElementById('filter-size').value;
+      const max_price = document.getElementById('filter-price').value;
+
+      const params = new URLSearchParams();
+      if (search) params.append('search', search);
+      if (category) params.append('category', category);
+      if (collection) params.append('collection', collection);
+      if (size) params.append('size', size);
+      if (max_price) params.append('max_price', max_price);
+
+      const res = await fetch('/api/catalog/products?' + params.toString());
+      allProducts = await res.json();
+
+      // Заполним селект на складе
+      const batchProdSel = document.getElementById('batch-product');
+      if (allProducts.length > 0 && batchProdSel.options.length === 0) {
+        batchProdSel.innerHTML = allProducts.map(p =>
+          `<option value="${p.id}" data-name="${p.name}">${p.name} (${p.sku})</option>`
+        ).join('');
+      }
+
+      const grid = document.getElementById('products-grid');
+      if (allProducts.length === 0) {
+        grid.innerHTML = '<div class="card">Модели по заданным фильтрам не найдены.</div>';
+        return;
+      }
+
+      grid.innerHTML = allProducts.map(p => {
+        const st = stockSummary[p.id] || { total_available: 0, sizes: {} };
+        const sizePills = p.sizes.map(sz => {
+          const count = st.sizes[sz] || 0;
+          return `<span class="size-pill ${count > 0 ? 'has-stock' : 'no-stock'}">${sz}: ${count} шт.</span>`;
+        }).join('');
+
+        const sizeOptions = p.sizes.map(sz => `<option value="${sz}">${sz} (доступно: ${st.sizes[sz] || 0})</option>`).join('');
+
+        return `
+          <div class="product-card">
+            <div>
+              <div class="product-header">
+                <span class="sku-tag">${p.sku} • ${p.category}</span>
+                <span class="collection-tag">${p.collection}</span>
+              </div>
+              <h3 style="margin-top: 10px; font-size: 17px;">${p.name}</h3>
+              <p style="font-size: 12px; color: var(--muted); margin-top: 4px;">Цвет: ${p.color} • ${p.description}</p>
+              <div style="margin-top: 10px;">
+                <span class="price-tag">${p.retail_price.toLocaleString('ru-RU')} ₽</span>
+                <span style="font-size: 12px; color: var(--muted); margin-left: 8px;">Всего на складе: ${st.total_available} шт.</span>
+              </div>
+              <div class="sizes-row">${sizePills}</div>
+            </div>
+
+            <div style="border-top: 1px solid var(--border); padding-top: 12px; display: flex; gap: 8px; align-items: center;">
+              <select id="buy-size-${p.id}" style="flex: 1;">${sizeOptions}</select>
+              <input type="number" id="buy-qty-${p.id}" value="1" min="1" max="20" style="width: 68px;" />
+              <button class="btn" onclick="buyProduct('${p.id}')">Купить</button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    async function buyProduct(productId) {
+      const size = document.getElementById(`buy-size-${productId}`).value;
+      const qty = parseInt(document.getElementById(`buy-qty-${productId}`).value, 10);
+      const res = await fetch('/api/orders', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          product_id: productId,
+          size: size,
+          quantity: qty,
+          customer_name: 'Покупатель витрины AURA'
+        })
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        showToast(`❌ Ошибка заказа: <b>${data.detail}</b>`);
+        return;
+      }
+      const batchesInfo = data.allocations.map(a =>
+        `${a.batch_id} (${a.supplier_name}: ${a.quantity} шт. × ${a.unit_purchase_price} ₽)`
+      ).join(', ');
+      showToast(
+        `✅ <b>Заказ ${data.order_id} оформлен!</b><br/>` +
+        `Модель: ${data.product_name} (${data.size}, ${data.quantity} шт.)<br/>` +
+        `Выручка: <b>${data.total_revenue} ₽</b> | Себестоимость FIFO: <b>${data.total_supplier_cost} ₽</b><br/>` +
+        `<span style="color:var(--muted)">Списано из партий: ${batchesInfo}</span>`
+      );
+      await loadStockAndProducts();
+    }
+
+    async function createNewProduct() {
+      const sku = document.getElementById('new-prod-sku').value.trim();
+      const name = document.getElementById('new-prod-name').value.trim();
+      const category = document.getElementById('new-prod-cat').value.trim() || 'Одежда';
+      const collection = document.getElementById('new-prod-col').value.trim() || 'SS26 Street';
+      const price = parseFloat(document.getElementById('new-prod-price').value);
+      if (!sku || !name || !price) {
+        showToast('⚠️ Заполните артикул, название и розничную цену модели');
+        return;
+      }
+      const res = await fetch('/api/catalog/products', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          sku, name, category, collection,
+          retail_price: price,
+          sizes: ['S', 'M', 'L', 'XL'],
+          color: 'Черный',
+          description: 'Капсульная модель бренда AURA Wear'
+        })
+      });
+      if (res.ok) {
+        showToast(`✅ Модель «${name}» добавлена в Catalog Service!`);
+        document.getElementById('batch-product').innerHTML = '';
+        await loadFilters();
+        await loadStockAndProducts();
+      }
+    }
+
+    async function loadBatches() {
+      const res = await fetch('/api/warehouse/batches');
+      const batches = await res.json();
+      const tbody = document.getElementById('batches-tbody');
+      tbody.innerHTML = batches.map(b => `
+        <tr>
+          <td><b>${b.batch_id}</b></td>
+          <td>${b.product_name}</td>
+          <td><b>${b.size}</b></td>
+          <td>${b.supplier_name}</td>
+          <td>${b.purchase_price.toLocaleString('ru-RU')} ₽</td>
+          <td><b>${b.remaining_quantity}</b> / ${b.initial_quantity} шт.</td>
+          <td>${b.arrival_date}</td>
+          <td>${b.expiry_date}</td>
+          <td><span class="status-pill status-${b.status}">${b.status_label}</span></td>
+          <td>
+            ${b.remaining_quantity > 0 ? `
+              <button class="btn btn-warning btn-sm" onclick="quickWriteOff('${b.batch_id}', 1, 'EXPIRED')">Списать 1 шт. (Срок)</button>
+              <button class="btn btn-secondary btn-sm" onclick="quickWriteOff('${b.batch_id}', 1, 'DEFECT')">Брак 1 шт.</button>
+            ` : '<span style="color:var(--muted)">Нет остатка</span>'}
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    async function createSupplyBatch() {
+      const sel = document.getElementById('batch-product');
+      const product_id = sel.value;
+      const product_name = sel.options[sel.selectedIndex]?.getAttribute('data-name') || 'Модель AURA';
+      const size = document.getElementById('batch-size').value;
+      const supplier_name = document.getElementById('batch-supplier').value.trim();
+      const purchase_price = parseFloat(document.getElementById('batch-price').value);
+      const quantity = parseInt(document.getElementById('batch-qty').value, 10);
+      const expiry_date = document.getElementById('batch-expiry').value;
+
+      if (!product_id || !supplier_name || !purchase_price || !quantity || !expiry_date) {
+        showToast('⚠️ Заполните все поля поставки');
+        return;
+      }
+
+      const res = await fetch('/api/warehouse/batches', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          product_id, product_name, size, supplier_name, purchase_price, quantity, expiry_date
+        })
+      });
+      if (res.ok) {
+        const b = await res.json();
+        showToast(`✅ Партия <b>${b.batch_id}</b> от «${b.supplier_name}» принята на склад!`);
+        await loadBatches();
+        await loadStockAndProducts();
+      }
+    }
+
+    async function quickWriteOff(batchId, qty, reason) {
+      const res = await fetch('/api/warehouse/writeoffs', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          batch_id: batchId,
+          quantity: qty,
+          reason: reason
+        })
+      });
+      const data = await res.json();
+      if (res.ok) {
+        showToast(`📋 Списано ${data.quantity} шт. из партии ${data.batch_id} (${data.reason_label}). Убыток: ${data.total_loss} ₽`);
+        await loadBatches();
+        await loadAlertsAndWriteoffs();
+        await loadStockAndProducts();
+      } else {
+        showToast(`❌ Ошибка: ${data.detail}`);
+      }
+    }
+
+    async function autoWriteOffExpired() {
+      const res = await fetch('/api/warehouse/writeoffs/auto-expired', { method: 'POST' });
+      const data = await res.json();
+      showToast(`✅ Автоматически списано просроченных партий: <b>${data.written_off_batches_count}</b>`);
+      await loadAlertsAndWriteoffs();
+      await loadBatches();
+      await loadStockAndProducts();
+    }
+
+    async function loadAlertsAndWriteoffs() {
+      const res = await fetch('/api/warehouse/alerts');
+      const data = await res.json();
+
+      const soonTbody = document.getElementById('expiring-soon-tbody');
+      if (data.expiring_soon.length === 0) {
+        soonTbody.innerHTML = '<tr><td colspan="7" style="color:var(--muted)">Нет партий с истекающим сроком.</td></tr>';
+      } else {
+        soonTbody.innerHTML = data.expiring_soon.map(b => `
+          <tr>
+            <td><b>${b.batch_id}</b></td>
+            <td>${b.product_name} (<b>${b.size}</b>)</td>
+            <td>${b.supplier_name}</td>
+            <td><b>${b.remaining_quantity} шт.</b></td>
+            <td>${b.purchase_price} ₽</td>
+            <td>${b.expiry_date}</td>
+            <td><span class="status-pill status-EXPIRING_SOON">Через ${b.days_until_expiry} дн.</span></td>
+          </tr>
+        `).join('');
+      }
+
+      const expTbody = document.getElementById('already-expired-tbody');
+      if (data.already_expired.length === 0) {
+        expTbody.innerHTML = '<tr><td colspan="7" style="color:var(--muted)">Все просроченные товары уже списаны.</td></tr>';
+      } else {
+        expTbody.innerHTML = data.already_expired.map(b => `
+          <tr>
+            <td><b>${b.batch_id}</b></td>
+            <td>${b.product_name} (<b>${b.size}</b>)</td>
+            <td>${b.supplier_name}</td>
+            <td><b>${b.remaining_quantity} шт.</b></td>
+            <td>${(b.remaining_quantity * b.purchase_price).toLocaleString('ru-RU')} ₽</td>
+            <td><span class="status-pill status-EXPIRED">${b.expiry_date}</span></td>
+            <td>
+              <button class="btn btn-danger btn-sm" onclick="quickWriteOff('${b.batch_id}', ${b.remaining_quantity}, 'EXPIRED')">
+                Списать весь остаток
+              </button>
+            </td>
+          </tr>
+        `).join('');
+      }
+
+      await loadWriteoffs('');
+    }
+
+    async function loadWriteoffs(reasonFilter) {
+      const url = reasonFilter ? `/api/warehouse/writeoffs?reason=${reasonFilter}` : '/api/warehouse/writeoffs';
+      const res = await fetch(url);
+      const list = await res.json();
+      const tbody = document.getElementById('writeoffs-tbody');
+      if (list.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="10" style="color:var(--muted)">Записей о списании нет.</td></tr>';
+        return;
+      }
+      tbody.innerHTML = list.map(w => `
+        <tr>
+          <td><b>${w.writeoff_id}</b></td>
+          <td>${w.date}</td>
+          <td>${w.batch_id}</td>
+          <td>${w.product_name}</td>
+          <td><b>${w.size}</b></td>
+          <td>${w.supplier_name}</td>
+          <td><b>${w.quantity} шт.</b></td>
+          <td>${w.purchase_price.toLocaleString('ru-RU')} ₽</td>
+          <td style="color: var(--danger); font-weight: 700;">-${w.total_loss.toLocaleString('ru-RU')} ₽</td>
+          <td>
+            <span class="status-pill ${w.reason === 'EXPIRED' ? 'status-EXPIRED' : 'status-EXPIRING_SOON'}">
+              ${w.reason_label}
+            </span>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    async function loadFinancialReport() {
+      const start = document.getElementById('rep-start').value;
+      const end = document.getElementById('rep-end').value;
+      const tax = document.getElementById('rep-tax').value || 6;
+
+      const params = new URLSearchParams({ tax_rate: tax });
+      if (start) params.append('start_date', start);
+      if (end) params.append('end_date', end);
+
+      const res = await fetch('/api/analytics/financial?' + params.toString());
+      const rep = await res.json();
+      const s = rep.summary;
+
+      document.getElementById('report-summary-cards').innerHTML = `
+        <div class="stat-box">
+          <div class="stat-label">Продано за период</div>
+          <div class="stat-value">${s.total_items_sold} шт.</div>
+          <div class="stat-sub">Оформлено заказов: ${s.total_orders_count}</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-label">Суммарная выручка</div>
+          <div class="stat-value" style="color: var(--info);">${s.total_revenue.toLocaleString('ru-RU')} ₽</div>
+          <div class="stat-sub">До вычета себестоимости и налогов</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-label">Издержки на закупку у поставщиков</div>
+          <div class="stat-value" style="color: var(--warning);">-${s.total_supplier_cost.toLocaleString('ru-RU')} ₽</div>
+          <div class="stat-sub">По фактическим ценам партий (FIFO)</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-label">Списания (Просрочка сезона + Брак)</div>
+          <div class="stat-value" style="color: var(--danger);">-${s.total_writeoff_loss.toLocaleString('ru-RU')} ₽</div>
+          <div class="stat-sub">Из них по сроку: ${s.expired_writeoff_loss.toLocaleString('ru-RU')} ₽</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-label">Налог (${rep.tax_rate_percent}%)</div>
+          <div class="stat-value" style="color: var(--warning);">-${s.tax_amount.toLocaleString('ru-RU')} ₽</div>
+          <div class="stat-sub">Налоговые отчисления за период</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-label">Чистая прибыль (СУММАРНО)</div>
+          <div class="stat-value" style="color: var(--success);">${s.net_profit.toLocaleString('ru-RU')} ₽</div>
+          <div class="stat-sub">Поштучно в среднем: <b>${s.avg_net_profit_per_unit.toLocaleString('ru-RU')} ₽ / шт.</b></div>
+        </div>
+      `;
+
+      const itemsTbody = document.getElementById('report-items-tbody');
+      itemsTbody.innerHTML = rep.items_breakdown.map(item => `
+        <tr>
+          <td><b>${item.product_name}</b></td>
+          <td><b>${item.units_sold} шт.</b></td>
+          <td>${item.avg_unit_retail_price.toLocaleString('ru-RU')} ₽</td>
+          <td>${item.avg_unit_supplier_cost.toLocaleString('ru-RU')} ₽</td>
+          <td>${item.total_revenue.toLocaleString('ru-RU')} ₽</td>
+          <td style="color: var(--warning);">-${item.total_supplier_cost.toLocaleString('ru-RU')} ₽</td>
+          <td style="color: var(--warning);">-${item.tax_amount.toLocaleString('ru-RU')} ₽</td>
+          <td style="color: var(--success); font-weight: 700;">+${item.net_profit_per_unit.toLocaleString('ru-RU')} ₽ / шт.</td>
+          <td style="color: var(--success); font-weight: 800;">+${item.net_profit_total.toLocaleString('ru-RU')} ₽</td>
+        </tr>
+      `).join('');
+
+      // Загрузим также список заказов
+      const ordRes = await fetch('/api/orders?' + params.toString());
+      const orders = await ordRes.json();
+      document.getElementById('orders-tbody').innerHTML = orders.map(o => `
+        <tr>
+          <td><b>${o.order_id}</b></td>
+          <td>${o.sale_date}</td>
+          <td>${o.customer_name}</td>
+          <td>${o.product_name}</td>
+          <td><b>${o.size}</b></td>
+          <td><b>${o.quantity} шт.</b></td>
+          <td>${o.total_revenue.toLocaleString('ru-RU')} ₽</td>
+          <td>
+            -${o.total_supplier_cost.toLocaleString('ru-RU')} ₽
+            <div style="font-size:11px; color:var(--muted);">
+              ${(o.allocations || []).map(a => `${a.batch_id} (${a.supplier_name}: ${a.quantity}×${a.unit_purchase_price}₽)`).join(', ')}
+            </div>
+          </td>
+          <td style="color: var(--success); font-weight: 700;">+${o.gross_profit.toLocaleString('ru-RU')} ₽</td>
+        </tr>
+      `).join('');
+    }
+
+    window.addEventListener('DOMContentLoaded', async () => {
+      const today = new Date();
+      const plus45 = new Date(today.getTime() + 45 * 86400000);
+      const minus30 = new Date(today.getTime() - 30 * 86400000);
+      document.getElementById('batch-expiry').value = plus45.toISOString().split('T')[0];
+      document.getElementById('rep-start').value = minus30.toISOString().split('T')[0];
+      document.getElementById('rep-end').value = today.toISOString().split('T')[0];
+
+      await checkMicroservicesHealth();
+      setInterval(checkMicroservicesHealth, 8000);
+      await loadFilters();
+      await loadStockAndProducts();
+    });
+  </script>
+</body>
+</html>

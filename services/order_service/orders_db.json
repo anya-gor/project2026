@@ -1,0 +1,90 @@
+[
+  {
+    "order_id": "ORD-901",
+    "product_id": "prod-1",
+    "product_name": "Оверсайз худи «Eclipse Heavy»",
+    "size": "M",
+    "quantity": 3,
+    "unit_retail_price": 6900.0,
+    "total_revenue": 20700.0,
+    "total_supplier_cost": 7200.0,
+    "gross_profit": 13500.0,
+    "customer_name": "Алексей Смирнов",
+    "sale_date": "2026-11-17",
+    "allocations": [
+      {
+        "batch_id": "BATCH-101",
+        "supplier_name": "ООО «Фабрика ТекстильПро»",
+        "quantity": 3,
+        "unit_purchase_price": 2400.0,
+        "subtotal_cost": 7200.0
+      }
+    ]
+  },
+  {
+    "order_id": "ORD-902",
+    "product_id": "prod-2",
+    "product_name": "Футболка «Core Boxy Fit»",
+    "size": "M",
+    "quantity": 4,
+    "unit_retail_price": 3200.0,
+    "total_revenue": 12800.0,
+    "total_supplier_cost": 3800.0,
+    "gross_profit": 9000.0,
+    "customer_name": "Мария Волкова",
+    "sale_date": "2026-11-19",
+    "allocations": [
+      {
+        "batch_id": "BATCH-104",
+        "supplier_name": "АО «CottonCraft Иваново»",
+        "quantity": 4,
+        "unit_purchase_price": 950.0,
+        "subtotal_cost": 3800.0
+      }
+    ]
+  },
+  {
+    "order_id": "ORD-903",
+    "product_id": "prod-3",
+    "product_name": "Джинсы Wide-Leg «Raw Indigo»",
+    "size": "M",
+    "quantity": 2,
+    "unit_retail_price": 8500.0,
+    "total_revenue": 17000.0,
+    "total_supplier_cost": 6600.0,
+    "gross_profit": 10400.0,
+    "customer_name": "Дмитрий Орлов",
+    "sale_date": "2026-11-21",
+    "allocations": [
+      {
+        "batch_id": "BATCH-106",
+        "supplier_name": "Фабрика «DenimFactory Юг»",
+        "quantity": 2,
+        "unit_purchase_price": 3300.0,
+        "subtotal_cost": 6600.0
+      }
+    ]
+  },
+  {
+    "order_id": "ORD-904",
+    "product_id": "prod-4",
+    "product_name": "Бомбер «Cyber Shell Waterproof»",
+    "size": "L",
+    "quantity": 1,
+    "unit_retail_price": 12900.0,
+    "total_revenue": 12900.0,
+    "total_supplier_cost": 5200.0,
+    "gross_profit": 7700.0,
+    "customer_name": "Екатерина Лебедева",
+    "sale_date": "2026-11-22",
+    "allocations": [
+      {
+        "batch_id": "BATCH-107",
+        "supplier_name": "TechWear Manufacturing",
+        "quantity": 1,
+        "unit_purchase_price": 5200.0,
+        "subtotal_cost": 5200.0
+      }
+    ]
+  }
+]

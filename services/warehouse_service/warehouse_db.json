@@ -1,0 +1,144 @@
+{
+  "batches": [
+    {
+      "batch_id": "BATCH-101",
+      "product_id": "prod-1",
+      "product_name": "Оверсайз худи «Eclipse Heavy»",
+      "size": "M",
+      "supplier_name": "ООО «Фабрика ТекстильПро»",
+      "purchase_price": 2400.0,
+      "initial_quantity": 15,
+      "remaining_quantity": 8,
+      "arrival_date": "2026-10-29",
+      "expiry_date": "2027-01-22"
+    },
+    {
+      "batch_id": "BATCH-102",
+      "product_id": "prod-1",
+      "product_name": "Оверсайз худи «Eclipse Heavy»",
+      "size": "M",
+      "supplier_name": "Швейный цех «Ателье МодаПлюс»",
+      "purchase_price": 2850.0,
+      "initial_quantity": 10,
+      "remaining_quantity": 10,
+      "arrival_date": "2026-11-13",
+      "expiry_date": "2027-01-07"
+    },
+    {
+      "batch_id": "BATCH-103",
+      "product_id": "prod-1",
+      "product_name": "Оверсайз худи «Eclipse Heavy»",
+      "size": "L",
+      "supplier_name": "ООО «Фабрика ТекстильПро»",
+      "purchase_price": 2450.0,
+      "initial_quantity": 12,
+      "remaining_quantity": 9,
+      "arrival_date": "2026-11-08",
+      "expiry_date": "2027-01-22"
+    },
+    {
+      "batch_id": "BATCH-104",
+      "product_id": "prod-2",
+      "product_name": "Футболка «Core Boxy Fit»",
+      "size": "M",
+      "supplier_name": "АО «CottonCraft Иваново»",
+      "purchase_price": 950.0,
+      "initial_quantity": 25,
+      "remaining_quantity": 14,
+      "arrival_date": "2026-10-29",
+      "expiry_date": "2026-11-28"
+    },
+    {
+      "batch_id": "BATCH-105",
+      "product_id": "prod-2",
+      "product_name": "Футболка «Core Boxy Fit»",
+      "size": "L",
+      "supplier_name": "ООО «Трикотаж Люкс»",
+      "purchase_price": 1100.0,
+      "initial_quantity": 20,
+      "remaining_quantity": 16,
+      "arrival_date": "2026-11-13",
+      "expiry_date": "2027-01-07"
+    },
+    {
+      "batch_id": "BATCH-106",
+      "product_id": "prod-3",
+      "product_name": "Джинсы Wide-Leg «Raw Indigo»",
+      "size": "M",
+      "supplier_name": "Фабрика «DenimFactory Юг»",
+      "purchase_price": 3300.0,
+      "initial_quantity": 12,
+      "remaining_quantity": 7,
+      "arrival_date": "2026-11-08",
+      "expiry_date": "2027-01-22"
+    },
+    {
+      "batch_id": "BATCH-107",
+      "product_id": "prod-4",
+      "product_name": "Бомбер «Cyber Shell Waterproof»",
+      "size": "L",
+      "supplier_name": "TechWear Manufacturing",
+      "purchase_price": 5200.0,
+      "initial_quantity": 8,
+      "remaining_quantity": 5,
+      "arrival_date": "2026-10-29",
+      "expiry_date": "2026-12-02"
+    },
+    {
+      "batch_id": "BATCH-108",
+      "product_id": "prod-5",
+      "product_name": "Свитшот «Minimal Fog»",
+      "size": "S",
+      "supplier_name": "АО «CottonCraft Иваново»",
+      "purchase_price": 1950.0,
+      "initial_quantity": 10,
+      "remaining_quantity": 4,
+      "arrival_date": "2026-10-29",
+      "expiry_date": "2026-11-20"
+    },
+    {
+      "batch_id": "BATCH-109",
+      "product_id": "prod-6",
+      "product_name": "Кепка «AURA Vintage washed»",
+      "size": "ONE SIZE",
+      "supplier_name": "Headwear Studio",
+      "purchase_price": 750.0,
+      "initial_quantity": 20,
+      "remaining_quantity": 15,
+      "arrival_date": "2026-11-18",
+      "expiry_date": "2027-01-22"
+    }
+  ],
+  "writeoffs": [
+    {
+      "writeoff_id": "WO-001",
+      "batch_id": "BATCH-108",
+      "product_id": "prod-5",
+      "product_name": "Свитшот «Minimal Fog»",
+      "size": "S",
+      "supplier_name": "АО «CottonCraft Иваново»",
+      "quantity": 3,
+      "purchase_price": 1950.0,
+      "total_loss": 5850.0,
+      "reason": "EXPIRED",
+      "reason_label": "Истечение срока годности / сезона коллекции",
+      "comment": "Окончание сезона коллекции Autumn Drop, списание остатка",
+      "date": "2026-11-21"
+    },
+    {
+      "writeoff_id": "WO-002",
+      "batch_id": "BATCH-104",
+      "product_id": "prod-2",
+      "product_name": "Футболка «Core Boxy Fit»",
+      "size": "M",
+      "supplier_name": "АО «CottonCraft Иваново»",
+      "quantity": 2,
+      "purchase_price": 950.0,
+      "total_loss": 1900.0,
+      "reason": "DEFECT",
+      "reason_label": "Порча товара / Производственный брак шва",
+      "comment": "Обнаружен дефект окрашивания при инвентаризации",
+      "date": "2026-11-19"
+    }
+  ]
+}
