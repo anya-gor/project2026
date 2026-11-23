@@ -1,5 +1,7 @@
 import json
 import os
+import socket
+import time
 import pymysql
 from pymysql.cursors import DictCursor
 
@@ -10,14 +12,32 @@ MYSQL_PASSWORD_ENV = os.getenv("MYSQL_PASSWORD", None)
 MYSQL_DB = os.getenv("MYSQL_DATABASE", "mad_fashion_db")
 
 _working_password = None
+_last_port_check_time = 0.0
+_last_port_open = False
+
+
+def _is_mysql_port_open() -> bool:
+    global _last_port_check_time, _last_port_open
+    now = time.time()
+    if now - _last_port_check_time < 3.0:
+        return _last_port_open
+    _last_port_check_time = now
+    try:
+        with socket.create_connection((MYSQL_HOST, MYSQL_PORT), timeout=0.15):
+            _last_port_open = True
+            return True
+    except OSError:
+        _last_port_open = False
+        return False
 
 
 def _get_server_connection(include_db: bool = True):
     """
     Устанавливает соединение с MySQL в Open Server.
-    В Open Server по умолчанию пользователь 'root' имеет либо пустой пароль '', либо 'root'.
-    Функция автоматически проверяет оба варианта.
+    Если порт 3306 закрыт (Open Server еще не запущен), мгновенно возвращает ошибку без задержки.
     """
+    if not _is_mysql_port_open():
+        raise ConnectionError(f"Порт MySQL {MYSQL_HOST}:{MYSQL_PORT} закрыт (Open Server не запущен)")
     global _working_password
     candidates = [MYSQL_PASSWORD_ENV] if MYSQL_PASSWORD_ENV is not None else (
         [_working_password, "", "root"] if _working_password is not None else ["", "root"]
