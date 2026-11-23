@@ -1,0 +1,52 @@
+[
+  {
+    "login": "375291111111",
+    "country": "Беларусь",
+    "password": "admin123",
+    "name": "Администратор MONROE",
+    "email": "admin@monroe.by",
+    "role": "admin",
+    "addresses": [
+      {
+        "id": "addr-adm",
+        "text": "г. Минск, пр. Победителей, д. 65 (Салон MONROE)",
+        "is_primary": true
+      }
+    ]
+  },
+  {
+    "login": "admin",
+    "country": "Беларусь",
+    "password": "admin123",
+    "name": "Администратор MONROE",
+    "email": "admin@monroe.by",
+    "role": "admin",
+    "addresses": [
+      {
+        "id": "addr-adm",
+        "text": "г. Минск, пр. Победителей, д. 65 (Салон MONROE)",
+        "is_primary": true
+      }
+    ]
+  },
+  {
+    "login": "375445658384",
+    "country": "Беларусь",
+    "password": "123",
+    "name": "Анна Ковалева",
+    "email": "client@monroe.by",
+    "role": "user",
+    "addresses": [
+      {
+        "id": "addr-1",
+        "text": "г. Минск, пр. Победителей, д. 65, кв. 12",
+        "is_primary": true
+      },
+      {
+        "id": "addr-2",
+        "text": "г. Минск, ул. М. Танка, д. 69, кв. 5",
+        "is_primary": false
+      }
+    ]
+  }
+]

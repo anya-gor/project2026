@@ -111,7 +111,7 @@ def check_mysql_status() -> dict:
 
 
 def init_mysql_schema():
-    """Создает базу данных monroe_db и все таблицы в MySQL (Open Server), если их еще нет."""
+    """Создает базу данных monroe_db и 4 основные таблицы (users, user_addresses, products, orders) в MySQL."""
     conn = _get_server_connection(include_db=False)
     try:
         with conn.cursor() as cur:
@@ -120,6 +120,10 @@ def init_mysql_schema():
                 f"CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
             )
             cur.execute(f"USE `{MYSQL_DB}`;")
+
+            # Убираем лишние складские таблицы списаний, чтобы в DBeaver было ровно 4 чистые таблицы сайта
+            cur.execute("DROP TABLE IF EXISTS `writeoffs`;")
+            cur.execute("DROP TABLE IF EXISTS `supply_batches`;")
 
             cur.execute("""
                 CREATE TABLE IF NOT EXISTS `users` (
@@ -132,6 +136,15 @@ def init_mysql_schema():
                     `role` VARCHAR(16) NOT NULL DEFAULT 'user',
                     `addresses_json` TEXT,
                     `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+            """)
+
+            cur.execute("""
+                CREATE TABLE IF NOT EXISTS `user_addresses` (
+                    `id` INT AUTO_INCREMENT PRIMARY KEY,
+                    `user_login` VARCHAR(64) NOT NULL,
+                    `address_text` VARCHAR(255) NOT NULL,
+                    `is_primary` TINYINT(1) NOT NULL DEFAULT 0
                 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
             """)
 
@@ -160,39 +173,6 @@ def init_mysql_schema():
             """)
 
             cur.execute("""
-                CREATE TABLE IF NOT EXISTS `supply_batches` (
-                    `batch_id` VARCHAR(32) PRIMARY KEY,
-                    `product_id` VARCHAR(32) NOT NULL,
-                    `product_name` VARCHAR(255) NOT NULL,
-                    `size` VARCHAR(32) NOT NULL,
-                    `supplier_name` VARCHAR(255) NOT NULL,
-                    `purchase_price` DOUBLE NOT NULL,
-                    `initial_quantity` INT NOT NULL,
-                    `remaining_quantity` INT NOT NULL,
-                    `arrival_date` VARCHAR(32) NOT NULL,
-                    `expiry_date` VARCHAR(32) NOT NULL
-                ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-            """)
-
-            cur.execute("""
-                CREATE TABLE IF NOT EXISTS `writeoffs` (
-                    `writeoff_id` VARCHAR(32) PRIMARY KEY,
-                    `batch_id` VARCHAR(32) NOT NULL,
-                    `product_id` VARCHAR(32) NOT NULL,
-                    `product_name` VARCHAR(255) NOT NULL,
-                    `size` VARCHAR(32) NOT NULL,
-                    `supplier_name` VARCHAR(255) NOT NULL,
-                    `quantity` INT NOT NULL,
-                    `purchase_price` DOUBLE NOT NULL,
-                    `total_loss` DOUBLE NOT NULL,
-                    `reason` VARCHAR(32) NOT NULL,
-                    `reason_label` VARCHAR(255) NOT NULL,
-                    `comment` VARCHAR(255) DEFAULT '',
-                    `date` VARCHAR(32) NOT NULL
-                ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-            """)
-
-            cur.execute("""
                 CREATE TABLE IF NOT EXISTS `orders` (
                     `order_id` VARCHAR(32) PRIMARY KEY,
                     `product_id` VARCHAR(32) NOT NULL,
@@ -201,8 +181,8 @@ def init_mysql_schema():
                     `quantity` INT NOT NULL,
                     `unit_retail_price` DOUBLE NOT NULL,
                     `total_revenue` DOUBLE NOT NULL,
-                    `total_supplier_cost` DOUBLE NOT NULL,
-                    `gross_profit` DOUBLE NOT NULL,
+                    `total_supplier_cost` DOUBLE NOT NULL DEFAULT 0,
+                    `gross_profit` DOUBLE NOT NULL DEFAULT 0,
                     `customer_name` VARCHAR(128) NOT NULL,
                     `city` VARCHAR(128) DEFAULT '',
                     `delivery_method` VARCHAR(128) DEFAULT '',
@@ -322,6 +302,7 @@ def mysql_save_users(users: list) -> bool:
     try:
         conn = _get_server_connection(include_db=True)
         with conn.cursor() as cur:
+            cur.execute("DELETE FROM `user_addresses`;")
             cur.execute("DELETE FROM `users`;")
             for u in users:
                 cur.execute(
@@ -335,67 +316,26 @@ def mysql_save_users(users: list) -> bool:
                         json.dumps(u.get("addresses", []), ensure_ascii=False),
                     ),
                 )
+                for a in u.get("addresses", []):
+                    cur.execute(
+                        """
+                        INSERT INTO `user_addresses` (`user_login`, `address_text`, `is_primary`)
+                        VALUES (%s, %s, %s);
+                        """,
+                        (u["login"], a.get("text", ""), 1 if a.get("is_primary") else 0),
+                    )
         conn.close()
         return True
     except Exception:
         return False
 
 
-# ==================== СИНХРОНИЗАЦИЯ СКЛАДА (SUPPLY_BATCHES) ====================
 def mysql_load_batches(default_batches: list) -> list | None:
-    try:
-        conn = _get_server_connection(include_db=True)
-        with conn.cursor() as cur:
-            cur.execute("SELECT COUNT(*) AS cnt FROM `supply_batches`;")
-            if cur.fetchone()["cnt"] == 0:
-                mysql_save_batches(default_batches)
-            cur.execute("SELECT * FROM `supply_batches`;")
-            rows = cur.fetchall()
-        conn.close()
-        result = []
-        for r in rows:
-            result.append({
-                "batch_id": r["batch_id"],
-                "product_id": r["product_id"],
-                "product_name": r["product_name"],
-                "size": r["size"],
-                "supplier_name": r["supplier_name"],
-                "purchase_price": float(r["purchase_price"]),
-                "initial_quantity": int(r["initial_quantity"]),
-                "remaining_quantity": int(r["remaining_quantity"]),
-                "arrival_date": str(r["arrival_date"]),
-                "expiry_date": str(r["expiry_date"]),
-            })
-        return result
-    except Exception:
-        return None
+    return None
 
 
 def mysql_save_batches(batches: list) -> bool:
-    try:
-        conn = _get_server_connection(include_db=True)
-        with conn.cursor() as cur:
-            cur.execute("DELETE FROM `supply_batches`;")
-            for b in batches:
-                cur.execute(
-                    """
-                    INSERT INTO `supply_batches` (
-                        `batch_id`, `product_id`, `product_name`, `size`, `supplier_name`,
-                        `purchase_price`, `initial_quantity`, `remaining_quantity`,
-                        `arrival_date`, `expiry_date`
-                    ) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s);
-                    """,
-                    (
-                        b["batch_id"], b["product_id"], b["product_name"], b["size"],
-                        b["supplier_name"], float(b["purchase_price"]),
-                        int(b["initial_quantity"]), int(b["remaining_quantity"]),
-                        str(b["arrival_date"]), str(b["expiry_date"]),
-                    ),
-                )
-        conn.close()
-        return True
-    except Exception:
-        return False
+    return False
 
 
 # ==================== СИНХРОНИЗАЦИЯ ЗАКАЗОВ (ORDERS) ====================
