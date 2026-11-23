@@ -1,15 +1,16 @@
+import json
 import os
 from datetime import date, timedelta
 from typing import Optional
 import httpx
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, JSONResponse
 
 app = FastAPI(
     title="MAD FASHION — API Gateway & Luxury Storefront UI",
-    description="Единый шлюз (API Gateway) и веб-интерфейс микросервисной системы бутика одежды MAD FASHION",
-    version="3.0.0",
+    description="Единый шлюз (API Gateway), сервис профилей/авторизации и веб-интерфейс бутика одежды MAD FASHION",
+    version="3.5.0",
 )
 
 app.add_middleware(
@@ -25,11 +26,107 @@ ORDER_URL = os.getenv("ORDER_SERVICE_URL", "http://127.0.0.1:8003")
 ANALYTICS_URL = os.getenv("ANALYTICS_SERVICE_URL", "http://127.0.0.1:8004")
 
 STATIC_DIR = os.path.join(os.path.dirname(__file__), "static")
+USERS_FILE = os.path.join(os.path.dirname(__file__), "users_db.json")
+
+DEFAULT_USERS = [
+    {
+        "login": "375445658384",
+        "country": "Беларусь",
+        "password": "123",
+        "name": "Анна Ковалева",
+        "email": "client@madfashion.by",
+        "role": "admin",
+        "addresses": [
+            {"id": "addr-1", "text": "г. Минск, пр. Победителей, д. 65, кв. 12", "is_primary": True},
+            {"id": "addr-2", "text": "г. Минск, ул. М. Танка, д. 69, кв. 5", "is_primary": False},
+        ],
+    }
+]
+
+
+def load_users():
+    if not os.path.exists(USERS_FILE):
+        save_users(DEFAULT_USERS)
+        return DEFAULT_USERS
+    with open(USERS_FILE, "r", encoding="utf-8") as f:
+        return json.load(f)
+
+
+def save_users(users):
+    with open(USERS_FILE, "w", encoding="utf-8") as f:
+        json.dump(users, f, ensure_ascii=False, indent=2)
 
 
 @app.get("/")
 def serve_index():
     return FileResponse(os.path.join(STATIC_DIR, "index.html"))
+
+
+@app.post("/api/auth/login")
+async def auth_login(request: Request):
+    body = await request.json()
+    login = str(body.get("login", "")).strip()
+    password = str(body.get("password", "")).strip()
+    country = body.get("country", "Беларусь")
+
+    if not login:
+        raise HTTPException(status_code=400, detail="Введите логин / номер телефона")
+
+    users = load_users()
+    for u in users:
+        if u["login"] == login:
+            if u["password"] and password and u["password"] != password:
+                raise HTTPException(status_code=401, detail="Неверный пароль")
+            return {"status": "ok", "user": u}
+
+    # Если пользователь вводит новый номер при входе — создаем профиль автоматически для удобства демонстрации
+    new_user = {
+        "login": login,
+        "country": country,
+        "password": password or "123",
+        "name": login,
+        "email": f"{login}@madfashion.by",
+        "role": "admin",
+        "addresses": [
+            {"id": "addr-1", "text": "г. Минск, пр. Победителей, д. 65", "is_primary": True},
+        ],
+    }
+    users.append(new_user)
+    save_users(users)
+    return {"status": "ok", "user": new_user}
+
+
+@app.post("/api/auth/register")
+async def auth_register(request: Request):
+    body = await request.json()
+    login = str(body.get("login", "")).strip()
+    password = str(body.get("password", "")).strip()
+    country = body.get("country", "Беларусь")
+    name = str(body.get("name", "")).strip() or login
+    email = str(body.get("email", "")).strip() or f"{login}@madfashion.by"
+
+    if not login or not password:
+        raise HTTPException(status_code=400, detail="Заполните логин и пароль")
+
+    users = load_users()
+    for u in users:
+        if u["login"] == login:
+            raise HTTPException(status_code=400, detail="Пользователь с таким логином уже зарегистрирован")
+
+    new_user = {
+        "login": login,
+        "country": country,
+        "password": password,
+        "name": name,
+        "email": email,
+        "role": "admin",
+        "addresses": [
+            {"id": "addr-1", "text": "г. Минск, пр. Победителей, д. 65", "is_primary": True},
+        ],
+    }
+    users.append(new_user)
+    save_users(users)
+    return {"status": "ok", "user": new_user}
 
 
 @app.get("/api/system-status")
@@ -96,7 +193,6 @@ async def proxy_create_product(request: Request):
     with httpx.Client(timeout=10.0) as client:
         r = client.post(f"{CATALOG_URL}/products", json=body)
         created = r.json()
-        # Автоматически регистрируем стартовый остаток в Warehouse Service, чтобы товар можно было сразу купить
         if r.status_code == 201 and "id" in created:
             exp_date = (date.today() + timedelta(days=90)).isoformat()
             for sz in created.get("sizes", ["S", "M"]):
@@ -137,6 +233,13 @@ def proxy_delete_product(product_id: str):
 def proxy_stock_summary():
     with httpx.Client(timeout=10.0) as client:
         r = client.get(f"{WAREHOUSE_URL}/stock/summary")
+        return JSONResponse(status_code=r.status_code, content=r.json())
+
+
+@app.get("/api/orders")
+def proxy_get_orders():
+    with httpx.Client(timeout=10.0) as client:
+        r = client.get(f"{ORDER_URL}/orders")
         return JSONResponse(status_code=r.status_code, content=r.json())
 
 

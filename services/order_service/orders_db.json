@@ -1,5 +1,63 @@
 [
   {
+    "order_id": "ORD-B3360",
+    "product_id": "prod-1",
+    "product_name": "PATRIZIA PEPE — Темно-синее мини-платье",
+    "size": "XS",
+    "quantity": 1,
+    "unit_retail_price": 1050.0,
+    "total_revenue": 1050.0,
+    "total_supplier_cost": 420.0,
+    "gross_profit": 630.0,
+    "customer_name": "Анна Ковалева",
+    "city": "Минск, Минская область, Беларусь",
+    "delivery_method": "Доставка курьером",
+    "payment_method": "Картой при получении",
+    "email": "client@madfashion.by",
+    "phone": "+375 29 345-00-29",
+    "address": "пр. Победителей, д. 65, кв. 12",
+    "comment": "",
+    "sale_date": "2026-11-23",
+    "allocations": [
+      {
+        "batch_id": "BATCH-203",
+        "supplier_name": "Tessilform S.p.A. (Флоренция, Италия)",
+        "quantity": 1,
+        "unit_purchase_price": 420.0,
+        "subtotal_cost": 420.0
+      }
+    ]
+  },
+  {
+    "order_id": "ORD-265A3",
+    "product_id": "prod-1",
+    "product_name": "PATRIZIA PEPE — Темно-синее мини-платье",
+    "size": "XS",
+    "quantity": 1,
+    "unit_retail_price": 1050.0,
+    "total_revenue": 1050.0,
+    "total_supplier_cost": 420.0,
+    "gross_profit": 630.0,
+    "customer_name": "Анна Ковалева",
+    "city": "Минск, Минская область, Беларусь",
+    "delivery_method": "Доставка курьером",
+    "payment_method": "Картой при получении",
+    "email": "client@madfashion.by",
+    "phone": "+375 29 345-00-29",
+    "address": "пр. Победителей, д. 65, кв. 12",
+    "comment": "",
+    "sale_date": "2026-11-23",
+    "allocations": [
+      {
+        "batch_id": "BATCH-203",
+        "supplier_name": "Tessilform S.p.A. (Флоренция, Италия)",
+        "quantity": 1,
+        "unit_purchase_price": 420.0,
+        "subtotal_cost": 420.0
+      }
+    ]
+  },
+  {
     "order_id": "ORD-701",
     "product_id": "prod-1",
     "product_name": "PATRIZIA PEPE — Темно-синее мини-платье",

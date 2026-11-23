@@ -3,18 +3,18 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>MAD FASHION — Осень 2026 | Бутик одежды и аксессуаров</title>
+  <title>MAD FASHION — Осень 2026 | Бутик брендовой одежды</title>
   <style>
-    /* ПАЛИТРА СО СКРИНШОТА 4 (IN COLOR BALANCE — ДОМИНИРУЮЩИЕ СВЕТЛЫЕ ЦВЕТА) */
+    /* СВЕТЛАЯ ПАЛИТРА САЙТА (ДОМИНИРУЮЩИЕ СВЕТЛЫЕ ОТТЕНКИ) */
     :root {
-      --ice-blue: #E4EDF2;      /* 1-й цвет палитры: светлый воздушно-голубой */
-      --soft-white: #F4F5F6;    /* 2-й цвет палитры: светлый молочно-серый */
-      --pure-white: #FFFFFF;    /* Основной светлый фон */
-      --taupe: #C5B4AC;         /* 3-й цвет палитры: пудровый бежево-тауповый */
-      --coffee: #634F44;        /* 4-й цвет палитры: теплый кофейно-коричневый */
-      --espresso: #2F211B;      /* 5-й цвет палитры: глубокий темный эспрессо */
-      --muted: #7D6E66;
-      --border: #E2DCD8;
+      --ice-blue: #E4EDF2;
+      --soft-white: #F4F5F6;
+      --pure-white: #FFFFFF;
+      --taupe: #C5B4AC;
+      --coffee: #634F44;
+      --espresso: #221A16;
+      --muted: #8C827D;
+      --border: #EAE6E3;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -28,48 +28,34 @@
       min-height: 100vh;
     }
     a { color: inherit; text-decoration: none; }
-    button { font-family: inherit; }
+    button, input, select, textarea { font-family: inherit; }
 
-    /* ТОНКАЯ СВЕТЛАЯ СТРОКА СТАТУСА МИКРОСЕРВИСОВ */
+    /* ТОНКАЯ ПАНЕЛЬ СТАТУСА МИКРОСЕРВИСОВ */
     .ms-top-strip {
-      background: var(--ice-blue);
-      border-bottom: 1px solid #d5e1e8;
+      background: var(--soft-white);
+      border-bottom: 1px solid var(--border);
       padding: 4px 48px;
       font-size: 11px;
-      color: var(--coffee);
+      color: var(--muted);
       display: flex;
       justify-content: space-between;
       align-items: center;
       flex-wrap: wrap;
       gap: 8px;
     }
-    .ms-indicators {
-      display: flex;
-      gap: 14px;
-      flex-wrap: wrap;
-    }
-    .ms-pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-    }
-    .ms-dot {
-      width: 7px;
-      height: 7px;
-      border-radius: 50%;
-      background: var(--taupe);
-    }
+    .ms-indicators { display: flex; gap: 14px; flex-wrap: wrap; }
+    .ms-pill { display: inline-flex; align-items: center; gap: 5px; }
+    .ms-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--taupe); }
     .ms-dot.online { background: #2e7d32; }
     .ms-dot.offline { background: #c62828; }
 
-    /* ШАПКА САЙТА (СВЕТЛАЯ, ВОЗДУШНАЯ) */
+    /* ШАПКА САЙТА */
     header {
       background: var(--pure-white);
-      padding: 18px 48px;
+      padding: 20px 48px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      border-bottom: 1px solid var(--soft-white);
       position: sticky;
       top: 0;
       z-index: 100;
@@ -77,78 +63,72 @@
     .header-left {
       display: flex;
       align-items: center;
-      gap: 32px;
+      gap: 44px;
     }
-    .main-nav {
-      display: flex;
-      gap: 26px;
-      font-size: 13px;
-      letter-spacing: 0.5px;
-      color: var(--espresso);
-    }
-    .main-nav a {
-      cursor: pointer;
-      padding: 4px 0;
-      border-bottom: 1.5px solid transparent;
-      transition: 0.15s;
-    }
-    .main-nav a:hover, .main-nav a.active {
-      color: var(--coffee);
-      border-bottom-color: var(--coffee);
-    }
-
     .logo {
       cursor: pointer;
       text-align: center;
       user-select: none;
     }
     .logo-main {
-      font-family: 'Georgia', 'Times New Roman', serif;
       font-size: 32px;
-      font-weight: 400;
+      font-weight: 300;
       letter-spacing: 4px;
-      color: var(--coffee);
+      color: var(--espresso);
       line-height: 1;
     }
     .logo-sub {
-      font-size: 8px;
+      font-size: 7.5px;
       letter-spacing: 3px;
       color: var(--muted);
       display: block;
-      margin-top: 2px;
+      margin-top: 3px;
+    }
+    .main-nav {
+      display: flex;
+      gap: 26px;
+      font-size: 12px;
+      letter-spacing: 0.7px;
+      text-transform: uppercase;
+      color: var(--espresso);
+    }
+    .main-nav a {
+      cursor: pointer;
+      padding: 4px 0;
+      border-bottom: 1px solid transparent;
+      transition: 0.15s;
+    }
+    .main-nav a:hover, .main-nav a.active {
+      border-bottom-color: var(--espresso);
     }
 
     .header-right {
       display: flex;
       align-items: center;
-      gap: 20px;
+      gap: 28px;
     }
-    .search-pill-box {
-      background: var(--soft-white);
-      border: 1px solid transparent;
-      border-radius: 4px;
-      padding: 7px 12px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      width: 190px;
-    }
-    .search-pill-box:focus-within {
-      border-color: var(--taupe);
-      background: var(--pure-white);
-    }
-    .search-pill-box input {
-      border: none;
-      background: transparent;
+    .header-region {
       font-size: 12px;
       color: var(--espresso);
-      outline: none;
-      width: 100%;
+      cursor: pointer;
     }
+    .header-phone {
+      text-align: right;
+    }
+    .header-phone .phone-num {
+      font-size: 12.5px;
+      font-weight: 500;
+    }
+    .header-phone .phone-hours {
+      font-size: 10px;
+      color: var(--muted);
+    }
+
+    /* ИКОНКИ В ШАПКЕ ТОЧЬ-В-ТОЧЬ КАК НА СКРИНШОТЕ 6 */
     .header-icons {
       display: flex;
       align-items: center;
-      gap: 16px;
+      gap: 20px;
     }
     .icon-btn {
       background: none;
@@ -158,42 +138,46 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      color: var(--espresso);
-      padding: 4px;
-      transition: color 0.15s;
+      color: #222;
+      padding: 2px;
     }
-    .icon-btn:hover { color: var(--coffee); }
+    .icon-btn svg {
+      display: block;
+    }
     .icon-badge {
       position: absolute;
-      bottom: -2px;
-      right: -4px;
-      background: var(--coffee);
-      color: #fff;
-      font-size: 9px;
-      font-weight: 700;
-      width: 15px;
-      height: 15px;
+      bottom: -4px;
+      right: -5px;
+      background: #2b2b2b;
+      color: #ffffff;
+      font-size: 10px;
+      font-weight: 600;
+      width: 16px;
+      height: 16px;
       border-radius: 50%;
       display: none;
       align-items: center;
       justify-content: center;
+      line-height: 1;
     }
     .icon-badge.visible { display: flex; }
 
-    .admin-btn-header {
-      background: var(--soft-white);
-      border: 1px solid var(--taupe);
-      color: var(--espresso);
-      padding: 6px 12px;
-      border-radius: 4px;
-      font-size: 11px;
-      cursor: pointer;
-      transition: 0.15s;
+    /* ВЫДВИЖНАЯ СТРОКА ПОИСКА ПО КЛИКУ НА ЛУПУ */
+    .search-drawer {
+      max-width: 560px;
+      margin: 0 auto 16px;
+      display: none;
+      align-items: center;
+      border-bottom: 1px solid var(--espresso);
+      padding: 6px 4px;
     }
-    .admin-btn-header:hover, .admin-btn-header.active {
-      background: var(--coffee);
-      border-color: var(--coffee);
-      color: #fff;
+    .search-drawer.open { display: flex; }
+    .search-drawer input {
+      border: none;
+      width: 100%;
+      font-size: 13px;
+      outline: none;
+      background: transparent;
     }
 
     /* ОСНОВНОЙ КОНТЕЙНЕР */
@@ -202,39 +186,40 @@
       max-width: 1380px;
       width: 100%;
       margin: 0 auto;
-      padding: 16px 48px 80px;
+      padding: 10px 48px 80px;
     }
     .page-view { display: none; }
     .page-view.active { display: block; }
 
     .breadcrumbs {
       text-align: center;
-      font-size: 12px;
-      color: var(--muted);
-      margin: 14px 0 10px;
+      font-size: 11px;
+      color: #9e9e9e;
+      letter-spacing: 0.4px;
+      margin: 12px 0 8px;
     }
     .breadcrumbs span { cursor: pointer; }
     .breadcrumbs span:hover { color: var(--espresso); }
     .page-title {
       text-align: center;
-      font-size: 22px;
+      font-size: 21px;
       font-weight: 400;
-      letter-spacing: 1.5px;
+      letter-spacing: 1.2px;
       text-transform: uppercase;
-      margin-bottom: 26px;
+      margin-bottom: 22px;
       color: var(--espresso);
     }
 
     /* ============================================================ */
-    /* ГЛАВНАЯ СТРАНИЦА (КАК НА СКРИНШОТЕ 2 — LIZET / MAD ОСЕНЬ 2026)*/
+    /* ГЛАВНАЯ СТРАНИЦА (БАННЕР ОСЕНЬ 2026 + НОВИНКИ)               */
     /* ============================================================ */
     .hero-banner {
       width: 100%;
-      height: 490px;
+      height: 480px;
       background: var(--ice-blue);
       position: relative;
       overflow: hidden;
-      margin-bottom: 48px;
+      margin-bottom: 44px;
       display: flex;
       align-items: center;
       cursor: pointer;
@@ -243,13 +228,12 @@
       width: 100%;
       height: 100%;
       object-fit: cover;
-      object-position: center 25%;
-      filter: brightness(0.92);
+      object-position: center 22%;
     }
     .hero-overlay {
       position: absolute;
       inset: 0;
-      background: linear-gradient(90deg, rgba(47,33,27,0.38) 0%, rgba(47,33,27,0.08) 60%, rgba(255,255,255,0) 100%);
+      background: linear-gradient(90deg, rgba(34,26,22,0.34) 0%, rgba(34,26,22,0.06) 60%, rgba(255,255,255,0) 100%);
       display: flex;
       flex-direction: column;
       justify-content: center;
@@ -257,18 +241,10 @@
     }
     .hero-title {
       font-family: 'Georgia', 'Times New Roman', serif;
-      font-size: 44px;
+      font-size: 42px;
       font-weight: 400;
       color: #ffffff;
-      letter-spacing: 1.5px;
-      text-shadow: 0 2px 16px rgba(0,0,0,0.25);
-    }
-    .hero-subtitle {
-      margin-top: 12px;
-      font-size: 13px;
-      color: var(--soft-white);
-      letter-spacing: 1px;
-      text-transform: uppercase;
+      letter-spacing: 1.2px;
     }
 
     .home-novelties-header {
@@ -276,7 +252,6 @@
       align-items: center;
       justify-content: space-between;
       margin-bottom: 24px;
-      position: relative;
     }
     .slider-arrow-btn {
       width: 34px;
@@ -284,28 +259,20 @@
       border-radius: 50%;
       border: 1px solid var(--taupe);
       background: var(--pure-white);
-      color: var(--coffee);
+      color: var(--espresso);
       display: flex;
       align-items: center;
       justify-content: center;
       cursor: pointer;
-      font-size: 15px;
-      transition: 0.15s;
-    }
-    .slider-arrow-btn:hover {
-      background: var(--coffee);
-      color: #fff;
-      border-color: var(--coffee);
+      font-size: 14px;
     }
     .home-novelties-title {
       font-family: 'Georgia', 'Times New Roman', serif;
-      font-size: 24px;
+      font-size: 22px;
       font-weight: 400;
-      letter-spacing: 2px;
+      letter-spacing: 1.8px;
       text-transform: uppercase;
-      color: var(--espresso);
     }
-
     .novelties-grid-5 {
       display: grid;
       grid-template-columns: repeat(5, 1fr);
@@ -314,20 +281,16 @@
     @media (max-width: 1150px) {
       .novelties-grid-5 { grid-template-columns: repeat(3, 1fr); }
     }
-    @media (max-width: 720px) {
-      .novelties-grid-5 { grid-template-columns: repeat(2, 1fr); }
-    }
     .novelty-card {
       background: var(--pure-white);
       border: 1px solid var(--border);
       border-radius: 6px;
       padding: 10px;
       cursor: pointer;
-      transition: box-shadow 0.2s, transform 0.2s;
+      transition: 0.2s;
     }
     .novelty-card:hover {
-      box-shadow: 0 8px 24px rgba(99, 79, 68, 0.1);
-      transform: translateY(-2px);
+      box-shadow: 0 8px 22px rgba(0,0,0,0.06);
     }
     .novelty-img-box {
       background: var(--soft-white);
@@ -346,16 +309,16 @@
       position: absolute;
       top: 10px;
       left: 10px;
-      background: var(--espresso);
+      background: #2b2b2b;
       color: #fff;
-      font-size: 11px;
+      font-size: 10.5px;
       font-weight: 600;
-      padding: 4px 10px;
+      padding: 4px 9px;
       border-radius: 3px;
     }
 
     /* ============================================================ */
-    /* КАТАЛОГ И МЯГКИЕ КВАДРАТНЫЕ ЧЕКБОКСЫ (СКРИНШОТЫ 1 и 3)       */
+    /* КАТАЛОГ И МЯГКИЕ КВАДРАТНЫЕ ЧЕКБОКСЫ                         */
     /* ============================================================ */
     .catalog-top-controls {
       display: flex;
@@ -378,8 +341,6 @@
     }
     @media (max-width: 960px) {
       .catalog-layout { grid-template-columns: 1fr; }
-      header { padding: 14px 20px; }
-      main { padding: 14px 20px 60px; }
     }
 
     .sidebar-section {
@@ -397,8 +358,6 @@
       cursor: pointer;
       user-select: none;
       margin-bottom: 10px;
-      color: var(--espresso);
-      font-weight: 500;
     }
     .filter-list {
       list-style: none;
@@ -411,7 +370,7 @@
       align-items: flex-start;
       justify-content: space-between;
       font-size: 12.5px;
-      color: var(--espresso);
+      color: #333;
       cursor: pointer;
     }
     .filter-item label {
@@ -420,37 +379,29 @@
       gap: 9px;
       cursor: pointer;
       width: 100%;
-      line-height: 1.3;
     }
-
-    /* КАСТОМНЫЙ МЯГКИЙ КВАДРАТ ДЛЯ ВСЕХ КАТЕГОРИЙ, РАЗМЕРОВ, БРЕНДОВ И ЦВЕТОВ */
     .soft-square-cb {
       appearance: none;
       -webkit-appearance: none;
       width: 14px;
       height: 14px;
       min-width: 14px;
-      border: 1px solid #8c7f78;
-      border-radius: 3px; /* Мягкий квадрат как на скриншоте 1 */
+      border: 1px solid #8c827d;
+      border-radius: 2.5px;
       background: var(--pure-white);
       cursor: pointer;
       position: relative;
       margin-top: 1px;
-      transition: 0.12s;
-    }
-    .soft-square-cb:hover {
-      border-color: var(--coffee);
     }
     .soft-square-cb:checked {
-      border-color: var(--espresso);
-      background: var(--pure-white);
+      border-color: #222;
     }
     .soft-square-cb:checked::after {
       content: "";
       position: absolute;
       inset: 2px;
-      background: var(--espresso);
-      border-radius: 1.5px;
+      background: #222;
+      border-radius: 1px;
     }
 
     .products-grid-4 {
@@ -458,10 +409,10 @@
       grid-template-columns: repeat(4, 1fr);
       gap: 28px 20px;
     }
-    @media (max-width: 1200px) {
+    @media (max-width: 1150px) {
       .products-grid-4 { grid-template-columns: repeat(3, 1fr); }
     }
-    @media (max-width: 820px) {
+    @media (max-width: 780px) {
       .products-grid-4 { grid-template-columns: repeat(2, 1fr); }
     }
 
@@ -489,8 +440,8 @@
     }
     .fashion-card-brand {
       font-size: 13px;
-      font-weight: 500;
-      letter-spacing: 0.6px;
+      font-weight: 400;
+      letter-spacing: 0.5px;
       text-transform: uppercase;
       color: var(--espresso);
       margin-bottom: 3px;
@@ -502,11 +453,297 @@
     }
     .fashion-card-price {
       font-size: 13px;
-      font-weight: 600;
-      color: var(--coffee);
+      font-weight: 500;
+      color: var(--espresso);
     }
 
-    /* ДЕТАЛЬНАЯ КАРТОЧКА ТОВАРА */
+    /* ============================================================ */
+    /* СТРАНИЦА "ЛИЧНЫЙ КАБИНЕТ" (ТОЧЬ-В-ТОЧЬ СКРИНШОТЫ 3, 4, 5)    */
+    /* ============================================================ */
+    .lk-greeting {
+      text-align: center;
+      font-size: 13px;
+      color: #222;
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .lk-logout-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: #444;
+      display: inline-flex;
+      align-items: center;
+      padding: 2px;
+    }
+    .lk-tabs-bar {
+      max-width: 760px;
+      margin: 0 auto 34px;
+      border: 1px solid #f0f0f0;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      text-align: center;
+      background: var(--pure-white);
+    }
+    .lk-tab-item {
+      padding: 13px 10px;
+      font-size: 12px;
+      color: #999;
+      cursor: pointer;
+      transition: 0.15s;
+    }
+    .lk-tab-item:hover { color: #333; }
+    .lk-tab-item.active {
+      color: #111;
+      font-weight: 500;
+    }
+    .lk-subview { display: none; }
+    .lk-subview.active { display: block; }
+
+    /* Вкладка "Ваши заказы" (Скриншот 3) */
+    .lk-orders-subtabs {
+      display: flex;
+      justify-content: center;
+      gap: 32px;
+      margin-bottom: 28px;
+      font-size: 13.5px;
+    }
+    .lk-orders-subtab {
+      color: #999;
+      cursor: pointer;
+    }
+    .lk-orders-subtab.active {
+      color: #111;
+    }
+    .lk-empty-orders {
+      text-align: center;
+      padding: 10px 0 30px;
+    }
+    .lk-empty-orders h3 {
+      font-size: 18px;
+      font-weight: 400;
+      letter-spacing: 0.6px;
+      text-transform: uppercase;
+      margin-bottom: 22px;
+    }
+    .btn-thin-box {
+      background: var(--pure-white);
+      color: #222;
+      border: 1px solid #333;
+      padding: 10px 22px;
+      font-size: 12px;
+      cursor: pointer;
+      transition: 0.15s;
+    }
+    .btn-thin-box:hover {
+      background: #222;
+      color: #fff;
+    }
+    .btn-thin-light {
+      background: var(--pure-white);
+      color: #888;
+      border: 1px solid #d5d5d5;
+      padding: 10px 24px;
+      font-size: 12px;
+      cursor: pointer;
+      transition: 0.15s;
+    }
+    .btn-thin-light:hover {
+      border-color: #222;
+      color: #222;
+    }
+
+    /* Оформленная карточка заказа в Личном кабинете */
+    .lk-framed-box {
+      max-width: 540px;
+      margin: 0 auto 24px;
+      border: 1px solid #f0f0f0;
+      padding: 28px 34px;
+      background: var(--pure-white);
+      box-shadow: 0 0 0 4px #fafafa;
+    }
+
+    /* Вкладка "Адрес доставки" (Скриншот 4) */
+    .lk-address-intro {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+    .lk-address-intro h4 {
+      font-size: 14px;
+      font-weight: 400;
+      margin-bottom: 8px;
+    }
+    .lk-address-intro p {
+      font-size: 11.5px;
+      color: #888;
+      max-width: 440px;
+      margin: 0 auto;
+      line-height: 1.5;
+    }
+    .address-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 7px 0;
+      font-size: 12px;
+    }
+    .address-row-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: #444;
+    }
+    .address-row-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .btn-primary-addr {
+      border: 1px solid #e5e5e5;
+      background: #fff;
+      color: #777;
+      font-size: 10px;
+      padding: 4px 12px;
+      cursor: pointer;
+    }
+    .btn-primary-addr.is-main {
+      border-color: #ccc;
+      color: #333;
+    }
+
+    /* МОДАЛЬНОЕ ОКНО АВТОРИЗАЦИИ И РЕГИСТРАЦИИ (СКРИНШОТЫ 1 и 2) */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.55);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      padding: 20px;
+    }
+    .modal-backdrop.open { display: flex; }
+
+    .auth-modal-window {
+      background: #ffffff;
+      width: 100%;
+      max-width: 460px;
+      padding: 44px 48px 40px;
+      position: relative;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.22);
+    }
+    .modal-close {
+      position: absolute;
+      top: 16px;
+      right: 20px;
+      background: none;
+      border: none;
+      font-size: 20px;
+      font-weight: 300;
+      cursor: pointer;
+      color: #666;
+    }
+    .auth-tabs-box {
+      border: 1px solid #efefef;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      text-align: center;
+      margin-bottom: 28px;
+    }
+    .auth-tab-btn {
+      padding: 14px 10px;
+      font-size: 15px;
+      color: #999;
+      background: none;
+      border: none;
+      cursor: pointer;
+    }
+    .auth-tab-btn.active {
+      color: #222;
+    }
+    .auth-subtitle {
+      text-align: center;
+      font-size: 12.5px;
+      color: #888;
+      line-height: 1.55;
+      margin-bottom: 24px;
+    }
+    .auth-login-group {
+      position: relative;
+      display: grid;
+      grid-template-columns: 118px 1fr;
+      border: 1px solid #e0e0e0;
+      margin-bottom: 20px;
+      height: 46px;
+    }
+    .auth-float-label {
+      position: absolute;
+      top: -8px;
+      left: 12px;
+      background: #fff;
+      padding: 0 5px;
+      font-size: 10.5px;
+      color: #999;
+      z-index: 2;
+    }
+    .auth-country-select {
+      border: none;
+      border-right: 1px solid #e0e0e0;
+      background: #fff;
+      padding: 0 10px;
+      font-size: 12.5px;
+      color: #222;
+      outline: none;
+      cursor: pointer;
+    }
+    .auth-login-input {
+      border: none;
+      padding: 0 14px;
+      font-size: 13px;
+      outline: none;
+      width: 100%;
+    }
+    .auth-field-group {
+      position: relative;
+      border: 1px solid #e0e0e0;
+      margin-bottom: 20px;
+      height: 46px;
+    }
+    .auth-field-group input {
+      border: none;
+      width: 100%;
+      height: 100%;
+      padding: 0 14px;
+      font-size: 13px;
+      outline: none;
+    }
+    .auth-remember-wrap {
+      margin-bottom: 24px;
+    }
+    .auth-remember-lbl {
+      display: block;
+      font-size: 12.5px;
+      color: #999;
+      margin-top: 6px;
+    }
+    .auth-center-actions {
+      text-align: center;
+    }
+    .auth-forgot-link {
+      display: inline-block;
+      margin-top: 18px;
+      font-size: 12.5px;
+      color: #888;
+      border-bottom: 1px solid #888;
+      padding-bottom: 2px;
+      cursor: pointer;
+    }
+
+    /* ДЕТАЛЬНАЯ КАРТОЧКА ТОВАРА, КОРЗИНА И ОФОРМЛЕНИЕ ЗАКАЗА */
     .product-detail-layout {
       display: grid;
       grid-template-columns: 1.55fr 1fr;
@@ -544,11 +781,6 @@
       text-transform: uppercase;
       margin-bottom: 4px;
     }
-    .detail-brand-badge {
-      background: var(--soft-white);
-      padding: 8px 10px;
-      font-size: 11px;
-    }
     .detail-name {
       font-size: 13px;
       color: var(--muted);
@@ -556,8 +788,7 @@
     }
     .detail-price {
       font-size: 17px;
-      font-weight: 600;
-      color: var(--coffee);
+      font-weight: 500;
       margin-bottom: 20px;
     }
     .size-selector {
@@ -570,18 +801,16 @@
       width: 42px;
       height: 42px;
       border: 1px solid var(--border);
-      border-radius: 3px;
+      border-radius: 2.5px;
       background: var(--pure-white);
       display: flex;
       align-items: center;
       justify-content: center;
       font-size: 12px;
       cursor: pointer;
-      transition: 0.15s;
     }
     .size-box.active {
-      border-color: var(--coffee);
-      background: var(--soft-white);
+      border-color: var(--espresso);
       font-weight: 600;
     }
     .size-chart-link {
@@ -598,25 +827,20 @@
       margin-bottom: 24px;
     }
     .btn-primary-dark {
-      background: var(--espresso);
+      background: #141414;
       color: #fff;
-      border: 1px solid var(--espresso);
+      border: 1px solid #141414;
       padding: 14px 28px;
       font-size: 12px;
       letter-spacing: 1px;
       text-transform: uppercase;
       cursor: pointer;
       min-width: 215px;
-      transition: 0.2s;
-    }
-    .btn-primary-dark:hover {
-      background: var(--coffee);
-      border-color: var(--coffee);
     }
     .btn-fav-outline {
       width: 46px;
       height: 46px;
-      border: 1px solid var(--espresso);
+      border: 1px solid #141414;
       background: var(--pure-white);
       display: flex;
       align-items: center;
@@ -625,8 +849,7 @@
       font-size: 18px;
     }
     .btn-fav-outline.in-fav {
-      background: var(--coffee);
-      border-color: var(--coffee);
+      background: #141414;
       color: #fff;
     }
     .detail-links {
@@ -644,7 +867,6 @@
       gap: 10px;
       cursor: pointer;
     }
-    .detail-link-row:hover { text-decoration: underline; }
     .about-brand-block h4 {
       font-size: 12px;
       letter-spacing: 0.8px;
@@ -682,18 +904,6 @@
     }
     .accordion-body.open { display: block; }
 
-    /* МОДАЛЬНОЕ ОКНО "НАЛИЧИЕ В МАГАЗИНАХ" */
-    .modal-backdrop {
-      position: fixed;
-      inset: 0;
-      background: rgba(47, 33, 27, 0.45);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      z-index: 1000;
-      padding: 20px;
-    }
-    .modal-backdrop.open { display: flex; }
     .modal-window {
       background: var(--pure-white);
       width: 100%;
@@ -701,16 +911,6 @@
       padding: 40px 48px;
       position: relative;
       box-shadow: 0 20px 50px rgba(0,0,0,0.2);
-    }
-    .modal-close {
-      position: absolute;
-      top: 20px;
-      right: 24px;
-      background: none;
-      border: none;
-      font-size: 22px;
-      cursor: pointer;
-      color: var(--muted);
     }
     .modal-title {
       text-align: center;
@@ -739,7 +939,6 @@
       width: 100%;
       aspect-ratio: 16 / 10;
       object-fit: cover;
-      background: var(--soft-white);
     }
     .modal-store-details {
       font-size: 12px;
@@ -747,19 +946,8 @@
       flex-direction: column;
       gap: 16px;
     }
-    .modal-store-details a {
-      color: var(--muted);
-      text-decoration: underline;
-      font-size: 11px;
-      display: inline-block;
-      margin-top: 3px;
-    }
 
-    /* КОРЗИНА */
-    .cart-container {
-      max-width: 820px;
-      margin: 0 auto;
-    }
+    .cart-container { max-width: 820px; margin: 0 auto; }
     .cart-item-row {
       display: grid;
       grid-template-columns: 150px 1fr auto auto auto;
@@ -775,11 +963,7 @@
       position: relative;
       overflow: hidden;
     }
-    .cart-img-box img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
+    .cart-img-box img { width: 100%; height: 100%; object-fit: cover; }
     .cart-remove-btn {
       position: absolute;
       top: 6px;
@@ -788,7 +972,6 @@
       border: none;
       font-size: 16px;
       cursor: pointer;
-      color: var(--espresso);
     }
     .cart-qty-box {
       display: inline-flex;
@@ -798,17 +981,10 @@
       gap: 12px;
       font-size: 13px;
     }
-    .cart-qty-box button {
-      background: none;
-      border: none;
-      cursor: pointer;
-      color: var(--muted);
-      font-size: 12px;
-    }
+    .cart-qty-box button { background: none; border: none; cursor: pointer; }
     .cart-summary-box {
       margin-top: 32px;
-      border: 1px solid var(--border);
-      background: var(--soft-white);
+      border: 1px solid #f0f0f0;
       padding: 28px 32px;
       display: flex;
       justify-content: space-between;
@@ -816,43 +992,27 @@
       flex-wrap: wrap;
       gap: 20px;
     }
-    .coupon-field-wrap {
+    .float-field {
       position: relative;
-      margin-bottom: 18px;
     }
-    .coupon-label {
+    .float-field label {
       position: absolute;
       top: -8px;
       left: 10px;
-      background: var(--soft-white);
-      padding: 0 6px;
-      font-size: 10px;
-      color: var(--muted);
-    }
-    .coupon-input {
-      border: 1px solid var(--taupe);
       background: var(--pure-white);
-      padding: 12px 14px;
-      width: 240px;
+      padding: 0 5px;
+      font-size: 10px;
+      color: #999;
+    }
+    .float-field input, .float-field textarea, .float-field select {
+      width: 100%;
+      border: 1px solid #e5e5e5;
+      padding: 12px;
       font-size: 12px;
       outline: none;
-    }
-    .btn-outline-dark {
       background: var(--pure-white);
-      color: var(--espresso);
-      border: 1px solid var(--espresso);
-      padding: 11px 22px;
-      font-size: 12px;
-      cursor: pointer;
-      transition: 0.15s;
-    }
-    .btn-outline-dark:hover {
-      background: var(--coffee);
-      border-color: var(--coffee);
-      color: #fff;
     }
 
-    /* ОФОРМЛЕНИЕ ЗАКАЗА */
     .checkout-layout {
       max-width: 980px;
       margin: 24px auto 0;
@@ -861,17 +1021,10 @@
       gap: 36px;
       align-items: start;
     }
-    @media (max-width: 860px) {
-      .checkout-layout { grid-template-columns: 1fr; }
-    }
-    .checkout-section-title {
-      font-size: 16px;
-      font-weight: 400;
-      margin: 24px 0 14px;
-    }
+    .checkout-section-title { font-size: 16px; font-weight: 400; margin: 24px 0 14px; }
     .city-input-wrap {
       position: relative;
-      border: 1px solid var(--border);
+      border: 1px solid #e5e5e5;
       padding: 12px 14px;
       display: flex;
       align-items: center;
@@ -884,142 +1037,18 @@
       background: var(--pure-white);
       padding: 0 6px;
       font-size: 10px;
-      color: var(--muted);
+      color: #999;
     }
-    .city-input-wrap input {
-      border: none;
-      width: 100%;
-      font-size: 12px;
-      outline: none;
-    }
-    .radio-grid-2 {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 16px 24px;
-    }
-    .radio-option {
-      display: flex;
-      align-items: flex-start;
-      gap: 10px;
-      font-size: 12px;
-      cursor: pointer;
-    }
-    .radio-option input {
-      accent-color: var(--coffee);
-      margin-top: 2px;
-    }
-    .radio-sub {
-      font-size: 10px;
-      color: var(--muted);
-      margin-top: 3px;
-    }
-    .form-row-2 {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 16px;
-      margin-bottom: 16px;
-    }
-    .form-row-3 {
-      display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
-      gap: 16px;
-      margin-bottom: 16px;
-    }
-    .float-field {
-      position: relative;
-    }
-    .float-field label {
-      position: absolute;
-      top: -8px;
-      left: 10px;
-      background: var(--pure-white);
-      padding: 0 5px;
-      font-size: 10px;
-      color: var(--muted);
-    }
-    .float-field input, .float-field textarea, .float-field select {
-      width: 100%;
-      border: 1px solid var(--border);
-      padding: 12px;
-      font-size: 12px;
-      outline: none;
-      background: var(--pure-white);
-    }
-    .checkout-summary-card {
-      border: 1px solid var(--border);
-      background: var(--soft-white);
-      padding: 24px;
-    }
+    .city-input-wrap input { border: none; width: 100%; font-size: 12px; outline: none; }
+    .radio-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px 24px; }
+    .radio-option { display: flex; align-items: flex-start; gap: 10px; font-size: 12px; cursor: pointer; }
+    .radio-option input { accent-color: #111; margin-top: 2px; }
+    .radio-sub { font-size: 10px; color: #999; margin-top: 3px; }
+    .form-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+    .form-row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+    .checkout-summary-card { border: 1px solid #f0f0f0; padding: 24px; }
 
-    /* ============================================================ */
-    /* АДМИН-ПАНЕЛЬ: ДОБАВЛЕНИЕ ТОВАРОВ И УПРАВЛЕНИЕ ЦЕНАМИ         */
-    /* ============================================================ */
-    .admin-card {
-      border: 1px solid var(--border);
-      background: var(--soft-white);
-      border-radius: 6px;
-      padding: 26px;
-      margin-bottom: 28px;
-    }
-    .admin-card h3 {
-      font-size: 15px;
-      font-weight: 500;
-      text-transform: uppercase;
-      letter-spacing: 0.8px;
-      margin-bottom: 18px;
-      color: var(--espresso);
-    }
-    .admin-form-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
-      gap: 14px;
-      margin-bottom: 16px;
-    }
-    .admin-field {
-      display: flex;
-      flex-direction: column;
-      gap: 5px;
-    }
-    .admin-field label {
-      font-size: 11px;
-      color: var(--coffee);
-      font-weight: 600;
-    }
-    .admin-field input, .admin-field select {
-      border: 1px solid var(--taupe);
-      background: var(--pure-white);
-      padding: 9px 11px;
-      border-radius: 4px;
-      font-size: 12.5px;
-      color: var(--espresso);
-    }
-    table.admin-table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 12.5px;
-      background: var(--pure-white);
-    }
-    table.admin-table th, table.admin-table td {
-      border-bottom: 1px solid var(--border);
-      padding: 12px 10px;
-      text-align: left;
-      vertical-align: middle;
-    }
-    table.admin-table th {
-      background: var(--ice-blue);
-      font-weight: 600;
-      color: var(--espresso);
-    }
-    .price-edit-input {
-      width: 105px;
-      border: 1px solid var(--taupe);
-      padding: 6px 8px;
-      border-radius: 3px;
-      font-size: 12.5px;
-      font-weight: 600;
-    }
-
-    /* СВЕТЛО-КОФЕЙНЫЙ / ЭСПРЕССО ФУТЕР В ТОН ПАЛИТРЕ 4 */
+    /* ФУТЕР */
     footer {
       background: var(--soft-white);
       border-top: 1px solid var(--border);
@@ -1034,15 +1063,11 @@
       grid-template-columns: 1fr 1fr 1fr 1.3fr;
       gap: 36px;
     }
-    @media (max-width: 860px) {
-      .footer-grid { grid-template-columns: 1fr 1fr; }
-    }
     .footer-col h5 {
       font-size: 11px;
       letter-spacing: 1px;
       text-transform: uppercase;
       margin-bottom: 16px;
-      color: var(--coffee);
     }
     .footer-col ul {
       list-style: none;
@@ -1065,7 +1090,6 @@
     .newsletter-input-wrap input {
       background: transparent;
       border: none;
-      color: var(--espresso);
       font-size: 12px;
       outline: none;
       width: 100%;
@@ -1075,12 +1099,11 @@
       position: fixed;
       bottom: 24px;
       right: 24px;
-      background: var(--espresso);
+      background: #222;
       color: #fff;
       padding: 14px 20px;
-      border-radius: 4px;
       font-size: 12px;
-      box-shadow: 0 10px 25px rgba(47,33,27,0.25);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
       display: none;
       z-index: 2000;
       max-width: 420px;
@@ -1091,72 +1114,99 @@
 
   <!-- ВЕРХНЯЯ ПАНЕЛЬ СТАТУСА МИКРОСЕРВИСОВ -->
   <div class="ms-top-strip">
-    <div>Микросервисная платформа бутика <b>MAD FASHION</b></div>
+    <div>Микросервисная платформа <b>MAD FASHION</b></div>
     <div class="ms-indicators" id="ms-status-bar">Проверка сервисов...</div>
   </div>
 
-  <!-- HEADER (БЕЗ БРЕНДОВ, БЛОГА, RUNWAY И СКЛАДА) -->
+  <!-- HEADER -->
   <header>
     <div class="header-left">
+      <div class="logo" onclick="navigateTo('home')">
+        <span class="logo-main">MAD</span>
+        <span class="logo-sub">— FASHION —</span>
+      </div>
       <nav class="main-nav">
-        <a id="nav-home" class="active" onclick="navigateTo('home')">Главная</a>
-        <a id="nav-novelties" onclick="openCatalogSection('ДЛЯ НЕЁ', true)">Новинки</a>
-        <a id="nav-women" onclick="openCatalogSection('ДЛЯ НЕЁ', false)">Для неё ⌄</a>
-        <a id="nav-men" onclick="openCatalogSection('ДЛЯ НЕГО', false)">Для него ⌄</a>
+        <a id="nav-home" class="active" onclick="navigateTo('home')">ГЛАВНАЯ</a>
+        <a id="nav-women" onclick="openCatalogSection('ДЛЯ НЕЁ', false)">ДЛЯ НЕЁ ⌄</a>
+        <a id="nav-men" onclick="openCatalogSection('ДЛЯ НЕГО', false)">ДЛЯ НЕГО ⌄</a>
+        <a id="nav-novelties" onclick="openCatalogSection('ДЛЯ НЕЁ', true)">НОВИНКИ</a>
       </nav>
     </div>
 
-    <div class="logo" onclick="navigateTo('home')">
-      <span class="logo-main">MAD</span>
-      <span class="logo-sub">— FASHION —</span>
-    </div>
-
     <div class="header-right">
-      <div class="search-pill-box">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-        <input type="text" id="header-search-input" placeholder="Поиск" oninput="onHeaderSearch(this.value)" />
+      <div class="header-region">Беларусь ⌄</div>
+      <div class="header-phone">
+        <div class="phone-num">+375 29 345-00-29</div>
+        <div class="phone-hours">Пн-Вс с 10:00 до 19:00</div>
       </div>
 
+      <!-- 4 ИКОНКИ ТОЧЬ-В-ТОЧЬ КАК НА СКРИНШОТЕ 6 -->
       <div class="header-icons">
-        <button class="icon-btn" title="Избранное" onclick="navigateTo('favorites')">
-          <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+        <!-- 1. Поиск (Лупа) -->
+        <button class="icon-btn" title="Поиск" onclick="toggleSearchBar()">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="10.5" cy="10.5" r="7"></circle>
+            <line x1="15.5" y1="15.5" x2="21" y2="21"></line>
+          </svg>
+        </button>
+
+        <!-- 2. Личный профиль / Авторизация -->
+        <button class="icon-btn" title="Личный кабинет" onclick="onProfileIconClick()">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="7.5" r="3.2"></circle>
+            <path d="M5.5 19.5c0-3 2.9-5 6.5-5s6.5 2 6.5 5Z"></path>
+          </svg>
+        </button>
+
+        <!-- 3. Избранное -->
+        <button class="icon-btn" title="Избранное" onclick="openFavoritesFromHeader()">
+          <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+          </svg>
           <span class="icon-badge" id="fav-badge">0</span>
         </button>
+
+        <!-- 4. Корзина -->
         <button class="icon-btn" title="Корзина" onclick="navigateTo('cart')">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="4.5" y="7" width="15" height="13.5" rx="1.5"></rect>
+            <path d="M8.5 7V5.5a3.5 3.5 0 0 1 7 0V7"></path>
+          </svg>
           <span class="icon-badge" id="cart-badge">0</span>
-        </button>
-        <button id="nav-admin" class="admin-btn-header" title="Управление товарами и ценами" onclick="navigateTo('admin')">
-          👤 Админ: Товары и цены
         </button>
       </div>
     </div>
   </header>
 
   <main>
+    <!-- ВЫДВИЖНАЯ СТРОКА ПОИСКА -->
+    <div class="search-drawer" id="search-drawer">
+      <input type="text" id="header-search-input" placeholder="Введите название модели, бренд или артикул..." oninput="onHeaderSearch(this.value)" />
+      <span style="cursor:pointer; font-size:13px; color:#888;" onclick="toggleSearchBar()">✕</span>
+    </div>
+
     <!-- ================================================================= -->
-    <!-- СТРАНИЦА 0: ГЛАВНАЯ СТРАНИЦА (КАК НА СКРИНШОТЕ 2 — ОСЕНЬ 2026)    -->
+    <!-- СТРАНИЦА 0: ГЛАВНАЯ СТРАНИЦА (MAD - ОСЕНЬ 2026)                   -->
     <!-- ================================================================= -->
     <section id="view-home" class="page-view active">
       <div class="hero-banner" onclick="openCatalogSection('ДЛЯ НЕЁ', false)">
         <img src="https://images.unsplash.com/photo-1490481651871-ab68de25d43d?auto=format&fit=crop&w=1600&q=85" alt="MAD - осень 2026" />
         <div class="hero-overlay">
           <h1 class="hero-title">MAD - осень 2026</h1>
-          <div class="hero-subtitle">Смотреть новую коллекцию →</div>
         </div>
       </div>
 
       <div class="home-novelties-header">
-        <button class="slider-arrow-btn" onclick="shiftNovelties(-1)" title="Назад">←</button>
+        <button class="slider-arrow-btn" onclick="shiftNovelties(-1)">←</button>
         <h2 class="home-novelties-title">НОВИНКИ</h2>
-        <button class="slider-arrow-btn" onclick="shiftNovelties(1)" title="Вперед">→</button>
+        <button class="slider-arrow-btn" onclick="shiftNovelties(1)">→</button>
       </div>
 
       <div class="novelties-grid-5" id="home-novelties-grid"></div>
     </section>
 
     <!-- ================================================================= -->
-    <!-- СТРАНИЦА 1: КАТАЛОГ ("ДЛЯ НЕЁ" И "ДЛЯ НЕГО")                      -->
+    <!-- СТРАНИЦА 1: КАТАЛОГ ("ДЛЯ НЕЁ" / "ДЛЯ НЕГО")                      -->
     <!-- ================================================================= -->
     <section id="view-catalog" class="page-view">
       <div class="breadcrumbs">
@@ -1173,22 +1223,17 @@
       </div>
 
       <div class="catalog-layout">
-        <!-- ЛЕВЫЙ САЙДБАР: ВСЕ ЭЛЕМЕНТЫ ВЫБОРА — МЯГКИЙ КВАДРАТ (СКРИНШОТ 1 И 3) -->
         <aside>
-          <!-- ОДЕЖДА -->
           <div class="sidebar-section">
             <div class="sidebar-title" onclick="toggleSidebarSub('sidebar-categories')">
-              <span>ОДЕЖДА</span>
-              <span>^</span>
+              <span>ОДЕЖДА</span><span>^</span>
             </div>
             <ul class="filter-list" id="sidebar-categories"></ul>
           </div>
 
-          <!-- РАЗМЕРЫ (МЯГКИЕ КВАДРАТЫ ВМЕСТО КРУГОВ!) -->
           <div class="sidebar-section">
             <div class="sidebar-title" onclick="toggleSidebarSub('sub-sizes')">
-              <span>РАЗМЕРЫ</span>
-              <span>⌄</span>
+              <span>РАЗМЕРЫ</span><span>⌄</span>
             </div>
             <ul class="filter-list" id="sub-sizes">
               <li class="filter-item"><label><input type="checkbox" class="soft-square-cb size-cb" value="XS" onchange="loadCatalogProducts()"><span>XS</span></label></li>
@@ -1200,11 +1245,9 @@
             </ul>
           </div>
 
-          <!-- БРЕНД (МЯГКИЕ КВАДРАТЫ ВМЕСТО КРУГОВ!) -->
           <div class="sidebar-section">
             <div class="sidebar-title" onclick="toggleSidebarSub('sub-brands')">
-              <span>БРЕНД</span>
-              <span>⌄</span>
+              <span>БРЕНД</span><span>⌄</span>
             </div>
             <ul class="filter-list" id="sub-brands">
               <li class="filter-item"><label><input type="checkbox" class="soft-square-cb brand-cb" value="GIUSEPPE DI MORABITO" onchange="loadCatalogProducts()"><span>GIUSEPPE DI MORABITO</span></label></li>
@@ -1212,11 +1255,9 @@
             </ul>
           </div>
 
-          <!-- ЦВЕТ (МЯГКИЕ КВАДРАТЫ ВМЕСТО КРУГОВ!) -->
           <div class="sidebar-section">
             <div class="sidebar-title" onclick="toggleSidebarSub('sub-colors')">
-              <span>ЦВЕТ</span>
-              <span>⌄</span>
+              <span>ЦВЕТ</span><span>⌄</span>
             </div>
             <ul class="filter-list" id="sub-colors">
               <li class="filter-item"><label><input type="checkbox" class="soft-square-cb color-cb" value="Черный" onchange="loadCatalogProducts()"><span>Черный</span></label></li>
@@ -1227,24 +1268,14 @@
             </ul>
           </div>
 
-          <!-- АКСЕССУАРЫ (КАК НА СКРИНШОТЕ 3: СУМКИ, РЕМНИ, БИЖУТЕРИЯ И Т.Д.) -->
           <div class="sidebar-section">
             <div class="sidebar-title" onclick="toggleSidebarSub('sidebar-accessories')">
-              <span>АКСЕССУАРЫ</span>
-              <span>^</span>
+              <span>АКСЕССУАРЫ</span><span>^</span>
             </div>
             <ul class="filter-list" id="sidebar-accessories"></ul>
           </div>
-
-          <div class="sidebar-section">
-            <div class="sidebar-title" onclick="resetCatalogFilters()">
-              <span>СБРОСИТЬ ФИЛЬТРЫ</span>
-              <span>↺</span>
-            </div>
-          </div>
         </aside>
 
-        <!-- СЕТКА ИЗ 4 КАРТОЧЕК В РЯД -->
         <div>
           <div class="products-grid-4" id="catalog-grid"></div>
         </div>
@@ -1260,14 +1291,156 @@
     </section>
 
     <!-- ================================================================= -->
-    <!-- СТРАНИЦА 3: ИЗБРАННОЕ                                             -->
+    <!-- СТРАНИЦА 3: ЛИЧНЫЙ КАБИНЕТ (СКРИНШОТЫ 3, 4, 5 + УПРАВЛЕНИЕ ЦЕНАМИ)-->
     <!-- ================================================================= -->
-    <section id="view-favorites" class="page-view">
+    <section id="view-profile" class="page-view">
       <div class="breadcrumbs">
-        <span onclick="navigateTo('home')">Главная</span> - <span>Избранное</span>
+        <span onclick="navigateTo('home')">ГЛАВНАЯ</span> - <span>ЛИЧНЫЙ КАБИНЕТ</span>
       </div>
-      <h1 class="page-title">ИЗБРАННОЕ</h1>
-      <div class="products-grid-4" id="favorites-grid"></div>
+      <h1 class="page-title" style="margin-bottom: 14px;">ЛИЧНЫЙ КАБИНЕТ</h1>
+
+      <div class="lk-greeting">
+        <span>Здравствуйте, <span id="lk-user-login">375445658384</span></span>
+        <button class="lk-logout-btn" title="Выйти из профиля" onclick="logoutUser()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+            <polyline points="16 17 21 12 16 7"></polyline>
+            <line x1="21" y1="12" x2="9" y2="12"></line>
+          </svg>
+        </button>
+      </div>
+
+      <!-- ГОРИЗОНТАЛЬНОЕ МЕНЮ ЛИЧНОГО КАБИНЕТА КАК НА СКРИНШОТАХ 3, 4, 5 -->
+      <div class="lk-tabs-bar">
+        <div class="lk-tab-item" id="lktab-data" onclick="switchProfileTab('data')">Ваши данные</div>
+        <div class="lk-tab-item active" id="lktab-orders" onclick="switchProfileTab('orders')">Ваши заказы</div>
+        <div class="lk-tab-item" id="lktab-address" onclick="switchProfileTab('address')">Адрес доставки</div>
+        <div class="lk-tab-item" id="lktab-favorite" onclick="switchProfileTab('favorite')">Избранное</div>
+      </div>
+
+      <!-- 1. ПОДВКЛАДКА "ВАШИ ЗАКАЗЫ" (СКРИНШОТ 3 + ОТОБРАЖЕНИЕ ОФОРМЛЕННЫХ ЗАКАЗОВ) -->
+      <div id="lkview-orders" class="lk-subview active">
+        <div class="lk-orders-subtabs">
+          <span class="lk-orders-subtab active" id="ordsub-current" onclick="switchOrdersSubtab('current')">Текущие заказы</span>
+          <span class="lk-orders-subtab" id="ordsub-history" onclick="switchOrdersSubtab('history')">История заказов</span>
+        </div>
+
+        <div id="lk-orders-content"></div>
+      </div>
+
+      <!-- 2. ПОДВКЛАДКА "АДРЕС ДОСТАВКИ" (СКРИНШОТ 4) -->
+      <div id="lkview-address" class="lk-subview">
+        <div class="lk-address-intro">
+          <h4>Ваши адреса</h4>
+          <p>Для изменения списка ваших адресов необходимо заполнить поле с адресом и нажать кнопку “Добавить”</p>
+        </div>
+
+        <div class="lk-framed-box">
+          <div style="text-align:center; font-size:14px; margin-bottom:18px;">Текущие адреса:</div>
+          <div id="lk-addresses-list" style="margin-bottom: 24px;"></div>
+
+          <div style="text-align:center; font-size:14px; margin-bottom:18px;">Добавить новый адрес</div>
+          <div class="float-field" style="margin-bottom: 22px;">
+            <label>Введите новый адрес</label>
+            <input type="text" id="lk-new-address-input" />
+          </div>
+          <div style="text-align:center;">
+            <button class="btn-thin-light" onclick="addProfileAddress()">Добавить</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3. ПОДВКЛАДКА "ИЗБРАННОЕ" (СКРИНШОТ 5) -->
+      <div id="lkview-favorite" class="lk-subview">
+        <div class="products-grid-4" id="favorites-grid"></div>
+      </div>
+
+      <!-- 4. ПОДВКЛАДКА "ВАШИ ДАННЫЕ" + МИНИМАЛИСТИЧНОЕ УПРАВЛЕНИЕ ТОВАРАМИ И ЦЕНАМИ В ТОМ ЖЕ ДИЗАЙНЕ -->
+      <div id="lkview-data" class="lk-subview">
+        <div class="lk-address-intro">
+          <h4>Личные данные и управление каталогом</h4>
+          <p>Вы можете обновить контактные данные или добавить новый товар и изменить розничные цены в каталоге</p>
+        </div>
+
+        <!-- Блок 1: Личные данные -->
+        <div class="lk-framed-box">
+          <div style="text-align:center; font-size:14px; margin-bottom:18px;">Ваши контактные данные</div>
+          <div class="float-field" style="margin-bottom: 16px;">
+            <label>Логин / Телефон</label>
+            <input type="text" id="lk-data-login" readonly />
+          </div>
+          <div class="float-field" style="margin-bottom: 20px;">
+            <label>Ф.И.О.</label>
+            <input type="text" id="lk-data-name" />
+          </div>
+          <div style="text-align:center;">
+            <button class="btn-thin-light" onclick="saveProfilePersonalData()">Сохранить</button>
+          </div>
+        </div>
+
+        <!-- Блок 2: Управление товарами и ценами (В ТОЧНО ТАКОМ ЖЕ СТИЛЕ КАК АДРЕС ДОСТАВКИ НА СКРИНШОТЕ 4) -->
+        <div class="lk-framed-box" style="max-width: 680px;">
+          <div style="text-align:center; font-size:14px; margin-bottom:18px;">Добавить новый товар в каталог</div>
+
+          <div class="form-row-2">
+            <div class="float-field">
+              <label>Название товара *</label>
+              <input type="text" id="adm-new-name" />
+            </div>
+            <div class="float-field">
+              <label>Цена (BYN) *</label>
+              <input type="number" id="adm-new-price" step="10" />
+            </div>
+          </div>
+
+          <div class="form-row-3">
+            <div class="float-field">
+              <label>Бренд</label>
+              <select id="adm-new-brand">
+                <option value="PATRIZIA PEPE">PATRIZIA PEPE</option>
+                <option value="GIUSEPPE DI MORABITO">GIUSEPPE DI MORABITO</option>
+              </select>
+            </div>
+            <div class="float-field">
+              <label>Раздел</label>
+              <select id="adm-new-gender">
+                <option value="ДЛЯ НЕЁ">ДЛЯ НЕЁ</option>
+                <option value="ДЛЯ НЕГО">ДЛЯ НЕГО</option>
+              </select>
+            </div>
+            <div class="float-field">
+              <label>Категория</label>
+              <select id="adm-new-category">
+                <option value="Платья">Платья</option>
+                <option value="Верхняя одежда">Верхняя одежда</option>
+                <option value="Джемперы">Джемперы</option>
+                <option value="Пиджаки">Пиджаки</option>
+                <option value="Брюки">Брюки</option>
+                <option value="Сумки">Сумки</option>
+                <option value="Ремни">Ремни</option>
+                <option value="Бижутерия">Бижутерия</option>
+                <option value="Платки и шарфы">Платки и шарфы</option>
+                <option value="Кошельки и картхолдеры">Кошельки и картхолдеры</option>
+                <option value="Солнцезащитные очки">Солнцезащитные очки</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="float-field" style="margin-bottom: 18px;">
+            <label>Ссылка на изображение товара (URL)</label>
+            <input type="text" id="adm-new-img" placeholder="https://images.unsplash.com/..." />
+          </div>
+
+          <div style="text-align:center; margin-bottom: 28px;">
+            <button class="btn-thin-light" onclick="adminAddNewProduct()">Добавить</button>
+          </div>
+
+          <div style="border-top:1px solid #f0f0f0; padding-top:22px;">
+            <div style="text-align:center; font-size:14px; margin-bottom:16px;">Текущие товары и цены:</div>
+            <div id="adm-minimal-products-list"></div>
+          </div>
+        </div>
+      </div>
     </section>
 
     <!-- ================================================================= -->
@@ -1292,7 +1465,7 @@
             <span class="city-float-lbl">Ваш город*</span>
             <span>🔍</span>
             <input type="text" id="chk-city" value="Минск, Минская область, Беларусь" />
-            <span style="cursor:pointer; color:var(--muted);" onclick="document.getElementById('chk-city').value=''">✖</span>
+            <span style="cursor:pointer; color:#888;" onclick="document.getElementById('chk-city').value=''">✖</span>
           </div>
 
           <h3 class="checkout-section-title">Способ доставки</h3>
@@ -1355,7 +1528,7 @@
               <select style="width:110px; border-right:none;">
                 <option>Беларусь</option>
               </select>
-              <input type="text" id="chk-phone" value="+375 29 345-00-29" />
+              <input type="text" id="chk-phone" value="+375 44 565-83-84" />
             </div>
             <div class="float-field">
               <label>Улица *</label>
@@ -1383,126 +1556,91 @@
             <textarea id="chk-comment" rows="3"></textarea>
           </div>
 
-          <button class="btn-primary-dark" onclick="submitCheckoutOrder()">ОФОРМИТЬ ЗАКАЗ</button>
+          <button class="btn-thin-box" style="padding:13px 32px;" onclick="submitCheckoutOrder()">Оформить заказ</button>
         </div>
 
         <div class="checkout-summary-card" id="checkout-right-summary"></div>
       </div>
     </section>
-
-    <!-- ================================================================= -->
-    <!-- СТРАНИЦА 6: АДМИН-ПАНЕЛЬ (ДОБАВЛЕНИЕ ТОВАРА И УСТАНОВКА ЦЕНЫ)     -->
-    <!-- ================================================================= -->
-    <section id="view-admin" class="page-view">
-      <div class="breadcrumbs">
-        <span onclick="navigateTo('home')">Главная</span> - <span>Панель администратора</span>
-      </div>
-      <h1 class="page-title">УПРАВЛЕНИЕ ТОВАРАМИ И ЦЕНАМИ</h1>
-
-      <!-- ФОРМА ДОБАВЛЕНИЯ НОВОГО ТОВАРА И УСТАНОВКИ ЦЕНЫ -->
-      <div class="admin-card">
-        <h3>➕ Добавить новый товар и установить цену (BYN)</h3>
-        <div class="admin-form-grid">
-          <div class="admin-field">
-            <label>Название товара *</label>
-            <input type="text" id="adm-new-name" placeholder="Например: Шелковое платье миди" />
-          </div>
-          <div class="admin-field">
-            <label>Цена (BYN) *</label>
-            <input type="number" id="adm-new-price" placeholder="1250" step="10" />
-          </div>
-          <div class="admin-field">
-            <label>Бренд</label>
-            <select id="adm-new-brand">
-              <option value="PATRIZIA PEPE">PATRIZIA PEPE</option>
-              <option value="GIUSEPPE DI MORABITO">GIUSEPPE DI MORABITO</option>
-            </select>
-          </div>
-          <div class="admin-field">
-            <label>Раздел (Для неё / Для него)</label>
-            <select id="adm-new-gender">
-              <option value="ДЛЯ НЕЁ">ДЛЯ НЕЁ</option>
-              <option value="ДЛЯ НЕГО">ДЛЯ НЕГО</option>
-            </select>
-          </div>
-          <div class="admin-field">
-            <label>Категория (Одежда / Аксессуары)</label>
-            <select id="adm-new-category">
-              <optgroup label="Одежда">
-                <option value="Платья">Платья</option>
-                <option value="Верхняя одежда">Верхняя одежда</option>
-                <option value="Джемперы">Джемперы</option>
-                <option value="Пиджаки">Пиджаки</option>
-                <option value="Брюки">Брюки</option>
-                <option value="Джинсы">Джинсы</option>
-                <option value="Блузы">Блузы</option>
-                <option value="Юбки">Юбки</option>
-                <option value="Топы">Топы</option>
-                <option value="Костюмы">Костюмы</option>
-              </optgroup>
-              <optgroup label="Аксессуары">
-                <option value="Сумки">Сумки</option>
-                <option value="Ремни">Ремни</option>
-                <option value="Бижутерия">Бижутерия</option>
-                <option value="Головные уборы">Головные уборы</option>
-                <option value="Платки и шарфы">Платки и шарфы</option>
-                <option value="Кошельки и картхолдеры">Кошельки и картхолдеры</option>
-                <option value="Перчатки">Перчатки</option>
-                <option value="Солнцезащитные очки">Солнцезащитные очки</option>
-              </optgroup>
-            </select>
-          </div>
-          <div class="admin-field">
-            <label>Цвет</label>
-            <select id="adm-new-color">
-              <option value="Бежевый">Бежевый</option>
-              <option value="Коричневый">Коричневый</option>
-              <option value="Черный">Черный</option>
-              <option value="Темно-синий">Темно-синий</option>
-              <option value="Серебристый">Серебристый</option>
-            </select>
-          </div>
-          <div class="admin-field">
-            <label>Артикул (SKU)</label>
-            <input type="text" id="adm-new-sku" placeholder="PP-90100" />
-          </div>
-          <div class="admin-field">
-            <label>Ссылка на фото товара (URL)</label>
-            <input type="text" id="adm-new-img" placeholder="https://images.unsplash.com/..." />
-          </div>
-        </div>
-        <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px;">
-          <label style="display:flex; align-items:center; gap:8px; font-size:12.5px; cursor:pointer;">
-            <input type="checkbox" class="soft-square-cb" id="adm-new-isnew" checked />
-            <span>Показывать с плашкой «Новинка!» на главной странице</span>
-          </label>
-          <button class="btn-primary-dark" onclick="adminAddNewProduct()">ДОБАВИТЬ ТОВАР В КАТАЛОГ</button>
-        </div>
-      </div>
-
-      <!-- ТАБЛИЦА ВСЕХ ТОВАРОВ С БЫСТРЫМ ИЗМЕНЕНИЕМ ЦЕНЫ -->
-      <div class="admin-card">
-        <h3>🏷️ Список товаров магазина — изменение цен</h3>
-        <div style="overflow-x:auto;">
-          <table class="admin-table">
-            <thead>
-              <tr>
-                <th>Фото</th>
-                <th>Артикул</th>
-                <th>Бренд и название</th>
-                <th>Раздел</th>
-                <th>Категория</th>
-                <th>Новинка</th>
-                <th>Цена (BYN)</th>
-                <th>Действия</th>
-              </tr>
-            </thead>
-            <tbody id="admin-products-tbody"></tbody>
-          </table>
-        </div>
-      </div>
-    </section>
   </main>
+
+  <!-- =================================================================== -->
+  <!-- МОДАЛЬНОЕ ОКНО АВТОРИЗАЦИИ И РЕГИСТРАЦИИ (СКРИНШОТЫ 1 И 2)          -->
+  <!-- =================================================================== -->
+  <div class="modal-backdrop" id="auth-modal" onclick="if(event.target===this) closeAuthModal()">
+    <div class="auth-modal-window">
+      <button class="modal-close" onclick="closeAuthModal()">✕</button>
+
+      <div class="auth-tabs-box">
+        <button class="auth-tab-btn active" id="authtab-login" onclick="switchAuthTab('login')">Авторизация</button>
+        <button class="auth-tab-btn" id="authtab-register" onclick="switchAuthTab('register')">Регистрация</button>
+      </div>
+
+      <!-- ФОРМА АВТОРИЗАЦИИ -->
+      <div id="authform-login">
+        <div class="auth-subtitle">
+          Авторизируйтесь, чтобы пользоваться всеми<br/>возможностями портала
+        </div>
+
+        <div class="auth-login-group">
+          <span class="auth-float-label">Логин *</span>
+          <select class="auth-country-select" id="login-country">
+            <option value="Беларусь">Беларусь</option>
+            <option value="Россия">Россия</option>
+            <option value="Казахстан">Казахстан</option>
+          </select>
+          <input type="text" class="auth-login-input" id="login-phone" value="375445658384" />
+        </div>
+
+        <div class="auth-field-group">
+          <span class="auth-float-label">Пароль *</span>
+          <input type="password" id="login-password" value="123" />
+        </div>
+
+        <div class="auth-remember-wrap">
+          <input type="checkbox" class="soft-square-cb" id="login-remember" checked />
+          <label class="auth-remember-lbl" for="login-remember">Запомнить меня</label>
+        </div>
+
+        <div class="auth-center-actions">
+          <button class="btn-thin-light" onclick="submitLogin()">Войти</button>
+          <br/>
+          <span class="auth-forgot-link" onclick="showToast('Инструкция по восстановлению пароля отправлена по SMS')">Забыли пароль?</span>
+        </div>
+      </div>
+
+      <!-- ФОРМА РЕГИСТРАЦИИ -->
+      <div id="authform-register" style="display:none;">
+        <div class="auth-subtitle">
+          Зарегистрируйтесь, чтобы отслеживать заказы<br/>и сохранять адреса доставки
+        </div>
+
+        <div class="auth-login-group">
+          <span class="auth-float-label">Логин *</span>
+          <select class="auth-country-select" id="reg-country">
+            <option value="Беларусь">Беларусь</option>
+            <option value="Россия">Россия</option>
+            <option value="Казахстан">Казахстан</option>
+          </select>
+          <input type="text" class="auth-login-input" id="reg-phone" placeholder="375290000000" />
+        </div>
+
+        <div class="auth-field-group">
+          <span class="auth-float-label">Пароль *</span>
+          <input type="password" id="reg-password" placeholder="••••••" />
+        </div>
+
+        <div class="auth-remember-wrap">
+          <input type="checkbox" class="soft-square-cb" id="reg-remember" checked />
+          <label class="auth-remember-lbl" for="reg-remember">Запомнить меня</label>
+        </div>
+
+        <div class="auth-center-actions">
+          <button class="btn-thin-light" onclick="submitRegister()">Зарегистрироваться</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- МОДАЛЬНОЕ ОКНО "НАЛИЧИЕ В МАГАЗИНАХ" -->
   <div class="modal-backdrop" id="store-availability-modal" onclick="if(event.target===this) closeStoreModal()">
@@ -1521,13 +1659,13 @@
           </div>
           <div>🕒 10:00 - 22:00 БЕЗ ВЫХОДНЫХ</div>
           <div>📷 INSTAGRAM</div>
-          <div id="modal-sizes-stock" style="border-top:1px solid var(--border); padding-top:10px; font-size:11px; color:var(--coffee);"></div>
+          <div id="modal-sizes-stock" style="border-top:1px solid var(--border); padding-top:10px; font-size:11px;"></div>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- СВЕТЛЫЙ ФУТЕР В ПАЛИТРЕ САЙТА -->
+  <!-- FOOTER -->
   <footer>
     <div class="footer-grid">
       <div class="footer-col">
@@ -1541,18 +1679,18 @@
         </ul>
       </div>
       <div class="footer-col">
-        <h5>КАТАЛОГ</h5>
+        <h5>КОМПАНИЯ</h5>
         <ul>
-          <li onclick="openCatalogSection('ДЛЯ НЕЁ', true)">Новинки Осень 2026</li>
+          <li>О нас</li>
           <li onclick="openCatalogSection('ДЛЯ НЕЁ', false)">Для неё</li>
           <li onclick="openCatalogSection('ДЛЯ НЕГО', false)">Для него</li>
-          <li onclick="openStoreModal()">Контакты бутика</li>
+          <li onclick="openStoreModal()">Контакты</li>
         </ul>
       </div>
       <div class="footer-col">
         <h5>ПОДДЕРЖКА</h5>
         <ul>
-          <li style="color:var(--espresso); font-weight:500;">🇧🇾 Беларусь</li>
+          <li style="color:var(--espresso); font-weight:500;">🇧🇾 Беларусь ⌄</li>
           <li style="color:var(--espresso); font-weight:500;">+375 (29) 345-00-29</li>
           <li>10:00 - 19:00 Пн-Вс</li>
           <li>info@madfashion.by</li>
@@ -1562,7 +1700,7 @@
         <h5>ПОДПИСАТЬСЯ НА РАССЫЛКУ</h5>
         <div class="newsletter-input-wrap">
           <input type="email" placeholder="Ваш email" />
-          <span style="cursor:pointer;" onclick="showToast('Спасибо за подписку на новости MAD FASHION!')">›</span>
+          <span style="cursor:pointer;" onclick="showToast('Спасибо за подписку!')">›</span>
         </div>
       </div>
     </div>
@@ -1590,7 +1728,6 @@
       { name: "Костюмы", arrow: false }
     ];
 
-    // КАТЕГОРИИ АКСЕССУАРОВ ТОЧЬ-В-ТОЧЬ КАК НА СКРИНШОТЕ 3
     const ACCESSORY_CATEGORIES = [
       { name: "Сумки", arrow: true },
       { name: "Ремни", arrow: false },
@@ -1616,13 +1753,28 @@
     let onlyNewFilter = false;
     let searchFilterText = "";
     let activeCouponCode = "";
+    let currentOrdersSubtab = "current";
 
+    let currentUser = JSON.parse(localStorage.getItem('mad_user') || 'null');
+    let userAddresses = JSON.parse(localStorage.getItem('mad_addresses') || JSON.stringify([
+      { id: 'a1', text: 'г. Минск, пр. Победителей, д. 65, кв. 12', is_primary: true },
+      { id: 'a2', text: 'г. Минск, ул. М. Танка, д. 69, кв. 5', is_primary: false }
+    ]));
+    // Текущие заказы, оформленные пользователем в этой сессии
+    let userCurrentOrders = JSON.parse(localStorage.getItem('mad_current_orders') || '[]');
     let favorites = JSON.parse(localStorage.getItem('mad_favorites') || '["prod-1"]');
     let cart = JSON.parse(localStorage.getItem('mad_cart') || '[{"product_id":"prod-1","size":"S","quantity":1}]');
 
     function saveState() {
       localStorage.setItem('mad_favorites', JSON.stringify(favorites));
       localStorage.setItem('mad_cart', JSON.stringify(cart));
+      localStorage.setItem('mad_addresses', JSON.stringify(userAddresses));
+      localStorage.setItem('mad_current_orders', JSON.stringify(userCurrentOrders));
+      if (currentUser) {
+        localStorage.setItem('mad_user', JSON.stringify(currentUser));
+      } else {
+        localStorage.removeItem('mad_user');
+      }
       updateHeaderBadges();
     }
 
@@ -1648,8 +1800,286 @@
       return Number(val).toLocaleString('ru-RU') + ' BYN';
     }
 
+    function toggleSearchBar() {
+      const dr = document.getElementById('search-drawer');
+      dr.classList.toggle('open');
+      if (dr.classList.contains('open')) {
+        document.getElementById('header-search-input').focus();
+      }
+    }
+
+    /* ==================== АВТОРИЗАЦИЯ И ЛИЧНЫЙ КАБИНЕТ ==================== */
+    function onProfileIconClick() {
+      if (!currentUser) {
+        openAuthModal();
+      } else {
+        navigateTo('profile');
+      }
+    }
+
+    function openFavoritesFromHeader() {
+      if (!currentUser) {
+        currentUser = { login: "375445658384", name: "Анна Ковалева", country: "Беларусь" };
+        saveState();
+      }
+      navigateTo('profile');
+      switchProfileTab('favorite');
+    }
+
+    function openAuthModal() {
+      document.getElementById('auth-modal').classList.add('open');
+    }
+
+    function closeAuthModal() {
+      document.getElementById('auth-modal').classList.remove('open');
+    }
+
+    function switchAuthTab(tab) {
+      document.getElementById('authtab-login').classList.toggle('active', tab === 'login');
+      document.getElementById('authtab-register').classList.toggle('active', tab === 'register');
+      document.getElementById('authform-login').style.display = tab === 'login' ? 'block' : 'none';
+      document.getElementById('authform-register').style.display = tab === 'register' ? 'block' : 'none';
+    }
+
+    async function submitLogin() {
+      const country = document.getElementById('login-country').value;
+      const login = document.getElementById('login-phone').value.trim();
+      const password = document.getElementById('login-password').value.trim();
+      if (!login) {
+        showToast('Введите логин / номер телефона');
+        return;
+      }
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ country, login, password })
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        showToast(data.detail || 'Ошибка входа');
+        return;
+      }
+      currentUser = data.user;
+      saveState();
+      closeAuthModal();
+      navigateTo('profile');
+      switchProfileTab('orders');
+    }
+
+    async function submitRegister() {
+      const country = document.getElementById('reg-country').value;
+      const login = document.getElementById('reg-phone').value.trim();
+      const password = document.getElementById('reg-password').value.trim();
+      if (!login || !password) {
+        showToast('Заполните логин и пароль');
+        return;
+      }
+      const res = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ country, login, password })
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        showToast(data.detail || 'Ошибка регистрации');
+        return;
+      }
+      currentUser = data.user;
+      saveState();
+      closeAuthModal();
+      showToast('Регистрация прошла успешно!');
+      navigateTo('profile');
+      switchProfileTab('orders');
+    }
+
+    function logoutUser() {
+      currentUser = null;
+      saveState();
+      openAuthModal();
+    }
+
+    function switchProfileTab(tabName) {
+      ['data', 'orders', 'address', 'favorite'].forEach(t => {
+        document.getElementById('lktab-' + t).classList.toggle('active', t === tabName);
+        document.getElementById('lkview-' + t).classList.toggle('active', t === tabName);
+      });
+
+      if (tabName === 'orders') renderProfileOrders();
+      if (tabName === 'address') renderProfileAddresses();
+      if (tabName === 'favorite') renderFavoritesView();
+      if (tabName === 'data') renderProfileDataAndAdmin();
+    }
+
+    function switchOrdersSubtab(sub) {
+      currentOrdersSubtab = sub;
+      document.getElementById('ordsub-current').classList.toggle('active', sub === 'current');
+      document.getElementById('ordsub-history').classList.toggle('active', sub === 'history');
+      renderProfileOrders();
+    }
+
+    async function renderProfileOrders() {
+      await fetchAllProducts();
+      const container = document.getElementById('lk-orders-content');
+
+      if (currentOrdersSubtab === 'current') {
+        if (userCurrentOrders.length === 0) {
+          container.innerHTML = `
+            <div class="lk-empty-orders">
+              <h3>ТЕКУЩИЕ ЗАКАЗЫ НЕ НАЙДЕНЫ</h3>
+              <button class="btn-thin-box" onclick="openCatalogSection('ДЛЯ НЕЁ', false)">Перейти в каталог</button>
+            </div>
+          `;
+          return;
+        }
+
+        container.innerHTML = userCurrentOrders.map(ord => `
+          <div class="lk-framed-box" style="max-width: 660px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #f0f0f0; padding-bottom:12px; margin-bottom:16px;">
+              <div>
+                <div style="font-size:14px; font-weight:500;">Заказ № ${ord.id} от ${ord.date}</div>
+                <div style="font-size:11.5px; color:#888; margin-top:2px;">${ord.delivery} • ${ord.payment} • ${ord.address}</div>
+              </div>
+              <span style="border:1px solid #222; padding:4px 10px; font-size:11px; text-transform:uppercase;">Оформлен</span>
+            </div>
+            <div>
+              ${ord.items.map(it => {
+                const prod = allProducts.find(p => p.id === it.product_id) || {};
+                return `
+                  <div style="display:flex; align-items:center; justify-content:space-between; gap:16px; padding:8px 0;">
+                    <div style="display:flex; align-items:center; gap:14px;">
+                      <img src="${prod.image_main || ''}" style="width:48px; height:64px; object-fit:cover; background:#f4f4f4;" />
+                      <div>
+                        <div style="font-size:12px; text-transform:uppercase;">${prod.brand || 'MAD FASHION'}</div>
+                        <div style="font-size:12px; color:#777;">${prod.name || it.product_name} (Размер: ${it.size}, ${it.quantity} ед.)</div>
+                      </div>
+                    </div>
+                    <div style="font-size:13px; font-weight:500;">${formatBYN((prod.retail_price || 1050) * it.quantity)}</div>
+                  </div>
+                `;
+              }).join('')}
+            </div>
+            <div style="border-top:1px solid #f0f0f0; padding-top:12px; margin-top:12px; display:flex; justify-content:space-between; font-size:13px;">
+              <span style="color:#888;">ИТОГО К ОПЛАТЕ:</span>
+              <b>${formatBYN(ord.total_byn)}</b>
+            </div>
+          </div>
+        `).join('');
+      } else {
+        // История заказов с сервера Order Service (:8003)
+        const res = await fetch('/api/orders');
+        const serverOrders = await res.json();
+        if (!serverOrders || serverOrders.length === 0) {
+          container.innerHTML = `
+            <div class="lk-empty-orders">
+              <h3>ИСТОРИЯ ЗАКАЗОВ ПУСТА</h3>
+              <button class="btn-thin-box" onclick="openCatalogSection('ДЛЯ НЕЁ', false)">Перейти в каталог</button>
+            </div>
+          `;
+          return;
+        }
+        container.innerHTML = serverOrders.map(o => `
+          <div class="lk-framed-box" style="max-width: 660px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+              <div style="font-size:13.5px; font-weight:500;">Заказ № ${o.order_id} (${o.sale_date})</div>
+              <span style="border:1px solid #ccc; color:#666; padding:3px 9px; font-size:10.5px;">Выполнен</span>
+            </div>
+            <div style="font-size:12px; color:#666; margin-bottom:8px;">
+              ${o.product_name} • Размер: ${o.size} • Количество: ${o.quantity} ед.
+            </div>
+            <div style="font-size:13px; font-weight:500;">Сумма: ${formatBYN(o.total_revenue)}</div>
+          </div>
+        `).join('');
+      }
+    }
+
+    function renderProfileAddresses() {
+      const list = document.getElementById('lk-addresses-list');
+      if (userAddresses.length === 0) {
+        list.innerHTML = '<div style="text-align:center; font-size:12px; color:#999;">Список адресов пуст</div>';
+        return;
+      }
+      list.innerHTML = userAddresses.map((a, idx) => `
+        <div class="address-row">
+          <div class="address-row-left">
+            <span>📍</span>
+            <span>${a.text}</span>
+          </div>
+          <div class="address-row-right">
+            <span style="cursor:pointer; font-size:13px; color:#444;" onclick="removeProfileAddress(${idx})">✕</span>
+            <button class="btn-primary-addr ${a.is_primary ? 'is-main' : ''}" onclick="setPrimaryAddress(${idx})">
+              ✓ &nbsp;Основной
+            </button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function addProfileAddress() {
+      const inp = document.getElementById('lk-new-address-input');
+      const val = inp.value.trim();
+      if (!val) {
+        showToast('Введите адрес доставки');
+        return;
+      }
+      userAddresses.push({
+        id: 'addr-' + Date.now(),
+        text: val,
+        is_primary: userAddresses.length === 0
+      });
+      inp.value = '';
+      saveState();
+      renderProfileAddresses();
+      showToast('Адрес добавлен');
+    }
+
+    function removeProfileAddress(idx) {
+      userAddresses.splice(idx, 1);
+      saveState();
+      renderProfileAddresses();
+    }
+
+    function setPrimaryAddress(idx) {
+      userAddresses.forEach((a, i) => { a.is_primary = (i === idx); });
+      saveState();
+      renderProfileAddresses();
+    }
+
+    async function renderProfileDataAndAdmin() {
+      document.getElementById('lk-data-login').value = currentUser ? currentUser.login : '375445658384';
+      document.getElementById('lk-data-name').value = currentUser ? (currentUser.name || 'Анна Ковалева') : 'Анна Ковалева';
+
+      await fetchAllProducts();
+      const box = document.getElementById('adm-minimal-products-list');
+      box.innerHTML = allProducts.map(p => `
+        <div class="address-row" style="border-bottom:1px solid #f7f7f7; padding:10px 0;">
+          <div class="address-row-left">
+            <img src="${p.image_main}" style="width:34px; height:44px; object-fit:cover; background:#f4f4f4;" />
+            <div>
+              <div style="font-size:11.5px; font-weight:500;">${p.brand} — ${p.name}</div>
+              <div style="font-size:10.5px; color:#999;">${p.gender} • ${p.category}</div>
+            </div>
+          </div>
+          <div class="address-row-right">
+            <input type="number" id="adm-price-${p.id}" value="${p.retail_price}" step="10"
+              style="width:88px; border:1px solid #e5e5e5; padding:5px 8px; font-size:12px; text-align:right;" />
+            <span style="font-size:11px; color:#777;">BYN</span>
+            <button class="btn-primary-addr" onclick="adminUpdatePrice('${p.id}')">✓ &nbsp;Цена</button>
+            <span style="cursor:pointer; font-size:13px; color:#444;" title="Удалить товар" onclick="adminDeleteProduct('${p.id}')">✕</span>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function saveProfilePersonalData() {
+      if (!currentUser) currentUser = { login: '375445658384' };
+      currentUser.name = document.getElementById('lk-data-name').value.trim();
+      saveState();
+      showToast('Личные данные сохранены');
+    }
+
+    /* ==================== НАВИГАЦИЯ ==================== */
     function setActiveNav(navId) {
-      ['nav-home', 'nav-novelties', 'nav-women', 'nav-men', 'nav-admin'].forEach(id => {
+      ['nav-home', 'nav-novelties', 'nav-women', 'nav-men'].forEach(id => {
         const el = document.getElementById(id);
         if (el) el.classList.toggle('active', id === navId);
       });
@@ -1668,12 +2098,10 @@
         else if (currentGender === 'ДЛЯ НЕГО') setActiveNav('nav-men');
         else setActiveNav('nav-women');
         loadCatalogProducts();
-      } else if (viewName === 'admin') {
-        setActiveNav('nav-admin');
-        loadAdminProductsTable();
-      } else if (viewName === 'favorites') {
+      } else if (viewName === 'profile') {
         setActiveNav('');
-        renderFavoritesView();
+        document.getElementById('lk-user-login').textContent = currentUser ? currentUser.login : '375445658384';
+        renderProfileOrders();
       } else if (viewName === 'cart') {
         setActiveNav('');
         renderCartView();
@@ -1726,7 +2154,7 @@
             <input type="checkbox" class="soft-square-cb cat-cb" value="${c.name}" onchange="loadCatalogProducts()" />
             <span>${c.name}</span>
           </label>
-          ${c.arrow ? '<span style="color:var(--muted);">⌄</span>' : ''}
+          ${c.arrow ? '<span style="color:#999;">⌄</span>' : ''}
         </li>
       `).join('');
 
@@ -1736,7 +2164,7 @@
             <input type="checkbox" class="soft-square-cb cat-cb" value="${c.name}" onchange="loadCatalogProducts()" />
             <span>${c.name}</span>
           </label>
-          ${c.arrow ? '<span style="color:var(--muted);">⌄</span>' : ''}
+          ${c.arrow ? '<span style="color:#999;">⌄</span>' : ''}
         </li>
       `).join('');
     }
@@ -1753,7 +2181,7 @@
       loadCatalogProducts();
     }
 
-    /* ==================== ГЛАВНАЯ СТРАНИЦА (НОВИНКИ) ==================== */
+    /* ==================== ГЛАВНАЯ И КАТАЛОГ ==================== */
     async function loadHomeNovelties() {
       const res = await fetch('/api/catalog/products?only_new=true');
       noveltiesList = await res.json();
@@ -1791,7 +2219,6 @@
       `).join('');
     }
 
-    /* ==================== КАТАЛОГ ==================== */
     async function loadCatalogProducts() {
       const sRes = await fetch('/api/warehouse/stock-summary');
       stockSummary = await sRes.json();
@@ -1826,7 +2253,6 @@
       grid.innerHTML = catalogProducts.map(p => `
         <div class="fashion-card" onclick="openProductDetail('${p.id}')">
           <div class="fashion-card-img-wrap">
-            ${p.is_new ? '<span class="novelty-badge">Новинка!</span>' : ''}
             <img src="${p.image_main}" alt="${p.name}" loading="lazy" />
           </div>
           <div class="fashion-card-brand">${p.brand}</div>
@@ -1836,7 +2262,6 @@
       `).join('');
     }
 
-    /* ==================== КАРТОЧКА ТОВАРА ==================== */
     async function openProductDetail(productId) {
       const sRes = await fetch('/api/warehouse/stock-summary');
       stockSummary = await sRes.json();
@@ -1883,7 +2308,7 @@
               <h1 class="detail-brand">${p.brand}</h1>
               <div class="detail-name">${p.name}</div>
             </div>
-            <div class="detail-brand-badge">🧷</div>
+            <div style="background:#f3f3f3; padding:8px 10px; font-size:11px;">🧷</div>
           </div>
 
           <div class="detail-price">${formatBYN(p.retail_price)}</div>
@@ -2003,7 +2428,6 @@
       allProducts = await res.json();
     }
 
-    /* ==================== ИЗБРАННОЕ И КОРЗИНА ==================== */
     async function renderFavoritesView() {
       await fetchAllProducts();
       const grid = document.getElementById('favorites-grid');
@@ -2053,7 +2477,7 @@
               <button class="cart-remove-btn" title="Удалить" onclick="removeCartItem(${idx})">✕</button>
             </div>
             <div>
-              <div style="font-size:13px;">${prod.name}</div>
+              <div style="font-size:13px;">${prod.name}-0</div>
               <div style="font-size:11px; color:var(--muted); margin-top:4px;">Размер: ${item.size}</div>
             </div>
             <div style="font-size:14px;">${formatBYN(prod.retail_price)}</div>
@@ -2064,7 +2488,7 @@
                 <button onclick="changeCartQty(${idx}, 1)">›</button>
               </div>
             </div>
-            <div style="font-size:15px; font-weight:600;">${formatBYN(lineSum)}</div>
+            <div style="font-size:15px; font-weight:500;">${formatBYN(lineSum)}</div>
           </div>
         `;
       }).join('');
@@ -2073,14 +2497,14 @@
         <div>${rowsHtml}</div>
         <div class="cart-summary-box">
           <div>
-            <div class="coupon-field-wrap">
-              <span class="coupon-label">Введите код купона для скидки</span>
-              <input type="text" class="coupon-input" value="${activeCouponCode}" placeholder="Например: MAD10" oninput="activeCouponCode=this.value" />
+            <div class="float-field" style="margin-bottom:18px; width:240px;">
+              <label>Введите код купона для скидки</label>
+              <input type="text" value="${activeCouponCode}" oninput="activeCouponCode=this.value" />
             </div>
-            <button class="btn-outline-dark" onclick="navigateTo('checkout')">Перейти к оформлению</button>
+            <button class="btn-thin-box" onclick="navigateTo('checkout')">Перейти к оформлению</button>
           </div>
           <div style="text-align:right;">
-            <div style="font-size:10px; color:var(--muted); text-transform:uppercase;">ИТОГО:</div>
+            <div style="font-size:10px; color:#999; text-transform:uppercase;">ИТОГО:</div>
             <div style="font-size:18px; font-weight:700; margin-top:4px;">${formatBYN(totalSum)}</div>
           </div>
         </div>
@@ -2104,13 +2528,13 @@
       await fetchAllProducts();
       const box = document.getElementById('checkout-right-summary');
       if (cart.length === 0) {
-        box.innerHTML = `<div style="font-size:12px; color:var(--muted);">Корзина пуста</div>`;
+        box.innerHTML = `<div style="font-size:12px; color:#777;">Корзина пуста</div>`;
         return;
       }
 
       let totalUnits = 0;
       let totalBYN = 0;
-      const itemsHtml = cart.map((item, idx) => {
+      const itemsHtml = cart.map((item) => {
         const prod = allProducts.find(p => p.id === item.product_id) || {
           brand: 'patrizia pepe',
           name: 'Темно-синее мини-платье',
@@ -2122,12 +2546,12 @@
         return `
           <div style="margin-bottom: 18px;">
             <div style="font-size:13px; text-transform:lowercase; margin-bottom:2px;">${(prod.brand || '').toLowerCase()}</div>
-            <div style="font-size:11px; color:var(--muted); margin-bottom:10px;">${prod.name} (Размер: ${item.size})</div>
-            <div style="background:var(--pure-white); width:130px; aspect-ratio:3/4; margin-bottom:10px;">
+            <div style="font-size:11px; color:#777; margin-bottom:10px;">${prod.name}-0</div>
+            <div style="background:#f1f1f1; width:130px; aspect-ratio:3/4; margin-bottom:10px;">
               <img src="${prod.image_main}" style="width:100%; height:100%; object-fit:cover;" />
             </div>
             <div style="display:flex; align-items:center; gap:24px; font-size:12px;">
-              <span style="border:1px solid var(--taupe); padding:2px 6px; font-size:11px;">${item.quantity}</span>
+              <span style="border:1px solid #ccc; padding:2px 6px; font-size:11px;">${item.quantity}</span>
               <span>${formatBYN(prod.retail_price * item.quantity)}</span>
             </div>
           </div>
@@ -2136,9 +2560,9 @@
 
       box.innerHTML = `
         ${itemsHtml}
-        <div style="border-top:1px solid var(--border); padding-top:14px; margin-top:10px;">
-          <div style="font-size:10px; color:var(--muted); text-transform:uppercase;">ВСЕГО</div>
-          <div style="font-size:13px; font-weight:600; margin-top:3px;">${totalUnits} ед. ${formatBYN(totalBYN)}</div>
+        <div style="border-top:1px solid #f0f0f0; padding-top:14px; margin-top:10px;">
+          <div style="font-size:10px; color:#999; text-transform:uppercase;">ВСЕГО</div>
+          <div style="font-size:13px; margin-top:3px;">${totalUnits} ед. ${formatBYN(totalBYN)}</div>
         </div>
       `;
     }
@@ -2148,17 +2572,23 @@
         showToast('Корзина пуста!');
         return;
       }
+      const delivery = document.querySelector('input[name="chk-delivery"]:checked')?.value || 'Доставка курьером';
+      const payment = document.querySelector('input[name="chk-payment"]:checked')?.value || 'Картой при получении';
+      const street = document.getElementById('chk-street').value;
+      const house = document.getElementById('chk-house').value;
+      const apt = document.getElementById('chk-apt').value;
+
       const payload = {
         items: cart,
         city: document.getElementById('chk-city').value,
-        delivery_method: document.querySelector('input[name="chk-delivery"]:checked')?.value || 'Доставка курьером',
-        payment_method: document.querySelector('input[name="chk-payment"]:checked')?.value || 'Картой при получении',
+        delivery_method: delivery,
+        payment_method: payment,
         customer_name: document.getElementById('chk-name').value,
         email: document.getElementById('chk-email').value,
         phone: document.getElementById('chk-phone').value,
-        street: document.getElementById('chk-street').value,
-        house: document.getElementById('chk-house').value,
-        apartment: document.getElementById('chk-apt').value,
+        street: street,
+        house: house,
+        apartment: apt,
         floor: document.getElementById('chk-floor').value,
         comment: document.getElementById('chk-comment').value,
         coupon_code: activeCouponCode
@@ -2175,55 +2605,47 @@
         return;
       }
 
+      // Автоматически авторизуем пользователя, если он еще не вошел, и сохраняем заказ в "Текущие заказы" Личного кабинета
+      if (!currentUser) {
+        currentUser = {
+          login: document.getElementById('chk-phone').value.replace(/\D/g, '') || '375445658384',
+          name: document.getElementById('chk-name').value,
+          country: 'Беларусь'
+        };
+      }
+
+      const orderSummaryObj = {
+        id: (data.orders && data.orders[0]?.order_id) || ('ORD-' + Math.floor(1000 + Math.random() * 9000)),
+        date: new Date().toISOString().split('T')[0],
+        delivery: delivery,
+        payment: payment,
+        address: `${street}, д. ${house}${apt ? ', кв. ' + apt : ''}`,
+        total_byn: data.total_revenue_byn,
+        items: JSON.parse(JSON.stringify(cart))
+      };
+      userCurrentOrders.unshift(orderSummaryObj);
+
       cart = [];
       saveState();
-      showToast(`<b>Ваш заказ успешно оформлен!</b><br/>Сумма к оплате: <b>${formatBYN(data.total_revenue_byn)}</b>`);
-      navigateTo('home');
+      showToast(`Заказ № ${orderSummaryObj.id} оформлен и отображен в Личном кабинете!`);
+
+      // Сразу переводим в Личный кабинет -> Ваши заказы -> Текущие заказы
+      navigateTo('profile');
+      switchProfileTab('orders');
+      switchOrdersSubtab('current');
     }
 
-    /* ==================== АДМИН: ТОВАРЫ И ЦЕНЫ ==================== */
-    async function loadAdminProductsTable() {
-      await fetchAllProducts();
-      const tbody = document.getElementById('admin-products-tbody');
-      tbody.innerHTML = allProducts.map(p => `
-        <tr>
-          <td>
-            <img src="${p.image_main}" style="width:44px; height:58px; object-fit:cover; border-radius:3px;" />
-          </td>
-          <td><b>${p.sku}</b></td>
-          <td>
-            <div style="font-weight:600;">${p.brand}</div>
-            <div style="color:var(--muted);">${p.name}</div>
-          </td>
-          <td>${p.gender}</td>
-          <td>${p.category}</td>
-          <td>
-            <input type="checkbox" class="soft-square-cb" id="adm-isnew-${p.id}" ${p.is_new ? 'checked' : ''} onchange="adminUpdatePrice('${p.id}')" />
-          </td>
-          <td>
-            <input type="number" class="price-edit-input" id="adm-price-${p.id}" value="${p.retail_price}" step="10" />
-          </td>
-          <td>
-            <button class="btn-outline-dark" style="padding:6px 12px; font-size:11px;" onclick="adminUpdatePrice('${p.id}')">Сохранить цену</button>
-            <button class="btn-outline-dark" style="padding:6px 10px; font-size:11px; margin-left:6px;" onclick="adminDeleteProduct('${p.id}')">✕</button>
-          </td>
-        </tr>
-      `).join('');
-    }
-
+    /* ==================== МИНИМАЛИСТИЧНОЕ УПРАВЛЕНИЕ ТОВАРАМИ ==================== */
     async function adminAddNewProduct() {
       const name = document.getElementById('adm-new-name').value.trim();
       const price = parseFloat(document.getElementById('adm-new-price').value);
       const brand = document.getElementById('adm-new-brand').value;
       const gender = document.getElementById('adm-new-gender').value;
       const category = document.getElementById('adm-new-category').value;
-      const color = document.getElementById('adm-new-color').value;
-      const sku = document.getElementById('adm-new-sku').value.trim() || ('MAD-' + Math.floor(1000 + Math.random() * 9000));
       const img = document.getElementById('adm-new-img').value.trim() || 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=900&q=85';
-      const is_new = document.getElementById('adm-new-isnew').checked;
 
       if (!name || !price || price <= 0) {
-        showToast('Укажите название товара и корректную цену в BYN');
+        showToast('Укажите название товара и цену в BYN');
         return;
       }
 
@@ -2233,7 +2655,7 @@
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          sku,
+          sku: 'MAD-' + Math.floor(1000 + Math.random() * 9000),
           brand,
           name,
           gender,
@@ -2242,26 +2664,24 @@
           collection: "Осень 2026",
           retail_price: price,
           sizes,
-          color,
-          is_new,
+          color: "Черный",
+          is_new: true,
           image_main: img,
           image_model: img,
-          description: `${name} из новой коллекции ${brand} Осень 2026.`
+          description: `${name} из коллекции ${brand} Осень 2026.`
         })
       });
 
       if (res.ok) {
-        showToast(`Товар «${name}» с ценой ${formatBYN(price)} успешно добавлен!`);
+        showToast(`Товар «${name}» (${formatBYN(price)}) добавлен в каталог!`);
         document.getElementById('adm-new-name').value = '';
         document.getElementById('adm-new-price').value = '';
-        document.getElementById('adm-new-sku').value = '';
-        await loadAdminProductsTable();
+        await renderProfileDataAndAdmin();
       }
     }
 
     async function adminUpdatePrice(productId) {
       const newPrice = parseFloat(document.getElementById(`adm-price-${productId}`).value);
-      const isNew = document.getElementById(`adm-isnew-${productId}`).checked;
       if (!newPrice || newPrice <= 0) {
         showToast('Введите корректную цену больше 0 BYN');
         return;
@@ -2269,19 +2689,19 @@
       const res = await fetch(`/api/catalog/products/${productId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ retail_price: newPrice, is_new: isNew })
+        body: JSON.stringify({ retail_price: newPrice })
       });
       if (res.ok) {
-        showToast(`Цена товара обновлена: <b>${formatBYN(newPrice)}</b>`);
-        await loadAdminProductsTable();
+        showToast(`Цена обновлена: ${formatBYN(newPrice)}`);
+        await renderProfileDataAndAdmin();
       }
     }
 
     async function adminDeleteProduct(productId) {
       const res = await fetch(`/api/catalog/products/${productId}`, { method: 'DELETE' });
       if (res.ok) {
-        showToast('Товар удален из каталога');
-        await loadAdminProductsTable();
+        showToast('Товар удален');
+        await renderProfileDataAndAdmin();
       }
     }
 
