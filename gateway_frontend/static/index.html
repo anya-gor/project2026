@@ -1352,7 +1352,7 @@
 
       <!-- 3. ПОДВКЛАДКА "ИЗБРАННОЕ" (СКРИНШОТ 5) -->
       <div id="lkview-favorite" class="lk-subview">
-        <div class="products-grid-4" id="favorites-grid"></div>
+        <div class="products-grid-4" id="lk-favorites-grid"></div>
       </div>
 
       <!-- 4. ПОДВКЛАДКА "ВАШИ ДАННЫЕ" + МИНИМАЛИСТИЧНОЕ УПРАВЛЕНИЕ ТОВАРАМИ И ЦЕНАМИ В ТОМ ЖЕ ДИЗАЙНЕ -->
@@ -1441,6 +1441,17 @@
           </div>
         </div>
       </div>
+    </section>
+
+    <!-- ================================================================= -->
+    <!-- СТРАНИЦА 3.1: ОТДЕЛЬНАЯ СТРАНИЦА ИЗБРАННОЕ (ПО СЕРДЕЧКУ В ШАПКЕ)   -->
+    <!-- ================================================================= -->
+    <section id="view-favorites" class="page-view">
+      <div class="breadcrumbs">
+        <span onclick="navigateTo('home')">Главная</span> - <span>Избранное</span>
+      </div>
+      <h1 class="page-title">ИЗБРАННОЕ</h1>
+      <div class="products-grid-4" id="favorites-page-grid"></div>
     </section>
 
     <!-- ================================================================= -->
@@ -1818,12 +1829,7 @@
     }
 
     function openFavoritesFromHeader() {
-      if (!currentUser) {
-        currentUser = { login: "375445658384", name: "Анна Ковалева", country: "Беларусь" };
-        saveState();
-      }
-      navigateTo('profile');
-      switchProfileTab('favorite');
+      navigateTo('favorites');
     }
 
     function openAuthModal() {
@@ -2102,6 +2108,12 @@
         setActiveNav('');
         document.getElementById('lk-user-login').textContent = currentUser ? currentUser.login : '375445658384';
         renderProfileOrders();
+        renderFavoritesView();
+        renderProfileAddresses();
+        renderProfileDataAndAdmin();
+      } else if (viewName === 'favorites') {
+        setActiveNav('');
+        renderFavoritesView();
       } else if (viewName === 'cart') {
         setActiveNav('');
         renderCartView();
@@ -2430,24 +2442,28 @@
 
     async function renderFavoritesView() {
       await fetchAllProducts();
-      const grid = document.getElementById('favorites-grid');
       const favProducts = allProducts.filter(p => favorites.includes(p.id));
+      let html = '';
       if (favProducts.length === 0) {
-        grid.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:40px 0; color:var(--muted); font-size:13px;">
+        html = `<div style="grid-column:1/-1; text-align:center; padding:40px 0; color:var(--muted); font-size:13px;">
           В избранном пока нет товаров. <u style="cursor:pointer;" onclick="openCatalogSection('ДЛЯ НЕЁ', false)">Перейти в каталог</u>
         </div>`;
-        return;
-      }
-      grid.innerHTML = favProducts.map(p => `
-        <div class="fashion-card" onclick="openProductDetail('${p.id}')">
-          <div class="fashion-card-img-wrap">
-            <img src="${p.image_main}" alt="${p.name}" />
+      } else {
+        html = favProducts.map(p => `
+          <div class="fashion-card" onclick="openProductDetail('${p.id}')">
+            <div class="fashion-card-img-wrap">
+              <img src="${p.image_main}" alt="${p.name}" />
+            </div>
+            <div class="fashion-card-brand">${p.brand}</div>
+            <div class="fashion-card-name">${p.name}</div>
+            <div class="fashion-card-price">${formatBYN(p.retail_price)}</div>
           </div>
-          <div class="fashion-card-brand">${p.brand}</div>
-          <div class="fashion-card-name">${p.name}</div>
-          <div class="fashion-card-price">${formatBYN(p.retail_price)}</div>
-        </div>
-      `).join('');
+        `).join('');
+      }
+      const gridPage = document.getElementById('favorites-page-grid');
+      if (gridPage) gridPage.innerHTML = html;
+      const gridLk = document.getElementById('lk-favorites-grid');
+      if (gridLk) gridLk.innerHTML = html;
     }
 
     async function renderCartView() {

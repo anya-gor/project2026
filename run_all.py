@@ -17,7 +17,7 @@ def main():
     processes = []
 
     print("=" * 68)
-    print(" AURA WEAR — Запуск микросервисной архитектуры")
+    print(" MAD FASHION — Запуск микросервисной архитектуры")
     print("=" * 68)
 
     try:
@@ -25,20 +25,25 @@ def main():
             script_path = os.path.join(base_dir, script_rel_path)
             print(f"[+] Запуск {name} -> {script_rel_path}")
             proc = subprocess.Popen([sys.executable, script_path], cwd=base_dir)
-            processes.append((name, proc))
-            time.sleep(0.6)
+            processes.append([name, script_path, proc])
+            time.sleep(0.5)
 
         print("\n" + "=" * 68)
         print(" Все 5 микросервисов успешно запущены!")
         print(" Откройте в браузере: http://localhost:8000")
-        print(" Для остановки нажмите Ctrl+C")
         print("=" * 68 + "\n")
 
         while True:
-            time.sleep(1)
+            time.sleep(2)
+            # Если какой-то сервис упал (например, порт еще освобождался), автоматически перезапускаем его
+            for item in processes:
+                name, script_path, proc = item
+                if proc.poll() is not None:
+                    print(f"[!] Перезапуск {name}...")
+                    item[2] = subprocess.Popen([sys.executable, script_path], cwd=base_dir)
     except KeyboardInterrupt:
         print("\n[!] Остановка всех микросервисов...")
-        for name, proc in processes:
+        for name, _, proc in processes:
             proc.terminate()
         print("[OK] Все сервисы остановлены.")
 
