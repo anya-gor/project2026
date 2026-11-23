@@ -2688,7 +2688,9 @@
     function renderProductDetail() {
       const p = currentProduct;
       if (!p) return;
-      const isFav = favorites.includes(p.id);
+      const isFav = currentUser && currentUser.role !== 'admin'
+        ? (globalThis.__personalFavorites || []).includes(p.id)
+        : favorites.includes(p.id);
       const st = stockSummary[p.id] || { total_available: 0, sizes: {} };
       const selectedSizeStock = st.sizes[selectedDetailSize] || 0;
 
@@ -2748,7 +2750,7 @@
               </button>
             ` : `
               <button class="btn-primary-dark" onclick="addCurrentToCart()">ДОБАВИТЬ В КОРЗИНУ</button>
-              <button class="btn-fav-outline ${isFav ? 'in-fav' : ''}" onclick="toggleFavorite('${p.id}')">
+              <button class="btn-fav-outline ${isFav ? 'in-fav' : ''}" onclick="toggleFavoriteOnCard('${p.id}')">
                 ${isFav ? '♥' : '♡'}
               </button>
             `}
@@ -2821,7 +2823,73 @@
       document.getElementById('store-availability-modal').classList.remove('open');
     }
 
-    function toggleFavorite(productId) {
+    async function loadMyFavoritesFromDB() {
+      if (!currentUser || currentUser.role === 'admin') {
+        globalThis.__personalFavorites = null;
+        return [];
+      }
+      try {
+        const res = await fetch(`/api/user/${encodeURIComponent(currentUser.login)}/favorites`);
+        const data = await res.json();
+        globalThis.__personalFavorites = data.favorites || [];
+        return globalThis.__personalFavorites;
+      } catch {
+        globalThis.__personalFavorites = [];
+        return globalThis.__personalFavorites;
+      }
+    }
+
+    function isProductInPersonalFavorites(productId) {
+      if (currentUser && currentUser.role !== 'admin') {
+        return (globalThis.__personalFavorites || []).includes(productId);
+      }
+      return false;
+    }
+      const favBtn = document.getElementById('fav-btn-' + product.id);
+      if (!favBtn) return;
+      let isFav;
+      if (currentUser && currentUser.role !== 'admin') {
+        isFav = (globalThis.__personalFavorites || []).includes(product.id);
+      } else {
+        isFav = favorites.includes(product.id);
+      }
+      favBtn.innerHTML = isFav ? '♥' : '♡';
+    }
+
+    async function addProductToFavorite(productId) {
+      await fetch(`/api/user/${encodeURIComponent(currentUser.login)}/favorites/add`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ product_id: productId })
+      });
+    }
+
+    async function removeProductFromFavorite(productId) {
+      await fetch(`/api/user/${encodeURIComponent(currentUser.login)}/favorites/remove?product_id=${productId}`, {
+        method: 'DELETE'
+      });
+    }
+
+    async function toggleFavorite(productId) {
+      if (currentUser && currentUser.role !== 'admin') {
+        const isFavNow = (globalThis.__personalFavorites || []).includes(productId);
+        if (isFavNow) {
+          await removeProductFromFavorite(productId);
+          globalThis.__personalFavorites = globalThis.__personalFavorites.filter(p => p !== productId);
+          showToast('Убрано из Избранного');
+        } else {
+          await addProductToFavorite(productId);
+          globalThis.__personalFavorites = globalThis.__personalFavorites || [];
+          if (!globalThis.__personalFavorites.includes(productId)) {
+            globalThis.__personalFavorites.push(productId);
+          }
+          showToast('Добавлено в Избранное ♥');
+        }
+        await renderFavoritesView();
+        await renderProductDetail();
+        return;
+      }
+
       const idx = favorites.indexOf(productId);
       if (idx >= 0) {
         favorites.splice(idx, 1);
@@ -2834,6 +2902,25 @@
       if (currentProduct && currentProduct.id === productId) {
         renderProductDetail();
       }
+      await renderFavoritesView();
+    }
+
+    async function toggleFavoriteOnCard(productId) {
+      if (currentUser && currentUser.role !== 'admin') {
+        await toggleFavorite(productId);
+        return;
+      }
+      const idx = favorites.indexOf(productId);
+      if (idx >= 0) {
+        favorites.splice(idx, 1);
+        showToast('Удалено из Избранного');
+      } else {
+        favorites.push(productId);
+        showToast('Добавлено в Избранное ♥');
+      }
+      saveState();
+      renderProductDetail();
+      await renderFavoritesView();
     }
 
     function addCurrentToCart() {
@@ -2859,7 +2946,13 @@
 
     async function renderFavoritesView() {
       await fetchAllProducts();
-      const favProducts = allProducts.filter(p => favorites.includes(p.id));
+      let favProductIds = [];
+      if (currentUser && currentUser.role !== 'admin') {
+        favProductIds = globalThis.__personalFavorites || await loadMyFavoritesFromDB();
+      } else {
+        favProductIds = favorites;
+      }
+      const favProducts = allProducts.filter(p => favProductIds.includes(p.id));
       let html = '';
       if (favProducts.length === 0) {
         html = `<div style="grid-column:1/-1; text-align:center; padding:40px 0; color:var(--muted); font-size:13px;">
@@ -2867,15 +2960,15 @@
         </div>`;
       } else {
         html = favProducts.map(p => `
-          <div class="fashion-card" onclick="openProductDetail('${p.id}')">
-            <div class="fashion-card-img-wrap">
-              <img src="${p.image_main}" alt="${p.name}" />
+            <div class="fashion-card" onclick="openProductDetail('${p.id}')">
+              <div class="fashion-card-img-wrap">
+                <img src="${p.image_main}" alt="${p.name}" />
+              </div>
+              <div class="fashion-card-brand">${p.brand}</div>
+              <div class="fashion-card-name">${p.name}</div>
+              <div class="fashion-card-price">${formatBYN(p.retail_price)}</div>
             </div>
-            <div class="fashion-card-brand">${p.brand}</div>
-            <div class="fashion-card-name">${p.name}</div>
-            <div class="fashion-card-price">${formatBYN(p.retail_price)}</div>
-          </div>
-        `).join('');
+          `).join('');
       }
       const gridPage = document.getElementById('favorites-page-grid');
       if (gridPage) gridPage.innerHTML = html;

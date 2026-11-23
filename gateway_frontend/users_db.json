@@ -48,5 +48,35 @@
         "is_primary": false
       }
     ]
+  },
+  {
+    "login": "375447573540",
+    "country": "Беларусь",
+    "password": "12345",
+    "name": "375447573540",
+    "email": "375447573540@monroe.by",
+    "role": "user",
+    "addresses": [
+      {
+        "id": "addr-1",
+        "text": "г. Минск, пр. Победителей, д. 65",
+        "is_primary": true
+      }
+    ]
+  },
+  {
+    "login": "375447573541",
+    "country": "Беларусь",
+    "password": "12345",
+    "name": "375447573541",
+    "email": "375447573541@monroe.by",
+    "role": "user",
+    "addresses": [
+      {
+        "id": "addr-1",
+        "text": "г. Минск, пр. Победителей, д. 65",
+        "is_primary": true
+      }
+    ]
   }
 ]

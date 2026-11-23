@@ -10,7 +10,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, JSONResponse
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
-from database.mysql_client import check_mysql_status, mysql_load_users, mysql_save_users
+from database.mysql_client import check_mysql_status, mysql_load_users, mysql_save_users, mysql_load_favorites, mysql_add_favorite, mysql_remove_favorite
 
 RESET_CODES = {}
 
@@ -354,6 +354,46 @@ async def proxy_order_return_decision(order_id: str, request: Request):
     with httpx.Client(timeout=10.0) as client:
         r = client.post(f"{ORDER_URL}/orders/{order_id}/return-decision", json=body)
         return JSONResponse(status_code=r.status_code, content=r.json())
+
+
+@app.get("/api/user/{user_login}/favorites")
+def proxy_get_favorites(user_login: str):
+    """Возвращает личный список избранных товаров пользователя (из таблицы users_favorites)."""
+    return {"user_login": user_login, "favorites": mysql_load_favorites(user_login)}
+
+
+@app.post("/api/user/{user_login}/favorites/add")
+async def proxy_add_favorite(user_login: str, request: Request):
+    body = await request.json()
+    prod_id = body.get("product_id", "")
+    if prod_id:
+        try:
+            with httpx.Client(timeout=5.0) as client:
+                prod = client.get(f"{CATALOG_URL}/products/{prod_id}").json()
+                prod_name = f"{prod.get('brand', '')} — {prod['name']}".strip(" —")
+        except Exception:
+            prod_name = f"Товар {prod_id}"
+        mysql_add_favorite(user_login, prod_id, prod_name)
+    return {"status": "ok", "user_login": user_login}
+
+
+@app.delete("/api/user/{user_login}/favorites/remove")
+def proxy_remove_favorite(user_login: str, product_id: Optional[str] = None):
+    if product_id:
+        mysql_remove_favorite(user_login, product_id)
+    else:
+        conn = None
+        try:
+            from database.mysql_client import _get_server_connection
+            conn = _get_server_connection(include_db=True)
+            with conn.cursor() as cur:
+                cur.execute("DELETE FROM `users_favorites` WHERE `user_login` = %s;", (user_login,))
+        except Exception:
+            pass
+        finally:
+            if conn:
+                conn.close()
+    return {"status": "ok", "user_login": user_login}
 
 
 if __name__ == "__main__":

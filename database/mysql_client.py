@@ -130,6 +130,17 @@ def init_mysql_schema():
             cur.execute("DROP TABLE IF EXISTS `supply_batches`;")
 
             cur.execute("""
+                CREATE TABLE IF NOT EXISTS `users_favorites` (
+                    `id` INT AUTO_INCREMENT PRIMARY KEY,
+                    `user_login` VARCHAR(64) NOT NULL,
+                    `product_id` VARCHAR(32) NOT NULL,
+                    `product_name` VARCHAR(255) NOT NULL,
+                    `added_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    UNIQUE KEY `uk_user_product` (`user_login`, `product_id`)
+                ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+            """)
+
+            cur.execute("""
                 CREATE TABLE IF NOT EXISTS `users` (
                     `id` INT AUTO_INCREMENT PRIMARY KEY,
                     `login` VARCHAR(64) NOT NULL UNIQUE,
@@ -377,6 +388,50 @@ def mysql_save_batches(batches: list) -> bool:
                     "UPDATE `products` SET `stock_by_size_json` = %s WHERE `id` = %s;",
                     (json.dumps(sz_map, ensure_ascii=False), pid),
                 )
+        conn.close()
+        return True
+    except Exception:
+        return False
+
+
+# ==================== СИНХРОНИЗАЦИЯ ЛИЧНОГО ИЗБРАННОГО (USERS_FAVORITES) ====================
+def mysql_load_favorites(user_login: str) -> list:
+    try:
+        conn = _get_server_connection(include_db=True)
+        with conn.cursor() as cur:
+            cur.execute(
+                "SELECT `product_id` FROM `users_favorites` WHERE `user_login` = %s ORDER BY `id` ASC;",
+                (user_login,),
+            )
+            rows = cur.fetchall()
+        conn.close()
+        return [r["product_id"] for r in rows]
+    except Exception:
+        return []
+
+
+def mysql_add_favorite(user_login: str, product_id: str, product_name: str = "") -> bool:
+    try:
+        conn = _get_server_connection(include_db=True)
+        with conn.cursor() as cur:
+            cur.execute(
+                "INSERT IGNORE INTO `users_favorites` (`user_login`, `product_id`, `product_name`) VALUES (%s, %s, %s);",
+                (user_login, product_id, product_name),
+            )
+        conn.close()
+        return True
+    except Exception:
+        return False
+
+
+def mysql_remove_favorite(user_login: str, product_id: str) -> bool:
+    try:
+        conn = _get_server_connection(include_db=True)
+        with conn.cursor() as cur:
+            cur.execute(
+                "DELETE FROM `users_favorites` WHERE `user_login` = %s AND `product_id` = %s;",
+                (user_login, product_id),
+            )
         conn.close()
         return True
     except Exception:

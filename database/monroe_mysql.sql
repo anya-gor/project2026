@@ -95,6 +95,17 @@ CREATE TABLE IF NOT EXISTS `order_returns` (
     CONSTRAINT `fk_return_order` FOREIGN KEY (`order_id`) REFERENCES `orders`(`order_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+-- 5. Таблица личного избранного пользователей (Личный кабинет -> Избранное)
+CREATE TABLE IF NOT EXISTS `users_favorites` (
+    `id` INT AUTO_INCREMENT PRIMARY KEY,
+    `user_login` VARCHAR(64) NOT NULL COMMENT 'Номер телефона пользователя',
+    `product_id` VARCHAR(32) NOT NULL COMMENT 'ID избранного товара из таблицы products',
+    `product_name` VARCHAR(255) NOT NULL COMMENT 'Название товара из каталога',
+    `added_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT 'Когда добавили в Избранное',
+    CONSTRAINT `fk_fav_user` FOREIGN KEY (`user_login`) REFERENCES `users`(`login`) ON DELETE CASCADE,
+    UNIQUE KEY `uk_user_product` (`user_login`, `product_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
 -- Стартовые пользователи (Админ и Покупатель)
 INSERT IGNORE INTO `users` (`login`, `country`, `password`, `name`, `email`, `role`) VALUES
 ('375291111111', 'Беларусь', 'admin123', 'Администратор MONROE', 'admin@monroe.by', 'admin'),
