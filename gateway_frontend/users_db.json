@@ -1,5 +1,20 @@
 [
   {
+    "login": "375291111111",
+    "country": "Беларусь",
+    "password": "admin123",
+    "name": "Администратор MAD FASHION",
+    "email": "admin@madfashion.by",
+    "role": "admin",
+    "addresses": [
+      {
+        "id": "addr-adm",
+        "text": "г. Минск, пр. Победителей, д. 65 (Салон MAD FASHION)",
+        "is_primary": true
+      }
+    ]
+  },
+  {
     "login": "admin",
     "country": "Беларусь",
     "password": "admin123",

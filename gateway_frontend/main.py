@@ -30,6 +30,17 @@ USERS_FILE = os.path.join(os.path.dirname(__file__), "users_db.json")
 
 DEFAULT_USERS = [
     {
+        "login": "375291111111",
+        "country": "Беларусь",
+        "password": "admin123",
+        "name": "Администратор MAD FASHION",
+        "email": "admin@madfashion.by",
+        "role": "admin",
+        "addresses": [
+            {"id": "addr-adm", "text": "г. Минск, пр. Победителей, д. 65 (Салон MAD FASHION)", "is_primary": True},
+        ],
+    },
+    {
         "login": "admin",
         "country": "Беларусь",
         "password": "admin123",
@@ -61,9 +72,8 @@ def load_users():
         return DEFAULT_USERS
     with open(USERS_FILE, "r", encoding="utf-8") as f:
         users = json.load(f)
-    # Гарантируем, что аккаунт admin есть и у покупателя роль user
-    has_admin = any(u["login"] == "admin" for u in users)
-    if not has_admin:
+    has_phone_admin = any(u["login"] == "375291111111" for u in users)
+    if not has_phone_admin:
         save_users(DEFAULT_USERS)
         return DEFAULT_USERS
     return users
@@ -82,21 +92,22 @@ def serve_index():
 @app.post("/api/auth/login")
 async def auth_login(request: Request):
     body = await request.json()
-    login = str(body.get("login", "")).strip()
+    raw_login = str(body.get("login", "")).strip()
+    digits_only = "".join(ch for ch in raw_login if ch.isdigit())
+    login = digits_only if len(digits_only) >= 7 else raw_login
     password = str(body.get("password", "")).strip()
     country = body.get("country", "Беларусь")
 
     if not login:
-        raise HTTPException(status_code=400, detail="Введите логин / номер телефона")
+        raise HTTPException(status_code=400, detail="Введите номер телефона")
 
     users = load_users()
     for u in users:
-        if u["login"].lower() == login.lower():
+        if u["login"].lower() == login.lower() or u["login"].lower() == raw_login.lower():
             if u["password"] != password:
-                raise HTTPException(status_code=401, detail="Неверный логин или пароль")
+                raise HTTPException(status_code=401, detail="Неверный номер телефона или пароль")
             return {"status": "ok", "user": u}
 
-    # Если входит новый номер телефона — создаем обычного покупателя (role = "user")
     new_user = {
         "login": login,
         "country": country,
@@ -116,19 +127,21 @@ async def auth_login(request: Request):
 @app.post("/api/auth/register")
 async def auth_register(request: Request):
     body = await request.json()
-    login = str(body.get("login", "")).strip()
+    raw_login = str(body.get("login", "")).strip()
+    digits_only = "".join(ch for ch in raw_login if ch.isdigit())
+    login = digits_only if len(digits_only) >= 7 else raw_login
     password = str(body.get("password", "")).strip()
     country = body.get("country", "Беларусь")
     name = str(body.get("name", "")).strip() or login
     email = str(body.get("email", "")).strip() or f"{login}@madfashion.by"
 
     if not login or not password:
-        raise HTTPException(status_code=400, detail="Заполните логин и пароль")
+        raise HTTPException(status_code=400, detail="Заполните номер телефона и пароль")
 
     users = load_users()
     for u in users:
         if u["login"].lower() == login.lower():
-            raise HTTPException(status_code=400, detail="Пользователь с таким логином уже зарегистрирован")
+            raise HTTPException(status_code=400, detail="Пользователь с таким номером телефона уже зарегистрирован")
 
     new_user = {
         "login": login,

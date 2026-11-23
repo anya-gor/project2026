@@ -1610,12 +1610,12 @@
 
         <div class="auth-login-group">
           <span class="auth-float-label">Логин *</span>
-          <select class="auth-country-select" id="login-country">
+          <select class="auth-country-select" id="login-country" onchange="onCountryChange('login')">
             <option value="Беларусь">Беларусь</option>
             <option value="Россия">Россия</option>
             <option value="Казахстан">Казахстан</option>
           </select>
-          <input type="text" class="auth-login-input" id="login-phone" value="375445658384" />
+          <input type="tel" class="auth-login-input" id="login-phone" value="375445658384" placeholder="375 (__) ___-__-__" />
         </div>
 
         <div class="auth-field-group">
@@ -1632,9 +1632,9 @@
           <button class="btn-thin-light" onclick="submitLogin()">Войти</button>
           <br/>
           <span class="auth-forgot-link" onclick="showToast('Инструкция по восстановлению пароля отправлена по SMS')">Забыли пароль?</span>
-          <div style="margin-top: 16px; font-size: 11px; color: #aaa; line-height: 1.5;">
-            Покупатель: <u style="cursor:pointer;" onclick="fillAuth('375445658384','123')">375445658384 / 123</u> &nbsp;|&nbsp;
-            Админ: <u style="cursor:pointer;" onclick="fillAuth('admin','admin123')">admin / admin123</u>
+          <div style="margin-top: 16px; font-size: 11px; color: #aaa; line-height: 1.6;">
+            Тел. Покупателя: <u style="cursor:pointer;" onclick="fillAuth('375445658384','123')">375445658384 (пароль: 123)</u><br/>
+            Тел. Админа: <u style="cursor:pointer;" onclick="fillAuth('375291111111','admin123')">375291111111 (пароль: admin123)</u>
           </div>
         </div>
       </div>
@@ -1642,17 +1642,17 @@
       <!-- ФОРМА РЕГИСТРАЦИИ -->
       <div id="authform-register" style="display:none;">
         <div class="auth-subtitle">
-          Зарегистрируйтесь, чтобы отслеживать заказы<br/>и сохранять адреса доставки
+          Зарегистрируйтесь по номеру телефона, чтобы отслеживать<br/>заказы и сохранять адреса доставки
         </div>
 
         <div class="auth-login-group">
           <span class="auth-float-label">Логин *</span>
-          <select class="auth-country-select" id="reg-country">
+          <select class="auth-country-select" id="reg-country" onchange="onCountryChange('reg')">
             <option value="Беларусь">Беларусь</option>
             <option value="Россия">Россия</option>
             <option value="Казахстан">Казахстан</option>
           </select>
-          <input type="text" class="auth-login-input" id="reg-phone" placeholder="375290000000" />
+          <input type="tel" class="auth-login-input" id="reg-phone" value="375" placeholder="375290000000" />
         </div>
 
         <div class="auth-field-group">
@@ -1896,6 +1896,16 @@
     function fillAuth(loginVal, passVal) {
       document.getElementById('login-phone').value = loginVal;
       document.getElementById('login-password').value = passVal;
+    }
+
+    function onCountryChange(mode) {
+      const sel = document.getElementById(mode === 'reg' ? 'reg-country' : 'login-country').value;
+      const inp = document.getElementById(mode === 'reg' ? 'reg-phone' : 'login-phone');
+      const prefixes = { 'Беларусь': '375', 'Россия': '79', 'Казахстан': '77' };
+      if (mode === 'reg' || inp.value.length <= 4) {
+        inp.value = prefixes[sel] || '375';
+      }
+      inp.focus();
     }
 
     function updateProfileRoleUI() {
