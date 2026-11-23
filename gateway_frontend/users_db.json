@@ -1,0 +1,37 @@
+[
+  {
+    "login": "admin",
+    "country": "Беларусь",
+    "password": "admin123",
+    "name": "Администратор MAD FASHION",
+    "email": "admin@madfashion.by",
+    "role": "admin",
+    "addresses": [
+      {
+        "id": "addr-adm",
+        "text": "г. Минск, пр. Победителей, д. 65 (Салон MAD FASHION)",
+        "is_primary": true
+      }
+    ]
+  },
+  {
+    "login": "375445658384",
+    "country": "Беларусь",
+    "password": "123",
+    "name": "Анна Ковалева",
+    "email": "client@madfashion.by",
+    "role": "user",
+    "addresses": [
+      {
+        "id": "addr-1",
+        "text": "г. Минск, пр. Победителей, д. 65, кв. 12",
+        "is_primary": true
+      },
+      {
+        "id": "addr-2",
+        "text": "г. Минск, ул. М. Танка, д. 69, кв. 5",
+        "is_primary": false
+      }
+    ]
+  }
+]

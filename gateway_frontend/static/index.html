@@ -1310,12 +1310,13 @@
         </button>
       </div>
 
-      <!-- ГОРИЗОНТАЛЬНОЕ МЕНЮ ЛИЧНОГО КАБИНЕТА КАК НА СКРИНШОТАХ 3, 4, 5 -->
-      <div class="lk-tabs-bar">
+      <!-- ГОРИЗОНТАЛЬНОЕ МЕНЮ ЛИЧНОГО КАБИНЕТА -->
+      <div class="lk-tabs-bar" id="lk-tabs-bar">
         <div class="lk-tab-item" id="lktab-data" onclick="switchProfileTab('data')">Ваши данные</div>
         <div class="lk-tab-item active" id="lktab-orders" onclick="switchProfileTab('orders')">Ваши заказы</div>
         <div class="lk-tab-item" id="lktab-address" onclick="switchProfileTab('address')">Адрес доставки</div>
         <div class="lk-tab-item" id="lktab-favorite" onclick="switchProfileTab('favorite')">Избранное</div>
+        <div class="lk-tab-item" id="lktab-admin" style="display:none;" onclick="switchProfileTab('admin')">Добавить новый товар в каталог</div>
       </div>
 
       <!-- 1. ПОДВКЛАДКА "ВАШИ ЗАКАЗЫ" (СКРИНШОТ 3 + ОТОБРАЖЕНИЕ ОФОРМЛЕННЫХ ЗАКАЗОВ) -->
@@ -1355,16 +1356,15 @@
         <div class="products-grid-4" id="lk-favorites-grid"></div>
       </div>
 
-      <!-- 4. ПОДВКЛАДКА "ВАШИ ДАННЫЕ" + МИНИМАЛИСТИЧНОЕ УПРАВЛЕНИЕ ТОВАРАМИ И ЦЕНАМИ В ТОМ ЖЕ ДИЗАЙНЕ -->
+      <!-- 4. ПОДВКЛАДКА "ВАШИ ДАННЫЕ" (ТОЛЬКО ЛИЧНЫЕ ДАННЫЕ ПОЛЬЗОВАТЕЛЯ) -->
       <div id="lkview-data" class="lk-subview">
         <div class="lk-address-intro">
-          <h4>Личные данные и управление каталогом</h4>
-          <p>Вы можете обновить контактные данные или добавить новый товар и изменить розничные цены в каталоге</p>
+          <h4>Ваши личные данные</h4>
+          <p>Вы можете обновить свои контактные данные для оформления заказов</p>
         </div>
 
-        <!-- Блок 1: Личные данные -->
         <div class="lk-framed-box">
-          <div style="text-align:center; font-size:14px; margin-bottom:18px;">Ваши контактные данные</div>
+          <div style="text-align:center; font-size:14px; margin-bottom:18px;">Контактные данные</div>
           <div class="float-field" style="margin-bottom: 16px;">
             <label>Логин / Телефон</label>
             <input type="text" id="lk-data-login" readonly />
@@ -1377,8 +1377,15 @@
             <button class="btn-thin-light" onclick="saveProfilePersonalData()">Сохранить</button>
           </div>
         </div>
+      </div>
 
-        <!-- Блок 2: Управление товарами и ценами (В ТОЧНО ТАКОМ ЖЕ СТИЛЕ КАК АДРЕС ДОСТАВКИ НА СКРИНШОТЕ 4) -->
+      <!-- 5. ПОДВКЛАДКА АДМИНИСТРАТОРА "ДОБАВИТЬ НОВЫЙ ТОВАР В КАТАЛОГ" (ТОЛЬКО ДЛЯ АККАУНТА ADMIN) -->
+      <div id="lkview-admin" class="lk-subview">
+        <div class="lk-address-intro">
+          <h4>Управление каталогом и ценами (Администратор)</h4>
+          <p>Добавление новых товаров в разделы «Для неё» / «Для него» и установка розничных цен в BYN</p>
+        </div>
+
         <div class="lk-framed-box" style="max-width: 680px;">
           <div style="text-align:center; font-size:14px; margin-bottom:18px;">Добавить новый товар в каталог</div>
 
@@ -1416,10 +1423,18 @@
                 <option value="Джемперы">Джемперы</option>
                 <option value="Пиджаки">Пиджаки</option>
                 <option value="Брюки">Брюки</option>
+                <option value="Рубашки">Рубашки</option>
+                <option value="Футболки">Футболки</option>
+                <option value="Джинсы">Джинсы</option>
+                <option value="Шорты">Шорты</option>
+                <option value="Белье">Белье</option>
                 <option value="Сумки">Сумки</option>
                 <option value="Ремни">Ремни</option>
+                <option value="Рюкзаки">Рюкзаки</option>
                 <option value="Бижутерия">Бижутерия</option>
+                <option value="Головные уборы">Головные уборы</option>
                 <option value="Платки и шарфы">Платки и шарфы</option>
+                <option value="Шарфы">Шарфы</option>
                 <option value="Кошельки и картхолдеры">Кошельки и картхолдеры</option>
                 <option value="Солнцезащитные очки">Солнцезащитные очки</option>
               </select>
@@ -1617,6 +1632,10 @@
           <button class="btn-thin-light" onclick="submitLogin()">Войти</button>
           <br/>
           <span class="auth-forgot-link" onclick="showToast('Инструкция по восстановлению пароля отправлена по SMS')">Забыли пароль?</span>
+          <div style="margin-top: 16px; font-size: 11px; color: #aaa; line-height: 1.5;">
+            Покупатель: <u style="cursor:pointer;" onclick="fillAuth('375445658384','123')">375445658384 / 123</u> &nbsp;|&nbsp;
+            Админ: <u style="cursor:pointer;" onclick="fillAuth('admin','admin123')">admin / admin123</u>
+          </div>
         </div>
       </div>
 
@@ -1720,7 +1739,7 @@
   <div id="toast"></div>
 
   <script>
-    const CLOTHING_CATEGORIES = [
+    const WOMEN_CLOTHING_CATEGORIES = [
       { name: "Верхняя одежда", arrow: true },
       { name: "Платья", arrow: true },
       { name: "Джинсы", arrow: true },
@@ -1739,7 +1758,7 @@
       { name: "Костюмы", arrow: false }
     ];
 
-    const ACCESSORY_CATEGORIES = [
+    const WOMEN_ACCESSORY_CATEGORIES = [
       { name: "Сумки", arrow: true },
       { name: "Ремни", arrow: false },
       { name: "Бижутерия", arrow: true },
@@ -1751,6 +1770,33 @@
       { name: "Чулочно-носочные изделия", arrow: false },
       { name: "Брелоки", arrow: false },
       { name: "Солнцезащитные очки", arrow: false }
+    ];
+
+    const WOMEN_SIZES = ["XS", "S", "M", "L", "XL", "ONE SIZE"];
+
+    // МУЖСКИЕ КАТЕГОРИИ ОДЕЖДЫ, РАЗМЕРЫ И АКСЕССУАРЫ ТОЧЬ-В-ТОЧЬ КАК НА СКРИНШОТАХ 1, 2, 3
+    const MEN_CLOTHING_CATEGORIES = [
+      { name: "Белье", arrow: false },
+      { name: "Брюки", arrow: true },
+      { name: "Верхняя одежда", arrow: true },
+      { name: "Джемперы", arrow: true },
+      { name: "Джинсы", arrow: true },
+      { name: "Рубашки", arrow: true },
+      { name: "Футболки", arrow: true },
+      { name: "Шорты", arrow: false }
+    ];
+
+    const MEN_SIZES = ["XXS", "XS", "S", "M", "L", "XL", "XXL", "XXXL", "3XL"];
+
+    const MEN_ACCESSORY_CATEGORIES = [
+      { name: "Головные уборы", arrow: true },
+      { name: "Кошельки и картхолдеры", arrow: false },
+      { name: "Разное", arrow: false },
+      { name: "Ремни", arrow: false },
+      { name: "Рюкзаки", arrow: false },
+      { name: "Сумки", arrow: false },
+      { name: "Чулочно-носочные изделия", arrow: false },
+      { name: "Шарфы", arrow: false }
     ];
 
     let allProducts = [];
@@ -1847,6 +1893,21 @@
       document.getElementById('authform-register').style.display = tab === 'register' ? 'block' : 'none';
     }
 
+    function fillAuth(loginVal, passVal) {
+      document.getElementById('login-phone').value = loginVal;
+      document.getElementById('login-password').value = passVal;
+    }
+
+    function updateProfileRoleUI() {
+      const isAdmin = currentUser && currentUser.role === 'admin';
+      const admTab = document.getElementById('lktab-admin');
+      const bar = document.getElementById('lk-tabs-bar');
+      if (admTab && bar) {
+        admTab.style.display = isAdmin ? 'block' : 'none';
+        bar.style.gridTemplateColumns = isAdmin ? 'repeat(5, 1fr)' : 'repeat(4, 1fr)';
+      }
+    }
+
     async function submitLogin() {
       const country = document.getElementById('login-country').value;
       const login = document.getElementById('login-phone').value.trim();
@@ -1867,9 +1928,16 @@
       }
       currentUser = data.user;
       saveState();
+      updateProfileRoleUI();
       closeAuthModal();
       navigateTo('profile');
-      switchProfileTab('orders');
+      if (currentUser.role === 'admin') {
+        switchProfileTab('admin');
+        showToast('Вы вошли как Администратор');
+      } else {
+        switchProfileTab('orders');
+        showToast(`Здравствуйте, ${currentUser.login}`);
+      }
     }
 
     async function submitRegister() {
@@ -1892,6 +1960,7 @@
       }
       currentUser = data.user;
       saveState();
+      updateProfileRoleUI();
       closeAuthModal();
       showToast('Регистрация прошла успешно!');
       navigateTo('profile');
@@ -1901,19 +1970,27 @@
     function logoutUser() {
       currentUser = null;
       saveState();
+      updateProfileRoleUI();
       openAuthModal();
     }
 
     function switchProfileTab(tabName) {
-      ['data', 'orders', 'address', 'favorite'].forEach(t => {
-        document.getElementById('lktab-' + t).classList.toggle('active', t === tabName);
-        document.getElementById('lkview-' + t).classList.toggle('active', t === tabName);
+      const isAdmin = currentUser && currentUser.role === 'admin';
+      if (tabName === 'admin' && !isAdmin) {
+        tabName = 'orders';
+      }
+      ['data', 'orders', 'address', 'favorite', 'admin'].forEach(t => {
+        const tabEl = document.getElementById('lktab-' + t);
+        const viewEl = document.getElementById('lkview-' + t);
+        if (tabEl) tabEl.classList.toggle('active', t === tabName);
+        if (viewEl) viewEl.classList.toggle('active', t === tabName);
       });
 
       if (tabName === 'orders') renderProfileOrders();
       if (tabName === 'address') renderProfileAddresses();
       if (tabName === 'favorite') renderFavoritesView();
-      if (tabName === 'data') renderProfileDataAndAdmin();
+      if (tabName === 'data') renderProfilePersonalData();
+      if (tabName === 'admin') renderAdminCatalogList();
     }
 
     function switchOrdersSubtab(sub) {
@@ -2050,12 +2127,15 @@
       renderProfileAddresses();
     }
 
-    async function renderProfileDataAndAdmin() {
+    function renderProfilePersonalData() {
       document.getElementById('lk-data-login').value = currentUser ? currentUser.login : '375445658384';
       document.getElementById('lk-data-name').value = currentUser ? (currentUser.name || 'Анна Ковалева') : 'Анна Ковалева';
+    }
 
+    async function renderAdminCatalogList() {
       await fetchAllProducts();
       const box = document.getElementById('adm-minimal-products-list');
+      if (!box) return;
       box.innerHTML = allProducts.map(p => `
         <div class="address-row" style="border-bottom:1px solid #f7f7f7; padding:10px 0;">
           <div class="address-row-left">
@@ -2107,10 +2187,14 @@
       } else if (viewName === 'profile') {
         setActiveNav('');
         document.getElementById('lk-user-login').textContent = currentUser ? currentUser.login : '375445658384';
+        updateProfileRoleUI();
         renderProfileOrders();
         renderFavoritesView();
         renderProfileAddresses();
-        renderProfileDataAndAdmin();
+        renderProfilePersonalData();
+        if (currentUser && currentUser.role === 'admin') {
+          renderAdminCatalogList();
+        }
       } else if (viewName === 'favorites') {
         setActiveNav('');
         renderFavoritesView();
@@ -2130,6 +2214,7 @@
         onlyNew ? 'Новинки' : (gender === 'ДЛЯ НЕГО' ? 'Для него' : 'Для неё');
       document.getElementById('catalog-page-title').textContent =
         onlyNew ? 'НОВИНКИ' : gender;
+      initSidebarLists(gender);
       navigateTo('catalog');
     }
 
@@ -2159,8 +2244,13 @@
       }
     }
 
-    function initSidebarLists() {
-      document.getElementById('sidebar-categories').innerHTML = CLOTHING_CATEGORIES.map(c => `
+    function initSidebarLists(gender = "ДЛЯ НЕЁ") {
+      const isMen = (gender === "ДЛЯ НЕГО");
+      const clothingList = isMen ? MEN_CLOTHING_CATEGORIES : WOMEN_CLOTHING_CATEGORIES;
+      const sizesList = isMen ? MEN_SIZES : WOMEN_SIZES;
+      const accessoryList = isMen ? MEN_ACCESSORY_CATEGORIES : WOMEN_ACCESSORY_CATEGORIES;
+
+      document.getElementById('sidebar-categories').innerHTML = clothingList.map(c => `
         <li class="filter-item">
           <label>
             <input type="checkbox" class="soft-square-cb cat-cb" value="${c.name}" onchange="loadCatalogProducts()" />
@@ -2170,7 +2260,16 @@
         </li>
       `).join('');
 
-      document.getElementById('sidebar-accessories').innerHTML = ACCESSORY_CATEGORIES.map(c => `
+      document.getElementById('sub-sizes').innerHTML = sizesList.map(sz => `
+        <li class="filter-item">
+          <label>
+            <input type="checkbox" class="soft-square-cb size-cb" value="${sz}" onchange="loadCatalogProducts()" />
+            <span>${sz}</span>
+          </label>
+        </li>
+      `).join('');
+
+      document.getElementById('sidebar-accessories').innerHTML = accessoryList.map(c => `
         <li class="filter-item">
           <label>
             <input type="checkbox" class="soft-square-cb cat-cb" value="${c.name}" onchange="loadCatalogProducts()" />
@@ -2626,7 +2725,8 @@
         currentUser = {
           login: document.getElementById('chk-phone').value.replace(/\D/g, '') || '375445658384',
           name: document.getElementById('chk-name').value,
-          country: 'Беларусь'
+          country: 'Беларусь',
+          role: 'user'
         };
       }
 
@@ -2651,7 +2751,7 @@
       switchOrdersSubtab('current');
     }
 
-    /* ==================== МИНИМАЛИСТИЧНОЕ УПРАВЛЕНИЕ ТОВАРАМИ ==================== */
+    /* ==================== МИНИМАЛИСТИЧНОЕ УПРАВЛЕНИЕ ТОВАРАМИ (ТОЛЬКО АДМИН) ==================== */
     async function adminAddNewProduct() {
       const name = document.getElementById('adm-new-name').value.trim();
       const price = parseFloat(document.getElementById('adm-new-price').value);
@@ -2665,7 +2765,8 @@
         return;
       }
 
-      const sizes = ACCESSORY_CATEGORIES.some(a => a.name === category) ? ["ONE SIZE"] : ["XS", "S", "M", "L"];
+      const isAcc = WOMEN_ACCESSORY_CATEGORIES.some(a => a.name === category) || MEN_ACCESSORY_CATEGORIES.some(a => a.name === category);
+      const sizes = isAcc ? ["ONE SIZE"] : (gender === "ДЛЯ НЕГО" ? ["S", "M", "L", "XL", "XXL"] : ["XS", "S", "M", "L"]);
 
       const res = await fetch('/api/catalog/products', {
         method: 'POST',
@@ -2692,7 +2793,7 @@
         showToast(`Товар «${name}» (${formatBYN(price)}) добавлен в каталог!`);
         document.getElementById('adm-new-name').value = '';
         document.getElementById('adm-new-price').value = '';
-        await renderProfileDataAndAdmin();
+        await renderAdminCatalogList();
       }
     }
 
@@ -2709,7 +2810,7 @@
       });
       if (res.ok) {
         showToast(`Цена обновлена: ${formatBYN(newPrice)}`);
-        await renderProfileDataAndAdmin();
+        await renderAdminCatalogList();
       }
     }
 
@@ -2717,13 +2818,14 @@
       const res = await fetch(`/api/catalog/products/${productId}`, { method: 'DELETE' });
       if (res.ok) {
         showToast('Товар удален');
-        await renderProfileDataAndAdmin();
+        await renderAdminCatalogList();
       }
     }
 
     window.addEventListener('DOMContentLoaded', async () => {
-      initSidebarLists();
+      initSidebarLists("ДЛЯ НЕЁ");
       updateHeaderBadges();
+      updateProfileRoleUI();
       await checkMicroservicesHealth();
       setInterval(checkMicroservicesHealth, 8000);
       await loadHomeNovelties();

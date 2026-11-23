@@ -268,7 +268,7 @@ DEFAULT_PRODUCTS = [
         "subcategory": "Пальто мужское",
         "collection": "Осень 2026",
         "retail_price": 4100.0,
-        "sizes": ["M", "L", "XL"],
+        "sizes": ["S", "M", "L", "XL", "XXL"],
         "color": "Черный",
         "is_new": True,
         "image_main": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?auto=format&fit=crop&w=900&q=85",
@@ -283,19 +283,19 @@ DEFAULT_PRODUCTS = [
         "id": "prod-11",
         "sku": "PP-M-202",
         "brand": "PATRIZIA PEPE",
-        "name": "Мужской шерстяной пиджак шоколадного оттенка",
+        "name": "Мужские шерстяные брюки со стрелками",
         "gender": "ДЛЯ НЕГО",
-        "category": "Пиджаки",
-        "subcategory": "Костюмы и пиджаки",
+        "category": "Брюки",
+        "subcategory": "Брюки мужские",
         "collection": "Осень 2026",
-        "retail_price": 2350.0,
-        "sizes": ["M", "L", "XL"],
+        "retail_price": 1650.0,
+        "sizes": ["XS", "S", "M", "L", "XL", "XXL", "3XL"],
         "color": "Коричневый",
         "is_new": True,
-        "image_main": "https://images.unsplash.com/photo-1593030761757-71fae45fa0e7?auto=format&fit=crop&w=900&q=85",
+        "image_main": "https://images.unsplash.com/photo-1473966968600-fa801b869a1a?auto=format&fit=crop&w=900&q=85",
         "image_model": "https://images.unsplash.com/photo-1617137984095-74e4e5e3613f?auto=format&fit=crop&w=900&q=85",
         "brand_story": PATRIZIA_STORY,
-        "description": "Приталенный мужской пиджак из тонкой итальянской шерсти Virgin Wool.",
+        "description": "Прямые мужские брюки из тонкой итальянской шерсти Virgin Wool.",
         "care": "Сухая чистка.",
         "boutique_name": "Бутик «PATRIZIA PEPE»",
         "boutique_address": "САЛОН «PATRIZIA PEPE» Г. МИНСК, ПР. ПОБЕДИТЕЛЕЙ, 65"
@@ -310,7 +310,7 @@ DEFAULT_PRODUCTS = [
         "subcategory": "Трикотаж мужской",
         "collection": "Осень 2026",
         "retail_price": 1480.0,
-        "sizes": ["S", "M", "L", "XL"],
+        "sizes": ["XXS", "XS", "S", "M", "L", "XL", "XXL", "XXXL"],
         "color": "Бежевый",
         "is_new": True,
         "image_main": "https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?auto=format&fit=crop&w=900&q=85",
@@ -331,7 +331,7 @@ DEFAULT_PRODUCTS = [
         "subcategory": "Аксессуары",
         "collection": "Осень 2026",
         "retail_price": 420.0,
-        "sizes": ["ONE SIZE"],
+        "sizes": ["M", "L"],
         "color": "Черный",
         "is_new": False,
         "image_main": "https://images.unsplash.com/photo-1627123424574-724758594e93?auto=format&fit=crop&w=900&q=85",
@@ -341,6 +341,48 @@ DEFAULT_PRODUCTS = [
         "care": "Сухая чистка мягкой тканью.",
         "boutique_name": "Бутик «PATRIZIA PEPE»",
         "boutique_address": "САЛОН «PATRIZIA PEPE» Г. МИНСК, ПР. ПОБЕДИТЕЛЕЙ, 65"
+    },
+    {
+        "id": "prod-14",
+        "sku": "PP-M-205",
+        "brand": "PATRIZIA PEPE",
+        "name": "Мужская рубашка из египетского хлопка",
+        "gender": "ДЛЯ НЕГО",
+        "category": "Рубашки",
+        "subcategory": "Рубашки мужские",
+        "collection": "Осень 2026",
+        "retail_price": 890.0,
+        "sizes": ["S", "M", "L", "XL", "XXL", "3XL"],
+        "color": "Бежевый",
+        "is_new": True,
+        "image_main": "https://images.unsplash.com/photo-1596755094514-f87e34085b2c?auto=format&fit=crop&w=900&q=85",
+        "image_model": "https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?auto=format&fit=crop&w=900&q=85",
+        "brand_story": PATRIZIA_STORY,
+        "description": "Классическая мужская рубашка из плотного поплина премиального качества.",
+        "care": "Деликатная стирка при 30°C.",
+        "boutique_name": "Бутик «PATRIZIA PEPE»",
+        "boutique_address": "САЛОН «PATRIZIA PEPE» Г. МИНСК, ПР. ПОБЕДИТЕЛЕЙ, 65"
+    },
+    {
+        "id": "prod-15",
+        "sku": "GDM-M-206",
+        "brand": "GIUSEPPE DI MORABITO",
+        "name": "Мужской городской кожаный рюкзак",
+        "gender": "ДЛЯ НЕГО",
+        "category": "Рюкзаки",
+        "subcategory": "Аксессуары мужские",
+        "collection": "Осень 2026",
+        "retail_price": 1950.0,
+        "sizes": ["L", "XL"],
+        "color": "Черный",
+        "is_new": True,
+        "image_main": "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=900&q=85",
+        "image_model": "https://images.unsplash.com/photo-1548036328-c9fa89d128fa?auto=format&fit=crop&w=900&q=85",
+        "brand_story": GIUSEPPE_STORY,
+        "description": "Минималистичный мужской рюкзак из зернистой телячьей кожи с отделением для ноутбука.",
+        "care": "Уход средствами для натуральной кожи.",
+        "boutique_name": "Бутик «MAD FASHION»",
+        "boutique_address": "САЛОН «MAD FASHION» Г. МИНСК, ПР. ПОБЕДИТЕЛЕЙ, 65"
     }
 ]
 
@@ -351,7 +393,7 @@ def load_products() -> List[dict]:
         return DEFAULT_PRODUCTS
     with open(DATA_FILE, "r", encoding="utf-8") as f:
         data = json.load(f)
-    if not data or len(data) < 10 or "is_new" not in data[0]:
+    if not data or len(data) < 15 or "is_new" not in data[0]:
         save_products(DEFAULT_PRODUCTS)
         return DEFAULT_PRODUCTS
     return data

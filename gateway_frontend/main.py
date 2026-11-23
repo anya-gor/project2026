@@ -10,7 +10,7 @@ from fastapi.responses import FileResponse, JSONResponse
 app = FastAPI(
     title="MAD FASHION — API Gateway & Luxury Storefront UI",
     description="Единый шлюз (API Gateway), сервис профилей/авторизации и веб-интерфейс бутика одежды MAD FASHION",
-    version="3.5.0",
+    version="3.6.0",
 )
 
 app.add_middleware(
@@ -30,17 +30,28 @@ USERS_FILE = os.path.join(os.path.dirname(__file__), "users_db.json")
 
 DEFAULT_USERS = [
     {
+        "login": "admin",
+        "country": "Беларусь",
+        "password": "admin123",
+        "name": "Администратор MAD FASHION",
+        "email": "admin@madfashion.by",
+        "role": "admin",
+        "addresses": [
+            {"id": "addr-adm", "text": "г. Минск, пр. Победителей, д. 65 (Салон MAD FASHION)", "is_primary": True},
+        ],
+    },
+    {
         "login": "375445658384",
         "country": "Беларусь",
         "password": "123",
         "name": "Анна Ковалева",
         "email": "client@madfashion.by",
-        "role": "admin",
+        "role": "user",
         "addresses": [
             {"id": "addr-1", "text": "г. Минск, пр. Победителей, д. 65, кв. 12", "is_primary": True},
             {"id": "addr-2", "text": "г. Минск, ул. М. Танка, д. 69, кв. 5", "is_primary": False},
         ],
-    }
+    },
 ]
 
 
@@ -49,7 +60,13 @@ def load_users():
         save_users(DEFAULT_USERS)
         return DEFAULT_USERS
     with open(USERS_FILE, "r", encoding="utf-8") as f:
-        return json.load(f)
+        users = json.load(f)
+    # Гарантируем, что аккаунт admin есть и у покупателя роль user
+    has_admin = any(u["login"] == "admin" for u in users)
+    if not has_admin:
+        save_users(DEFAULT_USERS)
+        return DEFAULT_USERS
+    return users
 
 
 def save_users(users):
@@ -74,19 +91,19 @@ async def auth_login(request: Request):
 
     users = load_users()
     for u in users:
-        if u["login"] == login:
-            if u["password"] and password and u["password"] != password:
-                raise HTTPException(status_code=401, detail="Неверный пароль")
+        if u["login"].lower() == login.lower():
+            if u["password"] != password:
+                raise HTTPException(status_code=401, detail="Неверный логин или пароль")
             return {"status": "ok", "user": u}
 
-    # Если пользователь вводит новый номер при входе — создаем профиль автоматически для удобства демонстрации
+    # Если входит новый номер телефона — создаем обычного покупателя (role = "user")
     new_user = {
         "login": login,
         "country": country,
         "password": password or "123",
         "name": login,
         "email": f"{login}@madfashion.by",
-        "role": "admin",
+        "role": "user",
         "addresses": [
             {"id": "addr-1", "text": "г. Минск, пр. Победителей, д. 65", "is_primary": True},
         ],
@@ -110,7 +127,7 @@ async def auth_register(request: Request):
 
     users = load_users()
     for u in users:
-        if u["login"] == login:
+        if u["login"].lower() == login.lower():
             raise HTTPException(status_code=400, detail="Пользователь с таким логином уже зарегистрирован")
 
     new_user = {
@@ -119,7 +136,7 @@ async def auth_register(request: Request):
         "password": password,
         "name": name,
         "email": email,
-        "role": "admin",
+        "role": "user",
         "addresses": [
             {"id": "addr-1", "text": "г. Минск, пр. Победителей, д. 65", "is_primary": True},
         ],
