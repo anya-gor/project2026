@@ -192,6 +192,8 @@ def init_mysql_schema():
                     `address` VARCHAR(255) DEFAULT '',
                     `comment` TEXT,
                     `sale_date` VARCHAR(32) NOT NULL,
+                    `return_status` VARCHAR(32) DEFAULT 'NONE',
+                    `return_reason` VARCHAR(255) DEFAULT '',
                     `allocations_json` TEXT
                 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
             """)
@@ -370,6 +372,8 @@ def mysql_load_orders(default_orders: list) -> list | None:
                 "address": r["address"],
                 "comment": r["comment"],
                 "sale_date": str(r["sale_date"]),
+                "return_status": r.get("return_status") or "NONE",
+                "return_reason": r.get("return_reason") or "",
                 "allocations": json.loads(r["allocations_json"] or "[]"),
             })
         return result
@@ -389,16 +393,18 @@ def mysql_save_orders(orders: list) -> bool:
                         `order_id`, `product_id`, `product_name`, `size`, `quantity`,
                         `unit_retail_price`, `total_revenue`, `total_supplier_cost`, `gross_profit`,
                         `customer_name`, `city`, `delivery_method`, `payment_method`,
-                        `email`, `phone`, `address`, `comment`, `sale_date`, `allocations_json`
-                    ) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s);
+                        `email`, `phone`, `address`, `comment`, `sale_date`,
+                        `return_status`, `return_reason`, `allocations_json`
+                    ) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s);
                     """,
                     (
                         o["order_id"], o["product_id"], o["product_name"], o["size"], int(o["quantity"]),
                         float(o["unit_retail_price"]), float(o["total_revenue"]),
-                        float(o["total_supplier_cost"]), float(o["gross_profit"]),
+                        float(o.get("total_supplier_cost", 0)), float(o.get("gross_profit", 0)),
                         o.get("customer_name", ""), o.get("city", ""), o.get("delivery_method", ""),
                         o.get("payment_method", ""), o.get("email", ""), o.get("phone", ""),
                         o.get("address", ""), o.get("comment", ""), str(o["sale_date"]),
+                        o.get("return_status", "NONE"), o.get("return_reason", ""),
                         json.dumps(o.get("allocations", []), ensure_ascii=False),
                     ),
                 )

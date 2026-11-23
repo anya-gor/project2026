@@ -45,6 +45,13 @@ class SaleDeductRequest(BaseModel):
     quantity: int = Field(..., gt=0)
 
 
+class ReturnStockRequest(BaseModel):
+    product_id: str
+    size: str
+    quantity: int = Field(..., gt=0)
+    is_defect: bool = Field(default=False, description="Если брак (True), товар не возвращается в доступный остаток витрины")
+
+
 class WriteOffRequest(BaseModel):
     batch_id: str
     quantity: int = Field(..., gt=0)
@@ -501,6 +508,59 @@ def deduct_stock_for_sale(req: SaleDeductRequest):
         "deducted_quantity": req.quantity,
         "total_supplier_cost": round(total_supplier_cost, 2),
         "allocations": allocations,
+    }
+
+
+@app.post("/stock/return-item")
+def return_stock_from_customer(req: ReturnStockRequest):
+    """
+    Возвращает товар обратно в наличие на склад после того, как Администратор одобрил возврат покупателя.
+    Если возврат по причине брака (is_defect=True), товар списывается в брак и на витрину не возвращается.
+    """
+    db = load_db()
+    if req.is_defect:
+        return {
+            "status": "DEFECT_NOT_RESTOCKED",
+            "product_id": req.product_id,
+            "size": req.size.upper(),
+            "restocked_quantity": 0,
+        }
+
+    for b in db["batches"]:
+        if b["product_id"] == req.product_id and b["size"].upper() == req.size.upper():
+            b["remaining_quantity"] += req.quantity
+            save_db(db)
+            return {
+                "status": "RESTOCKED",
+                "batch_id": b["batch_id"],
+                "product_id": req.product_id,
+                "size": req.size.upper(),
+                "restocked_quantity": req.quantity,
+                "new_remaining": b["remaining_quantity"],
+            }
+
+    # Если партии такого размера не было — создаем возвратную партию
+    today = date.today()
+    new_batch = {
+        "batch_id": f"BATCH-RET-{uuid.uuid4().hex[:4].upper()}",
+        "product_id": req.product_id,
+        "product_name": "Возврат покупателя MONROE",
+        "size": req.size.upper(),
+        "supplier_name": "Возврат в бутик MONROE",
+        "purchase_price": 400.0,
+        "initial_quantity": req.quantity,
+        "remaining_quantity": req.quantity,
+        "arrival_date": today.isoformat(),
+        "expiry_date": (today + timedelta(days=90)).isoformat(),
+    }
+    db["batches"].append(new_batch)
+    save_db(db)
+    return {
+        "status": "RESTOCKED",
+        "batch_id": new_batch["batch_id"],
+        "product_id": req.product_id,
+        "size": req.size.upper(),
+        "restocked_quantity": req.quantity,
     }
 
 

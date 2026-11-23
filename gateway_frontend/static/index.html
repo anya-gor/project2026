@@ -2176,75 +2176,171 @@
     async function renderProfileOrders() {
       await fetchAllProducts();
       const container = document.getElementById('lk-orders-content');
+      const isAdmin = currentUser && currentUser.role === 'admin';
 
-      if (currentOrdersSubtab === 'current') {
-        if (userCurrentOrders.length === 0) {
-          container.innerHTML = `
-            <div class="lk-empty-orders">
-              <h3>ТЕКУЩИЕ ЗАКАЗЫ НЕ НАЙДЕНЫ</h3>
-              <button class="btn-thin-box" onclick="openCatalogSection('ДЛЯ НЕЁ', false)">Перейти в каталог</button>
-            </div>
-          `;
+      const res = await fetch('/api/orders');
+      const allServerOrders = (res.ok ? await res.json() : []) || [];
+
+      if (isAdmin) {
+        // В Кабинете Администратора: все заказы клиентов + одобрение/отклонение заявок на возврат
+        document.querySelector('.lk-orders-subtabs').style.display = 'none';
+        if (allServerOrders.length === 0) {
+          container.innerHTML = `<div class="lk-empty-orders"><h3>ЗАКАЗОВ КЛИЕНТОВ ПОКА НЕТ</h3></div>`;
           return;
         }
+        container.innerHTML = allServerOrders.map(o => {
+          const rStatus = o.return_status || 'NONE';
+          let badgeHtml = `<span style="border:1px solid #222; padding:4px 10px; font-size:11px;">Оформлен</span>`;
+          if (rStatus === 'RETURN_REQUESTED') {
+            badgeHtml = `<span style="border:1px solid #b45309; color:#b45309; padding:4px 10px; font-size:11px; font-weight:600;">⏳ Заявка на возврат</span>`;
+          } else if (rStatus === 'RETURN_APPROVED') {
+            badgeHtml = `<span style="border:1px solid #15803d; color:#15803d; padding:4px 10px; font-size:11px;">✓ Возврат одобрен</span>`;
+          } else if (rStatus === 'RETURN_REJECTED') {
+            badgeHtml = `<span style="border:1px solid #b91c1c; color:#b91c1c; padding:4px 10px; font-size:11px;">✕ Возврат отклонен</span>`;
+          }
 
-        container.innerHTML = userCurrentOrders.map(ord => `
-          <div class="lk-framed-box" style="max-width: 660px;">
-            <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #f0f0f0; padding-bottom:12px; margin-bottom:16px;">
-              <div>
-                <div style="font-size:14px; font-weight:500;">Заказ № ${ord.id} от ${ord.date}</div>
-                <div style="font-size:11.5px; color:#888; margin-top:2px;">${ord.delivery} • ${ord.payment} • ${ord.address}</div>
+          return `
+            <div class="lk-framed-box" style="max-width: 680px;">
+              <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #f0f0f0; padding-bottom:10px; margin-bottom:12px;">
+                <div>
+                  <div style="font-size:13.5px; font-weight:500;">Заказ № ${o.order_id} от ${o.sale_date}</div>
+                  <div style="font-size:11.5px; color:#777; margin-top:2px;">Клиент: <b>${o.customer_name}</b> • ${o.delivery_method || 'Доставка'} • ${o.payment_method || ''}</div>
+                </div>
+                ${badgeHtml}
               </div>
-              <span style="border:1px solid #222; padding:4px 10px; font-size:11px; text-transform:uppercase;">Оформлен</span>
-            </div>
-            <div>
-              ${ord.items.map(it => {
-                const prod = allProducts.find(p => p.id === it.product_id) || {};
-                return `
-                  <div style="display:flex; align-items:center; justify-content:space-between; gap:16px; padding:8px 0;">
-                    <div style="display:flex; align-items:center; gap:14px;">
-                      <img src="${prod.image_main || ''}" style="width:48px; height:64px; object-fit:cover; background:#f4f4f4;" />
-                      <div>
-                        <div style="font-size:12px; text-transform:uppercase;">${prod.brand || 'MONROE'}</div>
-                        <div style="font-size:12px; color:#777;">${prod.name || it.product_name} (Размер: ${it.size}, ${it.quantity} ед.)</div>
-                      </div>
-                    </div>
-                    <div style="font-size:13px; font-weight:500;">${formatBYN((prod.retail_price || 1050) * it.quantity)}</div>
+
+              <div style="display:flex; justify-content:space-between; align-items:center; font-size:12.5px; margin-bottom:10px;">
+                <div>${o.product_name} (Размер: <b>${o.size}</b>, ${o.quantity} ед.)</div>
+                <div style="font-weight:600;">${formatBYN(o.total_revenue)}</div>
+              </div>
+
+              ${rStatus === 'RETURN_REQUESTED' ? `
+                <div style="background:var(--soft-white); border:1px solid var(--border); padding:12px 14px; margin-top:10px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+                  <div style="font-size:12px;">
+                    Причина возврата от клиента: <b>«${o.return_reason || 'Не подошел размер'}»</b>
                   </div>
-                `;
-              }).join('')}
-            </div>
-            <div style="border-top:1px solid #f0f0f0; padding-top:12px; margin-top:12px; display:flex; justify-content:space-between; font-size:13px;">
-              <span style="color:#888;">ИТОГО К ОПЛАТЕ:</span>
-              <b>${formatBYN(ord.total_byn)}</b>
-            </div>
-          </div>
-        `).join('');
-      } else {
-        // История заказов с сервера Order Service (:8003)
-        const res = await fetch('/api/orders');
-        const serverOrders = await res.json();
-        if (!serverOrders || serverOrders.length === 0) {
-          container.innerHTML = `
-            <div class="lk-empty-orders">
-              <h3>ИСТОРИЯ ЗАКАЗОВ ПУСТА</h3>
-              <button class="btn-thin-box" onclick="openCatalogSection('ДЛЯ НЕЁ', false)">Перейти в каталог</button>
+                  <div style="display:flex; gap:8px;">
+                    <button class="btn-thin-box" style="padding:6px 14px; font-size:11px;" onclick="adminDecideReturn('${o.order_id}', 'APPROVE')">✓ Одобрить возврат</button>
+                    <button class="btn-thin-light" style="padding:6px 14px; font-size:11px;" onclick="adminDecideReturn('${o.order_id}', 'REJECT')">✕ Отклонить</button>
+                  </div>
+                </div>
+              ` : (rStatus !== 'NONE' ? `
+                <div style="font-size:11.5px; color:var(--muted); margin-top:6px;">
+                  Причина возврата: «${o.return_reason}»
+                </div>
+              ` : '')}
             </div>
           `;
-          return;
-        }
-        container.innerHTML = serverOrders.map(o => `
-          <div class="lk-framed-box" style="max-width: 660px;">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-              <div style="font-size:13.5px; font-weight:500;">Заказ № ${o.order_id} (${o.sale_date})</div>
-              <span style="border:1px solid #ccc; color:#666; padding:3px 9px; font-size:10.5px;">Выполнен</span>
-            </div>
-            <div style="font-size:12px; color:#666; margin-bottom:8px;">
-              ${o.product_name} • Размер: ${o.size} • Количество: ${o.quantity} ед.
-            </div>
-            <div style="font-size:13px; font-weight:500;">Сумма: ${formatBYN(o.total_revenue)}</div>
+        }).join('');
+        return;
+      }
+
+      // В Личном кабинете Покупателя: разделение на "Текущие заказы" и "История заказов"
+      document.querySelector('.lk-orders-subtabs').style.display = 'flex';
+
+      // В "Текущие заказы" показываем заказы этой сессии или активные заявки на возврат
+      const currentOrderIds = userCurrentOrders.map(u => u.id);
+      const currentList = allServerOrders.filter(o =>
+        currentOrderIds.includes(o.order_id) || o.return_status === 'RETURN_REQUESTED'
+      );
+      // В "История заказов" показываем все заказы пользователя (включая завершенные и с возможностью оформить возврат)
+      const listToShow = currentOrdersSubtab === 'current' ? currentList : allServerOrders;
+
+      if (listToShow.length === 0) {
+        container.innerHTML = `
+          <div class="lk-empty-orders">
+            <h3>${currentOrdersSubtab === 'current' ? 'ТЕКУЩИЕ ЗАКАЗЫ НЕ НАЙДЕНЫ' : 'ИСТОРИЯ ЗАКАЗОВ ПУСТА'}</h3>
+            <button class="btn-thin-box" onclick="openCatalogSection('ДЛЯ НЕЁ', false)">Перейти в каталог</button>
           </div>
-        `).join('');
+        `;
+        return;
+      }
+
+      container.innerHTML = listToShow.map(o => {
+        const prod = allProducts.find(p => p.id === o.product_id) || {};
+        const rStatus = o.return_status || 'NONE';
+
+        let statusBadge = `<span style="border:1px solid #222; padding:4px 10px; font-size:11px; text-transform:uppercase;">Оформлен</span>`;
+        if (rStatus === 'RETURN_REQUESTED') {
+          statusBadge = `<span style="border:1px solid #b45309; color:#b45309; padding:4px 10px; font-size:11px;">Заявка на возврат (На рассмотрении)</span>`;
+        } else if (rStatus === 'RETURN_APPROVED') {
+          statusBadge = `<span style="border:1px solid #15803d; color:#15803d; padding:4px 10px; font-size:11px;">✓ Возврат одобрен администратором</span>`;
+        } else if (rStatus === 'RETURN_REJECTED') {
+          statusBadge = `<span style="border:1px solid #b91c1c; color:#b91c1c; padding:4px 10px; font-size:11px;">✕ В возврате отказано</span>`;
+        }
+
+        return `
+          <div class="lk-framed-box" style="max-width: 660px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #f0f0f0; padding-bottom:12px; margin-bottom:16px; flex-wrap:wrap; gap:8px;">
+              <div>
+                <div style="font-size:14px; font-weight:500;">Заказ № ${o.order_id} от ${o.sale_date}</div>
+                <div style="font-size:11.5px; color:#888; margin-top:2px;">${o.delivery_method || 'Доставка курьером'} • ${o.payment_method || 'Картой'}</div>
+              </div>
+              ${statusBadge}
+            </div>
+
+            <div style="display:flex; align-items:center; justify-content:space-between; gap:16px; padding:8px 0;">
+              <div style="display:flex; align-items:center; gap:14px;">
+                <img src="${prod.image_main || 'https://images.unsplash.com/photo-1539008835657-9e8e9680c956?auto=format&fit=crop&w=900&q=85'}" style="width:48px; height:64px; object-fit:cover; background:#f4f4f4;" />
+                <div>
+                  <div style="font-size:12px; font-weight:500;">${o.product_name}</div>
+                  <div style="font-size:12px; color:#777;">Размер: <b>${o.size}</b> • Количество: ${o.quantity} ед.</div>
+                </div>
+              </div>
+              <div style="font-size:13.5px; font-weight:600;">${formatBYN(o.total_revenue)}</div>
+            </div>
+
+            ${rStatus === 'NONE' ? `
+              <div style="border-top:1px solid #f0f0f0; padding-top:14px; margin-top:12px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+                <select id="ret-reason-${o.order_id}" style="border:1px solid #e0e0e0; padding:7px 10px; font-size:11.5px; color:#444; background:#fff;">
+                  <option value="Не подошел размер">Причина возврата: Не подошел размер</option>
+                  <option value="Не подошел фасон / цвет">Причина возврата: Не подошел фасон / цвет</option>
+                  <option value="Обнаружен производственный брак">Причина возврата: Обнаружен брак</option>
+                </select>
+                <button class="btn-thin-light" style="padding:7px 16px; font-size:11.5px;" onclick="customerRequestReturn('${o.order_id}')">
+                  Оформить возврат
+                </button>
+              </div>
+            ` : `
+              <div style="border-top:1px solid #f0f0f0; padding-top:10px; margin-top:10px; font-size:11.5px; color:var(--muted);">
+                Причина возврата: <b>«${o.return_reason}»</b>
+              </div>
+            `}
+          </div>
+        `;
+      }).join('');
+    }
+
+    async function customerRequestReturn(orderId) {
+      const reasonSel = document.getElementById(`ret-reason-${orderId}`);
+      const reason = reasonSel ? reasonSel.value : 'Не подошел размер';
+      const res = await fetch(`/api/orders/${orderId}/return-request`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ reason })
+      });
+      if (res.ok) {
+        showToast(`Заявка на возврат заказа № ${orderId} отправлена администратору!`);
+        await renderProfileOrders();
+      } else {
+        const d = await res.json();
+        showToast(d.detail || 'Ошибка заявки на возврат');
+      }
+    }
+
+    async function adminDecideReturn(orderId, decision) {
+      const res = await fetch(`/api/orders/${orderId}/return-decision`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ decision })
+      });
+      if (res.ok) {
+        if (decision === 'APPROVE') {
+          showToast(`✓ Возврат по заказу № ${orderId} одобрен! Размер автоматически возвращен в наличие на склад.`);
+        } else {
+          showToast(`✕ Заявка на возврат по заказу № ${orderId} отклонена.`);
+        }
+        await renderProfileOrders();
       }
     }
 

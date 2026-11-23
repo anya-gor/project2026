@@ -67,6 +67,14 @@ class CheckoutRequest(BaseModel):
     coupon_code: str = Field(default="")
 
 
+class ReturnRequestPayload(BaseModel):
+    reason: str = Field(default="Не подошел размер", description="Причина возврата")
+
+
+class ReturnDecisionPayload(BaseModel):
+    decision: str = Field(..., description="APPROVE (Одобрить) или REJECT (Отклонить)")
+
+
 def generate_seed_orders() -> List[dict]:
     today = date.today()
     return [
@@ -249,6 +257,8 @@ def create_order(payload: OrderCreate):
         "address": payload.address,
         "comment": payload.comment,
         "sale_date": date.today().isoformat(),
+        "return_status": "NONE",
+        "return_reason": "",
         "allocations": deduction["allocations"],
     }
 
@@ -256,6 +266,51 @@ def create_order(payload: OrderCreate):
     orders.insert(0, new_order)
     save_orders(orders)
     return new_order
+
+
+@app.post("/orders/{order_id}/return-request")
+def request_order_return(order_id: str, payload: ReturnRequestPayload):
+    orders = load_orders()
+    for o in orders:
+        if o["order_id"] == order_id:
+            curr = o.get("return_status", "NONE")
+            if curr == "RETURN_APPROVED":
+                raise HTTPException(status_code=400, detail="Возврат по этому заказу уже одобрен")
+            o["return_status"] = "RETURN_REQUESTED"
+            o["return_reason"] = payload.reason
+            save_orders(orders)
+            return o
+    raise HTTPException(status_code=404, detail="Заказ не найден")
+
+
+@app.post("/orders/{order_id}/return-decision")
+def decide_order_return(order_id: str, payload: ReturnDecisionPayload):
+    orders = load_orders()
+    for o in orders:
+        if o["order_id"] == order_id:
+            decision = payload.decision.upper()
+            if decision == "APPROVE":
+                reason = o.get("return_reason", "Не подошел размер")
+                is_defect = "брак" in reason.lower()
+                with httpx.Client(timeout=10.0) as client:
+                    try:
+                        client.post(
+                            f"{WAREHOUSE_SERVICE_URL}/stock/return-item",
+                            json={
+                                "product_id": o["product_id"],
+                                "size": o["size"],
+                                "quantity": o["quantity"],
+                                "is_defect": is_defect,
+                            },
+                        )
+                    except Exception:
+                        pass
+                o["return_status"] = "RETURN_APPROVED"
+            else:
+                o["return_status"] = "RETURN_REJECTED"
+            save_orders(orders)
+            return o
+    raise HTTPException(status_code=404, detail="Заказ не найден")
 
 
 @app.post("/orders/checkout", status_code=201)

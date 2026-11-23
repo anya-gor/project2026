@@ -340,6 +340,22 @@ async def proxy_checkout(request: Request):
         return JSONResponse(status_code=r.status_code, content=r.json())
 
 
+@app.post("/api/orders/{order_id}/return-request")
+async def proxy_order_return_request(order_id: str, request: Request):
+    body = await request.json()
+    with httpx.Client(timeout=10.0) as client:
+        r = client.post(f"{ORDER_URL}/orders/{order_id}/return-request", json=body)
+        return JSONResponse(status_code=r.status_code, content=r.json())
+
+
+@app.post("/api/orders/{order_id}/return-decision")
+async def proxy_order_return_decision(order_id: str, request: Request):
+    body = await request.json()
+    with httpx.Client(timeout=10.0) as client:
+        r = client.post(f"{ORDER_URL}/orders/{order_id}/return-decision", json=body)
+        return JSONResponse(status_code=r.status_code, content=r.json())
+
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8000)
