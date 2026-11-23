@@ -341,6 +341,63 @@ def mysql_save_users(users: list) -> bool:
         return False
 
 
+# ==================== СИНХРОНИЗАЦИЯ СКЛАДА (SUPPLY_BATCHES) ====================
+def mysql_load_batches(default_batches: list) -> list | None:
+    try:
+        conn = _get_server_connection(include_db=True)
+        with conn.cursor() as cur:
+            cur.execute("SELECT COUNT(*) AS cnt FROM `supply_batches`;")
+            if cur.fetchone()["cnt"] == 0:
+                mysql_save_batches(default_batches)
+            cur.execute("SELECT * FROM `supply_batches`;")
+            rows = cur.fetchall()
+        conn.close()
+        result = []
+        for r in rows:
+            result.append({
+                "batch_id": r["batch_id"],
+                "product_id": r["product_id"],
+                "product_name": r["product_name"],
+                "size": r["size"],
+                "supplier_name": r["supplier_name"],
+                "purchase_price": float(r["purchase_price"]),
+                "initial_quantity": int(r["initial_quantity"]),
+                "remaining_quantity": int(r["remaining_quantity"]),
+                "arrival_date": str(r["arrival_date"]),
+                "expiry_date": str(r["expiry_date"]),
+            })
+        return result
+    except Exception:
+        return None
+
+
+def mysql_save_batches(batches: list) -> bool:
+    try:
+        conn = _get_server_connection(include_db=True)
+        with conn.cursor() as cur:
+            cur.execute("DELETE FROM `supply_batches`;")
+            for b in batches:
+                cur.execute(
+                    """
+                    INSERT INTO `supply_batches` (
+                        `batch_id`, `product_id`, `product_name`, `size`, `supplier_name`,
+                        `purchase_price`, `initial_quantity`, `remaining_quantity`,
+                        `arrival_date`, `expiry_date`
+                    ) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s);
+                    """,
+                    (
+                        b["batch_id"], b["product_id"], b["product_name"], b["size"],
+                        b["supplier_name"], float(b["purchase_price"]),
+                        int(b["initial_quantity"]), int(b["remaining_quantity"]),
+                        str(b["arrival_date"]), str(b["expiry_date"]),
+                    ),
+                )
+        conn.close()
+        return True
+    except Exception:
+        return False
+
+
 # ==================== СИНХРОНИЗАЦИЯ ЗАКАЗОВ (ORDERS) ====================
 def mysql_load_orders(default_orders: list) -> list | None:
     try:

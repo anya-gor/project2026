@@ -798,20 +798,51 @@
       flex-wrap: wrap;
     }
     .size-box {
-      width: 42px;
-      height: 42px;
+      min-width: 56px;
+      height: 50px;
+      padding: 4px 8px;
       border: 1px solid var(--border);
       border-radius: 2.5px;
       background: var(--pure-white);
       display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
       font-size: 12px;
       cursor: pointer;
+      transition: 0.15s;
+    }
+    .size-box .sz-qty {
+      font-size: 10px;
+      color: var(--muted);
+      font-weight: 400;
+      margin-top: 2px;
     }
     .size-box.active {
       border-color: var(--espresso);
       font-weight: 600;
+    }
+    .size-box.active .sz-qty {
+      color: var(--coffee);
+      font-weight: 600;
+    }
+    .size-box.out-of-stock {
+      opacity: 0.45;
+    }
+    .card-sizes-stock {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 5px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .card-sz-pill {
+      background: var(--soft-white);
+      border: 1px solid var(--border);
+      padding: 1px 6px;
+      border-radius: 2px;
+      font-size: 10.5px;
     }
     .size-chart-link {
       display: inline-block;
@@ -2275,6 +2306,8 @@
     }
 
     async function renderAdminCatalogList() {
+      const sRes = await fetch('/api/warehouse/stock-summary');
+      stockSummary = await sRes.json();
       await fetchAllProducts();
       const box = document.getElementById('adm-minimal-products-list');
       if (!box) return;
@@ -2285,6 +2318,7 @@
             <div>
               <div style="font-size:11.5px; font-weight:500;">${p.brand} — ${p.name}</div>
               <div style="font-size:10.5px; color:#999;">${p.gender} • ${p.category}</div>
+              ${renderProductSizesBadges(p)}
             </div>
           </div>
           <div class="address-row-right">
@@ -2442,8 +2476,18 @@
       loadCatalogProducts();
     }
 
+    function renderProductSizesBadges(product) {
+      const st = stockSummary[product.id] || { total_available: 0, sizes: {} };
+      return `<div class="card-sizes-stock">` + product.sizes.map(sz => {
+        const cnt = st.sizes[sz] || 0;
+        return `<span class="card-sz-pill">${sz}: <b>${cnt} шт.</b></span>`;
+      }).join('') + `</div>`;
+    }
+
     /* ==================== ГЛАВНАЯ И КАТАЛОГ ==================== */
     async function loadHomeNovelties() {
+      const sRes = await fetch('/api/warehouse/stock-summary');
+      stockSummary = await sRes.json();
       const res = await fetch('/api/catalog/products?only_new=true');
       noveltiesList = await res.json();
       renderNoveltiesSlice();
@@ -2476,6 +2520,7 @@
           <div class="fashion-card-brand" style="font-size:11.5px;">${p.brand}</div>
           <div class="fashion-card-name">${p.name}</div>
           <div class="fashion-card-price">${formatBYN(p.retail_price)}</div>
+          ${renderProductSizesBadges(p)}
         </div>
       `).join('');
     }
@@ -2519,6 +2564,7 @@
           <div class="fashion-card-brand">${p.brand}</div>
           <div class="fashion-card-name">${p.name}</div>
           <div class="fashion-card-price">${formatBYN(p.retail_price)}</div>
+          ${renderProductSizesBadges(p)}
         </div>
       `).join('');
     }
@@ -2530,7 +2576,14 @@
       const res = await fetch(`/api/catalog/products/${productId}`);
       if (!res.ok) return;
       currentProduct = await res.json();
+      const st = stockSummary[currentProduct.id] || { total_available: 0, sizes: {} };
       selectedDetailSize = currentProduct.sizes[0] || "S";
+      for (const sz of currentProduct.sizes) {
+        if ((st.sizes[sz] || 0) > 0) {
+          selectedDetailSize = sz;
+          break;
+        }
+      }
 
       renderProductDetail();
       navigateTo('product');
@@ -2540,6 +2593,8 @@
       const p = currentProduct;
       if (!p) return;
       const isFav = favorites.includes(p.id);
+      const st = stockSummary[p.id] || { total_available: 0, sizes: {} };
+      const selectedSizeStock = st.sizes[selectedDetailSize] || 0;
 
       document.getElementById('detail-breadcrumbs').innerHTML = `
         <span onclick="navigateTo('home')">Главная</span> -
@@ -2549,8 +2604,15 @@
       `;
 
       const sizeBoxes = p.sizes.map(sz => {
+        const cnt = st.sizes[sz] || 0;
         const activeCls = sz === selectedDetailSize ? 'active' : '';
-        return `<div class="size-box ${activeCls}" onclick="selectProductSize('${sz}')">${sz}</div>`;
+        const outCls = cnt <= 0 ? 'out-of-stock' : '';
+        return `
+          <div class="size-box ${activeCls} ${outCls}" onclick="selectProductSize('${sz}')">
+            <span>${sz}</span>
+            <span class="sz-qty">${cnt} шт.</span>
+          </div>
+        `;
       }).join('');
 
       document.getElementById('product-detail-container').innerHTML = `
@@ -2575,6 +2637,10 @@
           <div class="detail-price">${formatBYN(p.retail_price)}</div>
 
           <div class="size-selector">${sizeBoxes}</div>
+          <div style="font-size:12px; color:var(--coffee); margin-bottom:8px;">
+            В наличии размера <b>${selectedDetailSize}</b>: <b>${selectedSizeStock} шт.</b>
+            <span style="color:var(--muted); margin-left:8px;">(Всего по всем размерам: ${st.total_available || 0} шт.)</span>
+          </div>
           <div class="size-chart-link" onclick="showToast('Таблица размеров: XS (40-42), S (42-44), M (46), L (48-50), XL (52).')">
             Таблица размеров
           </div>

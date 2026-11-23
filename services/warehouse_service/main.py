@@ -1,11 +1,15 @@
 import json
 import os
+import sys
 import uuid
 from datetime import date, timedelta
 from typing import List, Optional
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
+
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
+from database.mysql_client import mysql_load_batches, mysql_save_batches
 
 app = FastAPI(
     title="MONROE — Warehouse & Batches Microservice",
@@ -287,6 +291,30 @@ def generate_seed_data() -> dict:
             "arrival_date": d_minus_5,
             "expiry_date": exp_valid_1,
         },
+        # Дополнительные размеры для всех моделей, чтобы на сайте отображалось точное наличие по размерам XS, S, M, L, XL
+        {"batch_id": "BATCH-219", "product_id": "prod-1", "product_name": "PATRIZIA PEPE — Темно-синее мини-платье", "size": "L", "supplier_name": "Tessilform S.p.A.", "purchase_price": 430.0, "initial_quantity": 5, "remaining_quantity": 3, "arrival_date": d_minus_5, "expiry_date": exp_valid_1},
+        {"batch_id": "BATCH-220", "product_id": "prod-2", "product_name": "GIUSEPPE DI MORABITO — Двубортное приталенное пальто", "size": "L", "supplier_name": "Morabito Atelier Milano", "purchase_price": 1650.0, "initial_quantity": 4, "remaining_quantity": 2, "arrival_date": d_minus_5, "expiry_date": exp_valid_1},
+        {"batch_id": "BATCH-221", "product_id": "prod-4", "product_name": "GIUSEPPE DI MORABITO — Джемпер из мериноса с кружевом", "size": "XS", "supplier_name": "Morabito Atelier Milano", "purchase_price": 1100.0, "initial_quantity": 4, "remaining_quantity": 3, "arrival_date": d_minus_5, "expiry_date": exp_valid_1},
+        {"batch_id": "BATCH-222", "product_id": "prod-4", "product_name": "GIUSEPPE DI MORABITO — Джемпер из мериноса с кружевом", "size": "M", "supplier_name": "Morabito Atelier Milano", "purchase_price": 1100.0, "initial_quantity": 6, "remaining_quantity": 4, "arrival_date": d_minus_5, "expiry_date": exp_valid_1},
+        {"batch_id": "BATCH-223", "product_id": "prod-5", "product_name": "GIUSEPPE DI MORABITO — Брюки-палаццо с защипами", "size": "XS", "supplier_name": "EuroFashion Distribution", "purchase_price": 780.0, "initial_quantity": 5, "remaining_quantity": 4, "arrival_date": d_minus_5, "expiry_date": exp_valid_1},
+        {"batch_id": "BATCH-224", "product_id": "prod-5", "product_name": "GIUSEPPE DI MORABITO — Брюки-палаццо с защипами", "size": "L", "supplier_name": "EuroFashion Distribution", "purchase_price": 780.0, "initial_quantity": 5, "remaining_quantity": 3, "arrival_date": d_minus_5, "expiry_date": exp_valid_1},
+        {"batch_id": "BATCH-225", "product_id": "prod-6", "product_name": "PATRIZIA PEPE — Кожаная мини-сумка бьюти-кейс", "size": "ONE SIZE", "supplier_name": "Tessilform S.p.A.", "purchase_price": 410.0, "initial_quantity": 8, "remaining_quantity": 6, "arrival_date": d_minus_5, "expiry_date": exp_valid_1},
+        {"batch_id": "BATCH-226", "product_id": "prod-7", "product_name": "PATRIZIA PEPE — Кожаный ремень с пряжкой Fly", "size": "S", "supplier_name": "Tessilform S.p.A.", "purchase_price": 210.0, "initial_quantity": 6, "remaining_quantity": 5, "arrival_date": d_minus_5, "expiry_date": exp_valid_1},
+        {"batch_id": "BATCH-227", "product_id": "prod-7", "product_name": "PATRIZIA PEPE — Кожаный ремень с пряжкой Fly", "size": "M", "supplier_name": "Tessilform S.p.A.", "purchase_price": 210.0, "initial_quantity": 8, "remaining_quantity": 7, "arrival_date": d_minus_5, "expiry_date": exp_valid_1},
+        {"batch_id": "BATCH-228", "product_id": "prod-7", "product_name": "PATRIZIA PEPE — Кожаный ремень с пряжкой Fly", "size": "L", "supplier_name": "Tessilform S.p.A.", "purchase_price": 210.0, "initial_quantity": 5, "remaining_quantity": 3, "arrival_date": d_minus_5, "expiry_date": exp_valid_1},
+        {"batch_id": "BATCH-229", "product_id": "prod-10", "product_name": "GIUSEPPE DI MORABITO — Мужское кашемировое пальто", "size": "M", "supplier_name": "Morabito Atelier Milano", "purchase_price": 1800.0, "initial_quantity": 5, "remaining_quantity": 4, "arrival_date": d_minus_5, "expiry_date": exp_valid_1},
+        {"batch_id": "BATCH-230", "product_id": "prod-10", "product_name": "GIUSEPPE DI MORABITO — Мужское кашемировое пальто", "size": "XL", "supplier_name": "Morabito Atelier Milano", "purchase_price": 1800.0, "initial_quantity": 4, "remaining_quantity": 3, "arrival_date": d_minus_5, "expiry_date": exp_valid_1},
+        {"batch_id": "BATCH-231", "product_id": "prod-11", "product_name": "PATRIZIA PEPE — Мужские шерстяные брюки со стрелками", "size": "M", "supplier_name": "Tessilform S.p.A.", "purchase_price": 750.0, "initial_quantity": 6, "remaining_quantity": 5, "arrival_date": d_minus_5, "expiry_date": exp_valid_1},
+        {"batch_id": "BATCH-232", "product_id": "prod-11", "product_name": "PATRIZIA PEPE — Мужские шерстяные брюки со стрелками", "size": "XL", "supplier_name": "Tessilform S.p.A.", "purchase_price": 750.0, "initial_quantity": 5, "remaining_quantity": 4, "arrival_date": d_minus_5, "expiry_date": exp_valid_1},
+        {"batch_id": "BATCH-233", "product_id": "prod-12", "product_name": "GIUSEPPE DI MORABITO — Мужской джемпер крупной вязки", "size": "L", "supplier_name": "Morabito Atelier Milano", "purchase_price": 650.0, "initial_quantity": 7, "remaining_quantity": 5, "arrival_date": d_minus_5, "expiry_date": exp_valid_1},
+        {"batch_id": "BATCH-234", "product_id": "prod-12", "product_name": "GIUSEPPE DI MORABITO — Мужской джемпер крупной вязки", "size": "XL", "supplier_name": "Morabito Atelier Milano", "purchase_price": 650.0, "initial_quantity": 5, "remaining_quantity": 3, "arrival_date": d_minus_5, "expiry_date": exp_valid_1},
+        {"batch_id": "BATCH-235", "product_id": "prod-13", "product_name": "PATRIZIA PEPE — Мужской кожаный картхолдер", "size": "M", "supplier_name": "Tessilform S.p.A.", "purchase_price": 180.0, "initial_quantity": 8, "remaining_quantity": 6, "arrival_date": d_minus_5, "expiry_date": exp_valid_1},
+        {"batch_id": "BATCH-236", "product_id": "prod-13", "product_name": "PATRIZIA PEPE — Мужской кожаный картхолдер", "size": "L", "supplier_name": "Tessilform S.p.A.", "purchase_price": 180.0, "initial_quantity": 6, "remaining_quantity": 5, "arrival_date": d_minus_5, "expiry_date": exp_valid_1},
+        {"batch_id": "BATCH-237", "product_id": "prod-14", "product_name": "PATRIZIA PEPE — Мужская рубашка из египетского хлопка", "size": "M", "supplier_name": "Tessilform S.p.A.", "purchase_price": 390.0, "initial_quantity": 8, "remaining_quantity": 6, "arrival_date": d_minus_5, "expiry_date": exp_valid_1},
+        {"batch_id": "BATCH-238", "product_id": "prod-14", "product_name": "PATRIZIA PEPE — Мужская рубашка из египетского хлопка", "size": "L", "supplier_name": "Tessilform S.p.A.", "purchase_price": 390.0, "initial_quantity": 8, "remaining_quantity": 7, "arrival_date": d_minus_5, "expiry_date": exp_valid_1},
+        {"batch_id": "BATCH-239", "product_id": "prod-14", "product_name": "PATRIZIA PEPE — Мужская рубашка из египетского хлопка", "size": "XL", "supplier_name": "Tessilform S.p.A.", "purchase_price": 390.0, "initial_quantity": 5, "remaining_quantity": 4, "arrival_date": d_minus_5, "expiry_date": exp_valid_1},
+        {"batch_id": "BATCH-240", "product_id": "prod-15", "product_name": "GIUSEPPE DI MORABITO — Мужской городской кожаный рюкзак", "size": "L", "supplier_name": "Morabito Atelier Milano", "purchase_price": 850.0, "initial_quantity": 6, "remaining_quantity": 5, "arrival_date": d_minus_5, "expiry_date": exp_valid_1},
+        {"batch_id": "BATCH-241", "product_id": "prod-15", "product_name": "GIUSEPPE DI MORABITO — Мужской городской кожаный рюкзак", "size": "XL", "supplier_name": "Morabito Atelier Milano", "purchase_price": 850.0, "initial_quantity": 4, "remaining_quantity": 3, "arrival_date": d_minus_5, "expiry_date": exp_valid_1},
     ]
 
     writeoffs = [
@@ -326,20 +354,25 @@ def generate_seed_data() -> dict:
 
 
 def load_db() -> dict:
+    seed = generate_seed_data()
+    mysql_batches = mysql_load_batches(seed["batches"])
     if not os.path.exists(DATA_FILE):
-        seed = generate_seed_data()
+        if mysql_batches is not None and len(mysql_batches) > 0:
+            seed["batches"] = mysql_batches
         save_db(seed)
         return seed
     with open(DATA_FILE, "r", encoding="utf-8") as f:
         data = json.load(f)
-    if not data.get("batches") or data["batches"][0]["batch_id"].startswith("BATCH-1"):
-        seed = generate_seed_data()
+    if not data.get("batches") or len(data["batches"]) < 25:
         save_db(seed)
         return seed
+    if mysql_batches is not None and len(mysql_batches) >= len(data["batches"]):
+        data["batches"] = mysql_batches
     return data
 
 
 def save_db(data: dict):
+    mysql_save_batches(data.get("batches", []))
     with open(DATA_FILE, "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, indent=2)
 
