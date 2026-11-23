@@ -1129,7 +1129,6 @@
         <a id="nav-home" class="active" onclick="navigateTo('home')">ГЛАВНАЯ</a>
         <a id="nav-women" onclick="openCatalogSection('ДЛЯ НЕЁ', false)">ДЛЯ НЕЁ ⌄</a>
         <a id="nav-men" onclick="openCatalogSection('ДЛЯ НЕГО', false)">ДЛЯ НЕГО ⌄</a>
-        <a id="nav-novelties" onclick="openCatalogSection('ДЛЯ НЕЁ', true)">НОВИНКИ</a>
       </nav>
     </div>
 
@@ -1631,11 +1630,52 @@
         <div class="auth-center-actions">
           <button class="btn-thin-light" onclick="submitLogin()">Войти</button>
           <br/>
-          <span class="auth-forgot-link" onclick="showToast('Инструкция по восстановлению пароля отправлена по SMS')">Забыли пароль?</span>
+          <span class="auth-forgot-link" onclick="switchAuthTab('forgot')">Забыли пароль?</span>
           <div style="margin-top: 16px; font-size: 11px; color: #aaa; line-height: 1.6;">
             Тел. Покупателя: <u style="cursor:pointer;" onclick="fillAuth('375445658384','123')">375445658384 (пароль: 123)</u><br/>
             Тел. Админа: <u style="cursor:pointer;" onclick="fillAuth('375291111111','admin123')">375291111111 (пароль: admin123)</u>
           </div>
+        </div>
+      </div>
+
+      <!-- ФОРМА ВОССТАНОВЛЕНИЯ ПАРОЛЯ ("ЗАБЫЛИ ПАРОЛЬ?") -->
+      <div id="authform-forgot" style="display:none;">
+        <div class="auth-subtitle">
+          Введите ваш номер телефона для получения<br/>кода восстановления и смены пароля
+        </div>
+
+        <div class="auth-login-group">
+          <span class="auth-float-label">Логин (Телефон) *</span>
+          <select class="auth-country-select" id="forgot-country" onchange="onCountryChange('forgot')">
+            <option value="Беларусь">Беларусь</option>
+            <option value="Россия">Россия</option>
+            <option value="Казахстан">Казахстан</option>
+          </select>
+          <input type="tel" class="auth-login-input" id="forgot-phone" value="375445658384" />
+        </div>
+
+        <div style="text-align:center; margin-bottom:18px;">
+          <button class="btn-thin-light" onclick="requestResetCode()">Получить SMS-код</button>
+        </div>
+
+        <div id="forgot-step2" style="display:none;">
+          <div class="auth-field-group">
+            <span class="auth-float-label">Код из SMS *</span>
+            <input type="text" id="forgot-code" placeholder="4 цифры" />
+          </div>
+
+          <div class="auth-field-group">
+            <span class="auth-float-label">Новый пароль *</span>
+            <input type="password" id="forgot-new-password" placeholder="Введите новый пароль" />
+          </div>
+
+          <div class="auth-center-actions">
+            <button class="btn-thin-box" onclick="confirmResetPassword()">Сохранить новый пароль</button>
+          </div>
+        </div>
+
+        <div class="auth-center-actions" style="margin-top:12px;">
+          <span class="auth-forgot-link" onclick="switchAuthTab('login')">← Вернуться ко входу</span>
         </div>
       </div>
 
@@ -1887,10 +1927,64 @@
     }
 
     function switchAuthTab(tab) {
-      document.getElementById('authtab-login').classList.toggle('active', tab === 'login');
+      document.getElementById('authtab-login').classList.toggle('active', tab === 'login' || tab === 'forgot');
       document.getElementById('authtab-register').classList.toggle('active', tab === 'register');
       document.getElementById('authform-login').style.display = tab === 'login' ? 'block' : 'none';
       document.getElementById('authform-register').style.display = tab === 'register' ? 'block' : 'none';
+      const forgotEl = document.getElementById('authform-forgot');
+      if (forgotEl) {
+        forgotEl.style.display = tab === 'forgot' ? 'block' : 'none';
+        if (tab === 'forgot') {
+          document.getElementById('forgot-phone').value = document.getElementById('login-phone').value;
+        }
+      }
+    }
+
+    async function requestResetCode() {
+      const login = document.getElementById('forgot-phone').value.trim();
+      if (!login) {
+        showToast('Введите ваш номер телефона');
+        return;
+      }
+      const res = await fetch('/api/auth/request-reset-code', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ login })
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        showToast(data.detail || 'Ошибка отправки кода');
+        return;
+      }
+      document.getElementById('forgot-step2').style.display = 'block';
+      document.getElementById('forgot-code').value = data.sms_code_demo;
+      showToast(`📲 SMS-код восстановления для ${data.login}: <b>${data.sms_code_demo}</b>`);
+    }
+
+    async function confirmResetPassword() {
+      const login = document.getElementById('forgot-phone').value.trim();
+      const code = document.getElementById('forgot-code').value.trim();
+      const new_password = document.getElementById('forgot-new-password').value.trim();
+      if (!login || !code || !new_password) {
+        showToast('Заполните код из SMS и новый пароль');
+        return;
+      }
+      const res = await fetch('/api/auth/reset-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ login, code, new_password })
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        showToast(data.detail || 'Ошибка смены пароля');
+        return;
+      }
+      showToast('✅ Пароль успешно изменен в базе данных! Теперь вы можете войти.');
+      document.getElementById('login-phone').value = data.user.login;
+      document.getElementById('login-password').value = new_password;
+      document.getElementById('forgot-step2').style.display = 'none';
+      document.getElementById('forgot-new-password').value = '';
+      switchAuthTab('login');
     }
 
     function fillAuth(loginVal, passVal) {
@@ -1899,8 +1993,10 @@
     }
 
     function onCountryChange(mode) {
-      const sel = document.getElementById(mode === 'reg' ? 'reg-country' : 'login-country').value;
-      const inp = document.getElementById(mode === 'reg' ? 'reg-phone' : 'login-phone');
+      const selId = mode === 'reg' ? 'reg-country' : (mode === 'forgot' ? 'forgot-country' : 'login-country');
+      const inpId = mode === 'reg' ? 'reg-phone' : (mode === 'forgot' ? 'forgot-phone' : 'login-phone');
+      const sel = document.getElementById(selId).value;
+      const inp = document.getElementById(inpId);
       const prefixes = { 'Беларусь': '375', 'Россия': '79', 'Казахстан': '77' };
       if (mode === 'reg' || inp.value.length <= 4) {
         inp.value = prefixes[sel] || '375';
@@ -2279,12 +2375,20 @@
       try {
         const res = await fetch('/api/system-status');
         const data = await res.json();
-        document.getElementById('ms-status-bar').innerHTML = data.services.map(s => `
+        const msHtml = data.services.map(s => `
           <span class="ms-pill">
             <span class="ms-dot ${s.online ? 'online' : 'offline'}"></span>
             <span>${s.name} (:${s.port})</span>
           </span>
         `).join('');
+        const db = data.mysql || { online: false };
+        const dbHtml = `
+          <span class="ms-pill" title="${db.online ? 'Подключено к MySQL (Open Server)' : 'Ожидание запуска MySQL в Open Server (:3306)'}">
+            <span class="ms-dot ${db.online ? 'online' : ''}"></span>
+            <span>MySQL DB (${db.online ? 'mad_fashion_db :3306' : 'JSON + ожидание OpenServer :3306'})</span>
+          </span>
+        `;
+        document.getElementById('ms-status-bar').innerHTML = msHtml + dbHtml;
       } catch (e) {
         console.error(e);
       }

@@ -1,11 +1,18 @@
 import json
 import os
+import random
+import sys
 from datetime import date, timedelta
 from typing import Optional
 import httpx
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, JSONResponse
+
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+from database.mysql_client import check_mysql_status, mysql_load_users, mysql_save_users
+
+RESET_CODES = {}
 
 app = FastAPI(
     title="MAD FASHION — API Gateway & Luxury Storefront UI",
@@ -67,6 +74,9 @@ DEFAULT_USERS = [
 
 
 def load_users():
+    mysql_users = mysql_load_users(DEFAULT_USERS)
+    if mysql_users is not None and len(mysql_users) > 0:
+        return mysql_users
     if not os.path.exists(USERS_FILE):
         save_users(DEFAULT_USERS)
         return DEFAULT_USERS
@@ -80,6 +90,7 @@ def load_users():
 
 
 def save_users(users):
+    mysql_save_users(users)
     with open(USERS_FILE, "w", encoding="utf-8") as f:
         json.dump(users, f, ensure_ascii=False, indent=2)
 
@@ -159,6 +170,53 @@ async def auth_register(request: Request):
     return {"status": "ok", "user": new_user}
 
 
+@app.post("/api/auth/request-reset-code")
+async def request_password_reset_code(request: Request):
+    body = await request.json()
+    raw_login = str(body.get("login", "")).strip()
+    digits_only = "".join(ch for ch in raw_login if ch.isdigit())
+    login = digits_only if len(digits_only) >= 7 else raw_login
+
+    if not login:
+        raise HTTPException(status_code=400, detail="Введите номер телефона")
+
+    users = load_users()
+    found = any(u["login"].lower() == login.lower() for u in users)
+    if not found:
+        raise HTTPException(status_code=404, detail="Пользователь с таким номером телефона не найден")
+
+    code = str(random.randint(1000, 9999))
+    RESET_CODES[login.lower()] = code
+    return {"status": "ok", "login": login, "sms_code_demo": code}
+
+
+@app.post("/api/auth/reset-password")
+async def reset_password_confirm(request: Request):
+    body = await request.json()
+    raw_login = str(body.get("login", "")).strip()
+    digits_only = "".join(ch for ch in raw_login if ch.isdigit())
+    login = digits_only if len(digits_only) >= 7 else raw_login
+    code = str(body.get("code", "")).strip()
+    new_password = str(body.get("new_password", "")).strip()
+
+    if not login or not code or not new_password:
+        raise HTTPException(status_code=400, detail="Заполните номер телефона, SMS-код и новый пароль")
+
+    expected_code = RESET_CODES.get(login.lower())
+    if not expected_code or expected_code != code:
+        raise HTTPException(status_code=400, detail="Неверный SMS-код подтверждения")
+
+    users = load_users()
+    for u in users:
+        if u["login"].lower() == login.lower():
+            u["password"] = new_password
+            save_users(users)
+            RESET_CODES.pop(login.lower(), None)
+            return {"status": "ok", "user": u}
+
+    raise HTTPException(status_code=404, detail="Пользователь не найден")
+
+
 @app.get("/api/system-status")
 def check_microservices_health():
     services = [
@@ -181,7 +239,8 @@ def check_microservices_health():
                 "port": s["port"],
                 "online": online,
             })
-    return {"gateway": "online", "services": results}
+    mysql_info = check_mysql_status()
+    return {"gateway": "online", "services": results, "mysql": mysql_info}
 
 
 @app.get("/api/catalog/products")

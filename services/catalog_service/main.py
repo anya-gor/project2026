@@ -1,10 +1,14 @@
 import json
 import os
+import sys
 import uuid
 from typing import List, Optional
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
+
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
+from database.mysql_client import mysql_load_products, mysql_save_products
 
 app = FastAPI(
     title="MAD FASHION — Catalog Microservice",
@@ -388,6 +392,9 @@ DEFAULT_PRODUCTS = [
 
 
 def load_products() -> List[dict]:
+    mysql_data = mysql_load_products(DEFAULT_PRODUCTS)
+    if mysql_data is not None and len(mysql_data) > 0:
+        return mysql_data
     if not os.path.exists(DATA_FILE):
         save_products(DEFAULT_PRODUCTS)
         return DEFAULT_PRODUCTS
@@ -400,6 +407,7 @@ def load_products() -> List[dict]:
 
 
 def save_products(products: List[dict]):
+    mysql_save_products(products)
     with open(DATA_FILE, "w", encoding="utf-8") as f:
         json.dump(products, f, ensure_ascii=False, indent=2)
 

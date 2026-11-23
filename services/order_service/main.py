@@ -1,5 +1,6 @@
 import json
 import os
+import sys
 import uuid
 from datetime import date, timedelta
 from typing import List, Optional
@@ -7,6 +8,9 @@ import httpx
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
+
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
+from database.mysql_client import mysql_load_orders, mysql_save_orders
 
 app = FastAPI(
     title="MAD FASHION — Order & Checkout Microservice",
@@ -145,6 +149,9 @@ def generate_seed_orders() -> List[dict]:
 
 
 def load_orders() -> List[dict]:
+    mysql_data = mysql_load_orders(generate_seed_orders())
+    if mysql_data is not None:
+        return mysql_data
     if not os.path.exists(DATA_FILE):
         seed = generate_seed_orders()
         save_orders(seed)
@@ -159,6 +166,7 @@ def load_orders() -> List[dict]:
 
 
 def save_orders(orders: List[dict]):
+    mysql_save_orders(orders)
     with open(DATA_FILE, "w", encoding="utf-8") as f:
         json.dump(orders, f, ensure_ascii=False, indent=2)
 

@@ -1,5 +1,34 @@
 [
   {
+    "order_id": "ORD-5CFAA",
+    "product_id": "prod-5",
+    "product_name": "GIUSEPPE DI MORABITO — Брюки-палаццо с защипами",
+    "size": "S",
+    "quantity": 1,
+    "unit_retail_price": 1850.0,
+    "total_revenue": 1850.0,
+    "total_supplier_cost": 780.0,
+    "gross_profit": 1070.0,
+    "customer_name": "Анна Ковалева",
+    "city": "Минск, Минская область, Беларусь",
+    "delivery_method": "Доставка курьером",
+    "payment_method": "Картой при получении",
+    "email": "client@madfashion.by",
+    "phone": "+375 44 565-83-84",
+    "address": "пр. Победителей, д. 65, кв. 12",
+    "comment": "",
+    "sale_date": "2026-11-23",
+    "allocations": [
+      {
+        "batch_id": "BATCH-209",
+        "supplier_name": "EuroFashion Distribution (Милан)",
+        "quantity": 1,
+        "unit_purchase_price": 780.0,
+        "subtotal_cost": 780.0
+      }
+    ]
+  },
+  {
     "order_id": "ORD-B3360",
     "product_id": "prod-1",
     "product_name": "PATRIZIA PEPE — Темно-синее мини-платье",
