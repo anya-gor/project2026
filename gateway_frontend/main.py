@@ -1,14 +1,14 @@
 import os
 from typing import Optional
 import httpx
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, JSONResponse
 
 app = FastAPI(
-    title="AURA Wear — API Gateway & Storefront UI",
-    description="Единый шлюз (API Gateway) и веб-интерфейс микросервисной системы бренда одежды AURA Wear",
-    version="1.0.0",
+    title="MAD FASHION — API Gateway & Luxury Storefront UI",
+    description="Единый шлюз (API Gateway) и веб-интерфейс микросервисной системы бутика одежды MAD FASHION",
+    version="2.0.0",
 )
 
 app.add_middleware(
@@ -60,19 +60,30 @@ def check_microservices_health():
 def proxy_get_products(
     search: Optional[str] = None,
     category: Optional[str] = None,
-    collection: Optional[str] = None,
+    brand: Optional[str] = None,
+    color: Optional[str] = None,
+    gender: Optional[str] = None,
     size: Optional[str] = None,
-    max_price: Optional[float] = None,
+    sort: Optional[str] = None,
 ):
     params = {k: v for k, v in {
         "search": search,
         "category": category,
-        "collection": collection,
+        "brand": brand,
+        "color": color,
+        "gender": gender,
         "size": size,
-        "max_price": max_price,
+        "sort": sort,
     }.items() if v is not None and v != ""}
     with httpx.Client(timeout=10.0) as client:
         r = client.get(f"{CATALOG_URL}/products", params=params)
+        return JSONResponse(status_code=r.status_code, content=r.json())
+
+
+@app.get("/api/catalog/products/{product_id}")
+def proxy_get_product_detail(product_id: str):
+    with httpx.Client(timeout=10.0) as client:
+        r = client.get(f"{CATALOG_URL}/products/{product_id}")
         return JSONResponse(status_code=r.status_code, content=r.json())
 
 
@@ -156,6 +167,14 @@ async def proxy_create_order(request: Request):
     body = await request.json()
     with httpx.Client(timeout=10.0) as client:
         r = client.post(f"{ORDER_URL}/orders", json=body)
+        return JSONResponse(status_code=r.status_code, content=r.json())
+
+
+@app.post("/api/orders/checkout")
+async def proxy_checkout(request: Request):
+    body = await request.json()
+    with httpx.Client(timeout=10.0) as client:
+        r = client.post(f"{ORDER_URL}/orders/checkout", json=body)
         return JSONResponse(status_code=r.status_code, content=r.json())
 
 

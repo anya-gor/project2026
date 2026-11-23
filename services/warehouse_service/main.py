@@ -1,16 +1,16 @@
 import json
 import os
 import uuid
-from datetime import date, datetime, timedelta
+from datetime import date, timedelta
 from typing import List, Optional
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
 app = FastAPI(
-    title="AURA Wear — Warehouse & Batches Microservice",
-    description="Микросервис складского учета партий от поставщиков, контроля сроков годности/сезона и списаний",
-    version="1.0.0",
+    title="MAD FASHION — Warehouse & Batches Microservice",
+    description="Микросервис складского учета партий от поставщиков (в BYN), контроля сроков сезона и списаний",
+    version="2.0.0",
 )
 
 app.add_middleware(
@@ -28,11 +28,11 @@ class BatchCreate(BaseModel):
     product_id: str = Field(..., description="ID модели из каталога")
     product_name: str = Field(..., description="Название модели одежды")
     size: str = Field(..., description="Размер (XS, S, M, L, XL, ONE SIZE)")
-    supplier_name: str = Field(..., description="Поставщик / Швейная фабрика")
-    purchase_price: float = Field(..., gt=0, description="Закупочная цена за 1 ед. у поставщика (руб.)")
+    supplier_name: str = Field(..., description="Поставщик / Дистрибьютор")
+    purchase_price: float = Field(..., gt=0, description="Закупочная цена за 1 ед. у поставщика (BYN)")
     quantity: int = Field(..., gt=0, description="Количество поступивших единиц")
     arrival_date: Optional[str] = Field(None, description="Дата поступления (YYYY-MM-DD)")
-    expiry_date: str = Field(..., description="Срок годности / окончания сезонной реализации (YYYY-MM-DD)")
+    expiry_date: str = Field(..., description="Срок окончания сезонной реализации / годности (YYYY-MM-DD)")
 
 
 class SaleDeductRequest(BaseModel):
@@ -60,123 +60,170 @@ def generate_seed_data() -> dict:
 
     exp_valid_1 = (today + timedelta(days=60)).isoformat()
     exp_valid_2 = (today + timedelta(days=45)).isoformat()
-    exp_soon_1 = (today + timedelta(days=5)).isoformat()
-    exp_soon_2 = (today + timedelta(days=9)).isoformat()
-    exp_expired_1 = (today - timedelta(days=3)).isoformat()
-    exp_expired_2 = (today - timedelta(days=8)).isoformat()
+    exp_soon_1 = (today + timedelta(days=6)).isoformat()
+    exp_soon_2 = (today + timedelta(days=11)).isoformat()
+    exp_expired_1 = (today - timedelta(days=4)).isoformat()
 
     batches = [
-        # Партия 1 и Партия 2 одного и того же худи M от РАЗНЫХ поставщиков по РАЗНОЙ закупочной цене
+        # Темно-синее мини-платье PATRIZIA PEPE (от двух разных поставщиков по разной закупочной цене в BYN)
         {
-            "batch_id": "BATCH-101",
+            "batch_id": "BATCH-201",
             "product_id": "prod-1",
-            "product_name": "Оверсайз худи «Eclipse Heavy»",
-            "size": "M",
-            "supplier_name": "ООО «Фабрика ТекстильПро»",
-            "purchase_price": 2400.0,
-            "initial_quantity": 15,
-            "remaining_quantity": 8,
+            "product_name": "PATRIZIA PEPE — Темно-синее мини-платье",
+            "size": "S",
+            "supplier_name": "Tessilform S.p.A. (Флоренция, Италия)",
+            "purchase_price": 420.0,
+            "initial_quantity": 10,
+            "remaining_quantity": 6,
             "arrival_date": d_minus_25,
             "expiry_date": exp_valid_1,
         },
         {
-            "batch_id": "BATCH-102",
+            "batch_id": "BATCH-202",
             "product_id": "prod-1",
-            "product_name": "Оверсайз худи «Eclipse Heavy»",
-            "size": "M",
-            "supplier_name": "Швейный цех «Ателье МодаПлюс»",
-            "purchase_price": 2850.0,
-            "initial_quantity": 10,
-            "remaining_quantity": 10,
+            "product_name": "PATRIZIA PEPE — Темно-синее мини-платье",
+            "size": "S",
+            "supplier_name": "EuroFashion Distribution (Милан)",
+            "purchase_price": 490.0,
+            "initial_quantity": 8,
+            "remaining_quantity": 8,
             "arrival_date": d_minus_10,
             "expiry_date": exp_valid_2,
         },
         {
-            "batch_id": "BATCH-103",
+            "batch_id": "BATCH-203",
             "product_id": "prod-1",
-            "product_name": "Оверсайз худи «Eclipse Heavy»",
-            "size": "L",
-            "supplier_name": "ООО «Фабрика ТекстильПро»",
-            "purchase_price": 2450.0,
-            "initial_quantity": 12,
-            "remaining_quantity": 9,
+            "product_name": "PATRIZIA PEPE — Темно-синее мини-платье",
+            "size": "XS",
+            "supplier_name": "Tessilform S.p.A. (Флоренция, Италия)",
+            "purchase_price": 420.0,
+            "initial_quantity": 6,
+            "remaining_quantity": 5,
             "arrival_date": d_minus_15,
             "expiry_date": exp_valid_1,
         },
-        # Футболки от разных поставщиков + партия, у которой СКОРО истекает срок сезонной реализации
         {
-            "batch_id": "BATCH-104",
-            "product_id": "prod-2",
-            "product_name": "Футболка «Core Boxy Fit»",
+            "batch_id": "BATCH-204",
+            "product_id": "prod-1",
+            "product_name": "PATRIZIA PEPE — Темно-синее мини-платье",
             "size": "M",
-            "supplier_name": "АО «CottonCraft Иваново»",
-            "purchase_price": 950.0,
-            "initial_quantity": 25,
-            "remaining_quantity": 14,
+            "supplier_name": "Tessilform S.p.A. (Флоренция, Италия)",
+            "purchase_price": 430.0,
+            "initial_quantity": 6,
+            "remaining_quantity": 4,
+            "arrival_date": d_minus_15,
+            "expiry_date": exp_valid_1,
+        },
+        # Двубортное черное приталенное пальто GIUSEPPE DI MORABITO
+        {
+            "batch_id": "BATCH-205",
+            "product_id": "prod-2",
+            "product_name": "GIUSEPPE DI MORABITO — Двубортное черное приталенное пальто",
+            "size": "S",
+            "supplier_name": "Morabito Atelier Milano",
+            "purchase_price": 1650.0,
+            "initial_quantity": 6,
+            "remaining_quantity": 4,
             "arrival_date": d_minus_25,
+            "expiry_date": exp_valid_1,
+        },
+        {
+            "batch_id": "BATCH-206",
+            "product_id": "prod-2",
+            "product_name": "GIUSEPPE DI MORABITO — Двубортное черное приталенное пальто",
+            "size": "M",
+            "supplier_name": "Luxury Moda Logistics",
+            "purchase_price": 1790.0,
+            "initial_quantity": 5,
+            "remaining_quantity": 5,
+            "arrival_date": d_minus_10,
             "expiry_date": exp_soon_1,
         },
+        # Асимметричные серьги-пуссеты со стразами
         {
-            "batch_id": "BATCH-105",
-            "product_id": "prod-2",
-            "product_name": "Футболка «Core Boxy Fit»",
-            "size": "L",
-            "supplier_name": "ООО «Трикотаж Люкс»",
-            "purchase_price": 1100.0,
-            "initial_quantity": 20,
-            "remaining_quantity": 16,
-            "arrival_date": d_minus_10,
-            "expiry_date": exp_valid_2,
-        },
-        # Джинсы
-        {
-            "batch_id": "BATCH-106",
+            "batch_id": "BATCH-207",
             "product_id": "prod-3",
-            "product_name": "Джинсы Wide-Leg «Raw Indigo»",
-            "size": "M",
-            "supplier_name": "Фабрика «DenimFactory Юг»",
-            "purchase_price": 3300.0,
-            "initial_quantity": 12,
-            "remaining_quantity": 7,
+            "product_name": "GIUSEPPE DI MORABITO — Асимметричные серьги-пуссеты со стразами",
+            "size": "ONE SIZE",
+            "supplier_name": "Morabito Atelier Milano",
+            "purchase_price": 210.0,
+            "initial_quantity": 15,
+            "remaining_quantity": 11,
             "arrival_date": d_minus_15,
             "expiry_date": exp_valid_1,
         },
-        # Бомбер (Скоро истекает срок дропа!)
+        # Черный джемпер с кружевом (скоро истекает срок сезона)
         {
-            "batch_id": "BATCH-107",
+            "batch_id": "BATCH-208",
             "product_id": "prod-4",
-            "product_name": "Бомбер «Cyber Shell Waterproof»",
-            "size": "L",
-            "supplier_name": "TechWear Manufacturing",
-            "purchase_price": 5200.0,
-            "initial_quantity": 8,
+            "product_name": "GIUSEPPE DI MORABITO — Черный джемпер с кружевом",
+            "size": "S",
+            "supplier_name": "Morabito Atelier Milano",
+            "purchase_price": 1100.0,
+            "initial_quantity": 7,
             "remaining_quantity": 5,
             "arrival_date": d_minus_25,
             "expiry_date": exp_soon_2,
         },
-        # Свитшот — партия с УЖЕ ИСТЕКШИМ сроком сезонной годности (доступна для демонстрации списания)
+        # Черные брюки-палаццо с защипами
         {
-            "batch_id": "BATCH-108",
+            "batch_id": "BATCH-209",
             "product_id": "prod-5",
-            "product_name": "Свитшот «Minimal Fog»",
+            "product_name": "GIUSEPPE DI MORABITO — Черные брюки-палаццо с защипами",
             "size": "S",
-            "supplier_name": "АО «CottonCraft Иваново»",
-            "purchase_price": 1950.0,
+            "supplier_name": "EuroFashion Distribution (Милан)",
+            "purchase_price": 780.0,
             "initial_quantity": 10,
-            "remaining_quantity": 4,
+            "remaining_quantity": 7,
+            "arrival_date": d_minus_15,
+            "expiry_date": exp_valid_1,
+        },
+        {
+            "batch_id": "BATCH-210",
+            "product_id": "prod-5",
+            "product_name": "GIUSEPPE DI MORABITO — Черные брюки-палаццо с защипами",
+            "size": "M",
+            "supplier_name": "EuroFashion Distribution (Милан)",
+            "purchase_price": 780.0,
+            "initial_quantity": 8,
+            "remaining_quantity": 6,
+            "arrival_date": d_minus_15,
+            "expiry_date": exp_valid_1,
+        },
+        # Остальные товары
+        {
+            "batch_id": "BATCH-211",
+            "product_id": "prod-6",
+            "product_name": "PATRIZIA PEPE — Черное платье-мини с драпировкой и жемчугом",
+            "size": "S",
+            "supplier_name": "Tessilform S.p.A. (Флоренция, Италия)",
+            "purchase_price": 720.0,
+            "initial_quantity": 6,
+            "remaining_quantity": 5,
+            "arrival_date": d_minus_10,
+            "expiry_date": exp_valid_1,
+        },
+        {
+            "batch_id": "BATCH-212",
+            "product_id": "prod-7",
+            "product_name": "GIUSEPPE DI MORABITO — Атласный корсетный топ на косточках",
+            "size": "S",
+            "supplier_name": "Morabito Atelier Milano",
+            "purchase_price": 590.0,
+            "initial_quantity": 6,
+            "remaining_quantity": 3,
             "arrival_date": d_minus_25,
             "expiry_date": exp_expired_1,
         },
-        # Кепки
         {
-            "batch_id": "BATCH-109",
-            "product_id": "prod-6",
-            "product_name": "Кепка «AURA Vintage washed»",
+            "batch_id": "BATCH-213",
+            "product_id": "prod-8",
+            "product_name": "PATRIZIA PEPE — Кожаная мини-сумка бьюти-кейс",
             "size": "ONE SIZE",
-            "supplier_name": "Headwear Studio",
-            "purchase_price": 750.0,
-            "initial_quantity": 20,
-            "remaining_quantity": 15,
+            "supplier_name": "Tessilform S.p.A. (Флоренция, Италия)",
+            "purchase_price": 410.0,
+            "initial_quantity": 10,
+            "remaining_quantity": 8,
             "arrival_date": d_minus_5,
             "expiry_date": exp_valid_1,
         },
@@ -184,33 +231,33 @@ def generate_seed_data() -> dict:
 
     writeoffs = [
         {
-            "writeoff_id": "WO-001",
-            "batch_id": "BATCH-108",
-            "product_id": "prod-5",
-            "product_name": "Свитшот «Minimal Fog»",
+            "writeoff_id": "WO-101",
+            "batch_id": "BATCH-212",
+            "product_id": "prod-7",
+            "product_name": "GIUSEPPE DI MORABITO — Атласный корсетный топ на косточках",
             "size": "S",
-            "supplier_name": "АО «CottonCraft Иваново»",
-            "quantity": 3,
-            "purchase_price": 1950.0,
-            "total_loss": 5850.0,
+            "supplier_name": "Morabito Atelier Milano",
+            "quantity": 1,
+            "purchase_price": 590.0,
+            "total_loss": 590.0,
             "reason": "EXPIRED",
             "reason_label": "Истечение срока годности / сезона коллекции",
-            "comment": "Окончание сезона коллекции Autumn Drop, списание остатка",
+            "comment": "Окончание сезонной квоты бутика, перевод в списание",
             "date": (today - timedelta(days=2)).isoformat(),
         },
         {
-            "writeoff_id": "WO-002",
-            "batch_id": "BATCH-104",
-            "product_id": "prod-2",
-            "product_name": "Футболка «Core Boxy Fit»",
-            "size": "M",
-            "supplier_name": "АО «CottonCraft Иваново»",
-            "quantity": 2,
-            "purchase_price": 950.0,
-            "total_loss": 1900.0,
+            "writeoff_id": "WO-102",
+            "batch_id": "BATCH-207",
+            "product_id": "prod-3",
+            "product_name": "GIUSEPPE DI MORABITO — Асимметричные серьги-пуссеты со стразами",
+            "size": "ONE SIZE",
+            "supplier_name": "Morabito Atelier Milano",
+            "quantity": 1,
+            "purchase_price": 210.0,
+            "total_loss": 210.0,
             "reason": "DEFECT",
-            "reason_label": "Порча товара / Производственный брак шва",
-            "comment": "Обнаружен дефект окрашивания при инвентаризации",
+            "reason_label": "Порча товара / Повреждение застежки при транспортировке",
+            "comment": "Обнаружен дефект крепления кристалла",
             "date": (today - timedelta(days=4)).isoformat(),
         },
     ]
@@ -224,7 +271,12 @@ def load_db() -> dict:
         save_db(seed)
         return seed
     with open(DATA_FILE, "r", encoding="utf-8") as f:
-        return json.load(f)
+        data = json.load(f)
+    if not data.get("batches") or data["batches"][0]["batch_id"].startswith("BATCH-1"):
+        seed = generate_seed_data()
+        save_db(seed)
+        return seed
+    return data
 
 
 def save_db(data: dict):
@@ -294,7 +346,6 @@ def create_batch(payload: BatchCreate):
 
 @app.get("/stock/summary")
 def get_stock_summary():
-    """Возвращает доступные для продажи (непросроченные) остатки по моделям и размерам."""
     db = load_db()
     summary = {}
     for b in db["batches"]:
@@ -312,11 +363,6 @@ def get_stock_summary():
 
 @app.post("/stock/deduct-sale")
 def deduct_stock_for_sale(req: SaleDeductRequest):
-    """
-    Списывает товар при продаже покупателю по методу FIFO (сначала самые ранние поставки).
-    Просроченные партии к продаже не допускаются.
-    Возвращает точную закупочную себестоимость списанных единиц с учетом цен разных поставщиков.
-    """
     db = load_db()
     today = date.today()
     eligible_batches = [
@@ -332,7 +378,7 @@ def deduct_stock_for_sale(req: SaleDeductRequest):
     if total_available < req.quantity:
         raise HTTPException(
             status_code=400,
-            detail=f"Недостаточно непросроченного товара размера {req.size} на складе. Доступно: {total_available} шт., запрошено: {req.quantity} шт."
+            detail=f"Недостаточно товара размера {req.size} в наличии в бутике. Доступно: {total_available} ед., запрошено: {req.quantity} ед."
         )
 
     need = req.quantity
@@ -367,7 +413,6 @@ def deduct_stock_for_sale(req: SaleDeductRequest):
 
 @app.post("/writeoffs", status_code=201)
 def write_off_batch_items(req: WriteOffRequest):
-    """Списание единиц товара из партии (по причине истечения срока годности/сезона или брака/порчи)."""
     db = load_db()
     target = None
     for b in db["batches"]:
@@ -379,7 +424,7 @@ def write_off_batch_items(req: WriteOffRequest):
     if target["remaining_quantity"] < req.quantity:
         raise HTTPException(
             status_code=400,
-            detail=f"В партии {req.batch_id} осталось только {target['remaining_quantity']} шт."
+            detail=f"В партии {req.batch_id} осталось только {target['remaining_quantity']} ед."
         )
 
     target["remaining_quantity"] -= req.quantity
@@ -413,7 +458,6 @@ def write_off_batch_items(req: WriteOffRequest):
 
 @app.post("/writeoffs/auto-expired")
 def auto_write_off_all_expired():
-    """Автоматически списывает все партии, у которых истек срок годности/сезона."""
     db = load_db()
     today = date.today()
     created_records = []
@@ -448,7 +492,7 @@ def auto_write_off_all_expired():
 
 @app.get("/writeoffs")
 def list_writeoffs(
-    reason: Optional[str] = Query(None, description="Фильтр по причине: EXPIRED или DEFECT"),
+    reason: Optional[str] = Query(None),
     start_date: Optional[str] = Query(None),
     end_date: Optional[str] = Query(None),
 ):
@@ -467,11 +511,6 @@ def list_writeoffs(
 
 @app.get("/alerts/expiring")
 def get_expiring_and_expired_alerts():
-    """
-    Возвращает:
-    1) Список товаров/партий, которые СКОРО испортятся / выйдут из сезона (<= 14 дней)
-    2) Список партий с уже ИСТЕКШИМ сроком, требующих немедленного списания
-    """
     db = load_db()
     expiring_soon = []
     already_expired = []

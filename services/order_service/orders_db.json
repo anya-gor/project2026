@@ -1,89 +1,76 @@
 [
   {
-    "order_id": "ORD-901",
+    "order_id": "ORD-701",
     "product_id": "prod-1",
-    "product_name": "Оверсайз худи «Eclipse Heavy»",
-    "size": "M",
-    "quantity": 3,
-    "unit_retail_price": 6900.0,
-    "total_revenue": 20700.0,
-    "total_supplier_cost": 7200.0,
-    "gross_profit": 13500.0,
-    "customer_name": "Алексей Смирнов",
-    "sale_date": "2026-11-17",
-    "allocations": [
-      {
-        "batch_id": "BATCH-101",
-        "supplier_name": "ООО «Фабрика ТекстильПро»",
-        "quantity": 3,
-        "unit_purchase_price": 2400.0,
-        "subtotal_cost": 7200.0
-      }
-    ]
-  },
-  {
-    "order_id": "ORD-902",
-    "product_id": "prod-2",
-    "product_name": "Футболка «Core Boxy Fit»",
-    "size": "M",
-    "quantity": 4,
-    "unit_retail_price": 3200.0,
-    "total_revenue": 12800.0,
-    "total_supplier_cost": 3800.0,
-    "gross_profit": 9000.0,
-    "customer_name": "Мария Волкова",
-    "sale_date": "2026-11-19",
-    "allocations": [
-      {
-        "batch_id": "BATCH-104",
-        "supplier_name": "АО «CottonCraft Иваново»",
-        "quantity": 4,
-        "unit_purchase_price": 950.0,
-        "subtotal_cost": 3800.0
-      }
-    ]
-  },
-  {
-    "order_id": "ORD-903",
-    "product_id": "prod-3",
-    "product_name": "Джинсы Wide-Leg «Raw Indigo»",
-    "size": "M",
+    "product_name": "PATRIZIA PEPE — Темно-синее мини-платье",
+    "size": "S",
     "quantity": 2,
-    "unit_retail_price": 8500.0,
-    "total_revenue": 17000.0,
-    "total_supplier_cost": 6600.0,
-    "gross_profit": 10400.0,
-    "customer_name": "Дмитрий Орлов",
-    "sale_date": "2026-11-21",
+    "unit_retail_price": 1050.0,
+    "total_revenue": 2100.0,
+    "total_supplier_cost": 840.0,
+    "gross_profit": 1260.0,
+    "customer_name": "Алина Ковалева",
+    "city": "Минск, Минская область, Беларусь",
+    "delivery_method": "Доставка курьером",
+    "payment_method": "Онлайн картой на сайте",
+    "sale_date": "2026-11-18",
     "allocations": [
       {
-        "batch_id": "BATCH-106",
-        "supplier_name": "Фабрика «DenimFactory Юг»",
+        "batch_id": "BATCH-201",
+        "supplier_name": "Tessilform S.p.A. (Флоренция, Италия)",
         "quantity": 2,
-        "unit_purchase_price": 3300.0,
-        "subtotal_cost": 6600.0
+        "unit_purchase_price": 420.0,
+        "subtotal_cost": 840.0
       }
     ]
   },
   {
-    "order_id": "ORD-904",
-    "product_id": "prod-4",
-    "product_name": "Бомбер «Cyber Shell Waterproof»",
-    "size": "L",
+    "order_id": "ORD-702",
+    "product_id": "prod-2",
+    "product_name": "GIUSEPPE DI MORABITO — Двубортное черное приталенное пальто",
+    "size": "S",
     "quantity": 1,
-    "unit_retail_price": 12900.0,
-    "total_revenue": 12900.0,
-    "total_supplier_cost": 5200.0,
-    "gross_profit": 7700.0,
-    "customer_name": "Екатерина Лебедева",
+    "unit_retail_price": 3850.0,
+    "total_revenue": 3850.0,
+    "total_supplier_cost": 1650.0,
+    "gross_profit": 2200.0,
+    "customer_name": "Виктория Савицкая",
+    "city": "Минск, Минская область, Беларусь",
+    "delivery_method": "Самовывоз",
+    "payment_method": "Картой при получении",
+    "sale_date": "2026-11-20",
+    "allocations": [
+      {
+        "batch_id": "BATCH-205",
+        "supplier_name": "Morabito Atelier Milano",
+        "quantity": 1,
+        "unit_purchase_price": 1650.0,
+        "subtotal_cost": 1650.0
+      }
+    ]
+  },
+  {
+    "order_id": "ORD-703",
+    "product_id": "prod-5",
+    "product_name": "GIUSEPPE DI MORABITO — Черные брюки-палаццо с защипами",
+    "size": "S",
+    "quantity": 2,
+    "unit_retail_price": 1850.0,
+    "total_revenue": 3700.0,
+    "total_supplier_cost": 1560.0,
+    "gross_profit": 2140.0,
+    "customer_name": "Дарья Романова",
+    "city": "Минск, Минская область, Беларусь",
+    "delivery_method": "Доставка курьером",
+    "payment_method": "Экспресс Платежи - ЕРИП",
     "sale_date": "2026-11-22",
     "allocations": [
       {
-        "batch_id": "BATCH-107",
-        "supplier_name": "TechWear Manufacturing",
-        "quantity": 1,
-        "unit_purchase_price": 5200.0,
-        "subtotal_cost": 5200.0
+        "batch_id": "BATCH-209",
+        "supplier_name": "EuroFashion Distribution (Милан)",
+        "quantity": 2,
+        "unit_purchase_price": 780.0,
+        "subtotal_cost": 1560.0
       }
     ]
   }
