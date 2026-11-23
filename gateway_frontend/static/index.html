@@ -1158,16 +1158,16 @@
           </svg>
         </button>
 
-        <!-- 3. Избранное -->
-        <button class="icon-btn" title="Избранное" onclick="openFavoritesFromHeader()">
+        <!-- 3. Избранное (Только для покупателей) -->
+        <button class="icon-btn" id="header-fav-btn" title="Избранное" onclick="openFavoritesFromHeader()">
           <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
             <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
           </svg>
           <span class="icon-badge" id="fav-badge">0</span>
         </button>
 
-        <!-- 4. Корзина -->
-        <button class="icon-btn" title="Корзина" onclick="navigateTo('cart')">
+        <!-- 4. Корзина (Только для покупателей) -->
+        <button class="icon-btn" id="header-cart-btn" title="Корзина" onclick="navigateTo('cart')">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
             <rect x="4.5" y="7" width="15" height="13.5" rx="1.5"></rect>
             <path d="M8.5 7V5.5a3.5 3.5 0 0 1 7 0V7"></path>
@@ -1295,9 +1295,9 @@
     <!-- ================================================================= -->
     <section id="view-profile" class="page-view">
       <div class="breadcrumbs">
-        <span onclick="navigateTo('home')">ГЛАВНАЯ</span> - <span>ЛИЧНЫЙ КАБИНЕТ</span>
+        <span onclick="navigateTo('home')">ГЛАВНАЯ</span> - <span id="lk-breadcrumb-title">ЛИЧНЫЙ КАБИНЕТ</span>
       </div>
-      <h1 class="page-title" style="margin-bottom: 14px;">ЛИЧНЫЙ КАБИНЕТ</h1>
+      <h1 class="page-title" id="lk-main-title" style="margin-bottom: 14px;">ЛИЧНЫЙ КАБИНЕТ</h1>
 
       <div class="lk-greeting">
         <span>Здравствуйте, <span id="lk-user-login">375445658384</span></span>
@@ -1316,7 +1316,7 @@
         <div class="lk-tab-item active" id="lktab-orders" onclick="switchProfileTab('orders')">Ваши заказы</div>
         <div class="lk-tab-item" id="lktab-address" onclick="switchProfileTab('address')">Адрес доставки</div>
         <div class="lk-tab-item" id="lktab-favorite" onclick="switchProfileTab('favorite')">Избранное</div>
-        <div class="lk-tab-item" id="lktab-admin" style="display:none;" onclick="switchProfileTab('admin')">Добавить новый товар в каталог</div>
+        <div class="lk-tab-item" id="lktab-admin" style="display:none;" onclick="switchProfileTab('admin')">Управление каталогом и ценами</div>
       </div>
 
       <!-- 1. ПОДВКЛАДКА "ВАШИ ЗАКАЗЫ" (СКРИНШОТ 3 + ОТОБРАЖЕНИЕ ОФОРМЛЕННЫХ ЗАКАЗОВ) -->
@@ -1911,10 +1911,46 @@
     function updateProfileRoleUI() {
       const isAdmin = currentUser && currentUser.role === 'admin';
       const admTab = document.getElementById('lktab-admin');
+      const dataTab = document.getElementById('lktab-data');
+      const addrTab = document.getElementById('lktab-address');
+      const favTab = document.getElementById('lktab-favorite');
+      const ordTab = document.getElementById('lktab-orders');
       const bar = document.getElementById('lk-tabs-bar');
-      if (admTab && bar) {
-        admTab.style.display = isAdmin ? 'block' : 'none';
-        bar.style.gridTemplateColumns = isAdmin ? 'repeat(5, 1fr)' : 'repeat(4, 1fr)';
+
+      const headerFavBtn = document.getElementById('header-fav-btn');
+      const headerCartBtn = document.getElementById('header-cart-btn');
+      if (headerFavBtn) headerFavBtn.style.display = isAdmin ? 'none' : 'flex';
+      if (headerCartBtn) headerCartBtn.style.display = isAdmin ? 'none' : 'flex';
+
+      const mainTitle = document.getElementById('lk-main-title');
+      const bcTitle = document.getElementById('lk-breadcrumb-title');
+      if (mainTitle) mainTitle.textContent = isAdmin ? 'КАБИНЕТ АДМИНИСТРАТОРА' : 'ЛИЧНЫЙ КАБИНЕТ';
+      if (bcTitle) bcTitle.textContent = isAdmin ? 'КАБИНЕТ АДМИНИСТРАТОРА' : 'ЛИЧНЫЙ КАБИНЕТ';
+
+      if (bar) {
+        if (isAdmin) {
+          // У Админа строго 2 рабочие вкладки: Управление каталогом/ценами и Заказы клиентов
+          if (dataTab) dataTab.style.display = 'none';
+          if (addrTab) addrTab.style.display = 'none';
+          if (favTab) favTab.style.display = 'none';
+          if (admTab) admTab.style.display = 'block';
+          if (ordTab) {
+            ordTab.style.display = 'block';
+            ordTab.textContent = 'Заказы клиентов';
+          }
+          bar.style.gridTemplateColumns = 'repeat(2, 1fr)';
+        } else {
+          // У Покупателя строго 4 клиентские вкладки: Ваши данные, Ваши заказы, Адрес доставки, Избранное
+          if (dataTab) dataTab.style.display = 'block';
+          if (addrTab) addrTab.style.display = 'block';
+          if (favTab) favTab.style.display = 'block';
+          if (admTab) admTab.style.display = 'none';
+          if (ordTab) {
+            ordTab.style.display = 'block';
+            ordTab.textContent = 'Ваши заказы';
+          }
+          bar.style.gridTemplateColumns = 'repeat(4, 1fr)';
+        }
       }
     }
 
@@ -2440,10 +2476,16 @@
           </div>
 
           <div class="detail-actions">
-            <button class="btn-primary-dark" onclick="addCurrentToCart()">ДОБАВИТЬ В КОРЗИНУ</button>
-            <button class="btn-fav-outline ${isFav ? 'in-fav' : ''}" onclick="toggleFavorite('${p.id}')">
-              ${isFav ? '♥' : '♡'}
-            </button>
+            ${(currentUser && currentUser.role === 'admin') ? `
+              <button class="btn-thin-box" onclick="navigateTo('profile'); switchProfileTab('admin');">
+                УПРАВЛЕНИЕ ЦЕНОЙ И ТОВАРОМ (АДМИНИСТРАТОР)
+              </button>
+            ` : `
+              <button class="btn-primary-dark" onclick="addCurrentToCart()">ДОБАВИТЬ В КОРЗИНУ</button>
+              <button class="btn-fav-outline ${isFav ? 'in-fav' : ''}" onclick="toggleFavorite('${p.id}')">
+                ${isFav ? '♥' : '♡'}
+              </button>
+            `}
           </div>
 
           <div class="detail-links">
