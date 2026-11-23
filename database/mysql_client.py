@@ -5,30 +5,34 @@ import time
 import pymysql
 from pymysql.cursors import DictCursor
 
-MYSQL_HOST = os.getenv("MYSQL_HOST", "127.0.0.1")
+MYSQL_HOST = os.getenv("MYSQL_HOST", "127.0.1.31")
 MYSQL_PORT = int(os.getenv("MYSQL_PORT", "3306"))
 MYSQL_USER = os.getenv("MYSQL_USER", "root")
 MYSQL_PASSWORD_ENV = os.getenv("MYSQL_PASSWORD", None)
 MYSQL_DB = os.getenv("MYSQL_DATABASE", "monroe_db")
 
 _working_password = None
+_working_host = MYSQL_HOST
 _last_port_check_time = 0.0
 _last_port_open = False
 
 
 def _is_mysql_port_open() -> bool:
-    global _last_port_check_time, _last_port_open
+    global _last_port_check_time, _last_port_open, _working_host
     now = time.time()
     if now - _last_port_check_time < 3.0:
         return _last_port_open
     _last_port_check_time = now
-    try:
-        with socket.create_connection((MYSQL_HOST, MYSQL_PORT), timeout=0.15):
-            _last_port_open = True
-            return True
-    except OSError:
-        _last_port_open = False
-        return False
+    for host_candidate in [MYSQL_HOST, "127.0.1.31", "MySQL-8.4", "127.0.0.1"]:
+        try:
+            with socket.create_connection((host_candidate, MYSQL_PORT), timeout=0.15):
+                _working_host = host_candidate
+                _last_port_open = True
+                return True
+        except OSError:
+            continue
+    _last_port_open = False
+    return False
 
 
 def _get_server_connection(include_db: bool = True):
@@ -48,7 +52,7 @@ def _get_server_connection(include_db: bool = True):
             continue
         try:
             kwargs = {
-                "host": MYSQL_HOST,
+                "host": _working_host,
                 "port": MYSQL_PORT,
                 "user": MYSQL_USER,
                 "password": pwd,
@@ -68,7 +72,7 @@ def _get_server_connection(include_db: bool = True):
                 _working_password = pwd
                 init_mysql_schema()
                 return pymysql.connect(
-                    host=MYSQL_HOST,
+                    host=_working_host,
                     port=MYSQL_PORT,
                     user=MYSQL_USER,
                     password=pwd,
