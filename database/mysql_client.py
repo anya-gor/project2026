@@ -160,6 +160,7 @@ def init_mysql_schema():
                     `collection` VARCHAR(128) NOT NULL DEFAULT 'Осень 2026',
                     `retail_price` DOUBLE NOT NULL,
                     `sizes_json` TEXT NOT NULL,
+                    `stock_by_size_json` TEXT,
                     `color` VARCHAR(64) NOT NULL DEFAULT 'Черный',
                     `is_new` TINYINT(1) NOT NULL DEFAULT 1,
                     `image_main` TEXT NOT NULL,
@@ -195,6 +196,22 @@ def init_mysql_schema():
                     `return_status` VARCHAR(32) DEFAULT 'NONE',
                     `return_reason` VARCHAR(255) DEFAULT '',
                     `allocations_json` TEXT
+                ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+            """)
+
+            cur.execute("""
+                CREATE TABLE IF NOT EXISTS `order_returns` (
+                    `id` INT AUTO_INCREMENT PRIMARY KEY,
+                    `order_id` VARCHAR(32) NOT NULL UNIQUE,
+                    `product_id` VARCHAR(32) NOT NULL,
+                    `product_name` VARCHAR(255) NOT NULL,
+                    `size` VARCHAR(32) NOT NULL,
+                    `quantity` INT NOT NULL,
+                    `customer_name` VARCHAR(128) NOT NULL,
+                    `reason` VARCHAR(255) NOT NULL,
+                    `status` VARCHAR(32) NOT NULL DEFAULT 'RETURN_REQUESTED',
+                    `restocked_to_store` TINYINT(1) NOT NULL DEFAULT 0,
+                    `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
                 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
             """)
     finally:
@@ -337,7 +354,29 @@ def mysql_load_batches(default_batches: list) -> list | None:
 
 
 def mysql_save_batches(batches: list) -> bool:
-    return False
+    """Синхронизирует точные остатки по размерам (XS, S, M, L, XL) прямо в столбец stock_by_size_json таблицы products."""
+    try:
+        stock_by_prod = {}
+        for b in batches:
+            if b.get("remaining_quantity", 0) <= 0:
+                continue
+            pid = b["product_id"]
+            sz = b["size"]
+            if pid not in stock_by_prod:
+                stock_by_prod[pid] = {}
+            stock_by_prod[pid][sz] = stock_by_prod[pid].get(sz, 0) + int(b["remaining_quantity"])
+
+        conn = _get_server_connection(include_db=True)
+        with conn.cursor() as cur:
+            for pid, sz_map in stock_by_prod.items():
+                cur.execute(
+                    "UPDATE `products` SET `stock_by_size_json` = %s WHERE `id` = %s;",
+                    (json.dumps(sz_map, ensure_ascii=False), pid),
+                )
+        conn.close()
+        return True
+    except Exception:
+        return False
 
 
 # ==================== СИНХРОНИЗАЦИЯ ЗАКАЗОВ (ORDERS) ====================
@@ -385,8 +424,11 @@ def mysql_save_orders(orders: list) -> bool:
     try:
         conn = _get_server_connection(include_db=True)
         with conn.cursor() as cur:
+            cur.execute("DELETE FROM `order_returns`;")
             cur.execute("DELETE FROM `orders`;")
             for o in orders:
+                r_status = o.get("return_status", "NONE")
+                r_reason = o.get("return_reason", "")
                 cur.execute(
                     """
                     INSERT INTO `orders` (
@@ -404,10 +446,26 @@ def mysql_save_orders(orders: list) -> bool:
                         o.get("customer_name", ""), o.get("city", ""), o.get("delivery_method", ""),
                         o.get("payment_method", ""), o.get("email", ""), o.get("phone", ""),
                         o.get("address", ""), o.get("comment", ""), str(o["sale_date"]),
-                        o.get("return_status", "NONE"), o.get("return_reason", ""),
+                        r_status, r_reason,
                         json.dumps(o.get("allocations", []), ensure_ascii=False),
                     ),
                 )
+                # Если по заказу оформлена заявка на возврат или принято решение админом — пишем и в таблицу order_returns
+                if r_status != "NONE":
+                    is_defect = "брак" in r_reason.lower()
+                    restocked = 1 if (r_status == "RETURN_APPROVED" and not is_defect) else 0
+                    cur.execute(
+                        """
+                        INSERT INTO `order_returns` (
+                            `order_id`, `product_id`, `product_name`, `size`, `quantity`,
+                            `customer_name`, `reason`, `status`, `restocked_to_store`
+                        ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s);
+                        """,
+                        (
+                            o["order_id"], o["product_id"], o["product_name"], o["size"],
+                            int(o["quantity"]), o.get("customer_name", ""), r_reason, r_status, restocked,
+                        ),
+                    )
         conn.close()
         return True
     except Exception:

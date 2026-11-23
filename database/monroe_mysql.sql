@@ -1,6 +1,6 @@
 -- ============================================================================
 -- База данных MySQL для микросервисной системы интернет-магазина «MONROE»
--- Для запуска в Open Server и просмотра в DBeaver (4 основные таблицы)
+-- Для запуска в Open Server и просмотра в DBeaver
 -- ============================================================================
 
 CREATE DATABASE IF NOT EXISTS `monroe_db`
@@ -9,7 +9,6 @@ CREATE DATABASE IF NOT EXISTS `monroe_db`
 
 USE `monroe_db`;
 
--- Удаляем старые неиспользуемые складские таблицы, если они были созданы ранее
 DROP TABLE IF EXISTS `writeoffs`;
 DROP TABLE IF EXISTS `supply_batches`;
 
@@ -34,7 +33,7 @@ CREATE TABLE IF NOT EXISTS `user_addresses` (
     CONSTRAINT `fk_addr_user` FOREIGN KEY (`user_login`) REFERENCES `users`(`login`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- 3. Таблица каталога товаров (Catalog Microservice :8001)
+-- 3. Таблица каталога товаров и остатков по размерам (Catalog :8001 + Warehouse :8002)
 CREATE TABLE IF NOT EXISTS `products` (
     `id` VARCHAR(32) PRIMARY KEY,
     `sku` VARCHAR(64) NOT NULL COMMENT 'Артикул товара',
@@ -45,7 +44,8 @@ CREATE TABLE IF NOT EXISTS `products` (
     `subcategory` VARCHAR(128) NOT NULL DEFAULT '',
     `collection` VARCHAR(128) NOT NULL DEFAULT 'Осень 2026',
     `retail_price` DECIMAL(10, 2) NOT NULL COMMENT 'Розничная цена в BYN',
-    `sizes_json` TEXT NOT NULL COMMENT 'Доступные размеры и остатки по размерам (XS, S, M, L, XL)',
+    `sizes_json` TEXT NOT NULL COMMENT 'Список доступных размеров модели (XS, S, M, L, XL)',
+    `stock_by_size_json` TEXT COMMENT 'Точное количество оставшихся штук по каждому размеру {"XS":5,"S":14,"M":4,"L":3}',
     `color` VARCHAR(64) NOT NULL DEFAULT 'Черный',
     `is_new` TINYINT(1) NOT NULL DEFAULT 1 COMMENT '1 - Показывать в блоке НОВИНКИ на главной странице',
     `image_main` TEXT NOT NULL COMMENT 'Основное фото товара',
@@ -74,7 +74,25 @@ CREATE TABLE IF NOT EXISTS `orders` (
     `phone` VARCHAR(64) DEFAULT '',
     `address` VARCHAR(255) DEFAULT '',
     `comment` TEXT,
-    `sale_date` DATE NOT NULL COMMENT 'Дата оформления заказа'
+    `sale_date` DATE NOT NULL COMMENT 'Дата оформления заказа',
+    `return_status` VARCHAR(32) NOT NULL DEFAULT 'NONE' COMMENT 'Статус возврата: NONE, RETURN_REQUESTED, RETURN_APPROVED, RETURN_REJECTED',
+    `return_reason` VARCHAR(255) NOT NULL DEFAULT '' COMMENT 'Причина возврата от покупателя'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- 5. Таблица заявок на возврат товаров (связана с заказами и решением Администратора)
+CREATE TABLE IF NOT EXISTS `order_returns` (
+    `id` INT AUTO_INCREMENT PRIMARY KEY,
+    `order_id` VARCHAR(32) NOT NULL UNIQUE COMMENT 'Номер заказа из таблицы orders',
+    `product_id` VARCHAR(32) NOT NULL COMMENT 'ID возвращаемого товара',
+    `product_name` VARCHAR(255) NOT NULL COMMENT 'Название товара',
+    `size` VARCHAR(32) NOT NULL COMMENT 'Возвращаемый размер',
+    `quantity` INT NOT NULL COMMENT 'Количество возвращаемых штук',
+    `customer_name` VARCHAR(128) NOT NULL COMMENT 'Покупатель, оформивший возврат',
+    `reason` VARCHAR(255) NOT NULL COMMENT 'Причина возврата (Не подошел размер / фасон / брак)',
+    `status` VARCHAR(32) NOT NULL DEFAULT 'RETURN_REQUESTED' COMMENT 'RETURN_REQUESTED (На рассмотрении), RETURN_APPROVED (Одобрен), RETURN_REJECTED (Отклонен)',
+    `restocked_to_store` TINYINT(1) NOT NULL DEFAULT 0 COMMENT '1 - Размер возвращен обратно в наличие на сайт, 0 - Нет',
+    `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    CONSTRAINT `fk_return_order` FOREIGN KEY (`order_id`) REFERENCES `orders`(`order_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- Стартовые пользователи (Админ и Покупатель)
