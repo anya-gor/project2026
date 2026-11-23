@@ -1,4 +1,5 @@
 import os
+from datetime import date, timedelta
 from typing import Optional
 import httpx
 from fastapi import FastAPI, Request
@@ -8,7 +9,7 @@ from fastapi.responses import FileResponse, JSONResponse
 app = FastAPI(
     title="MAD FASHION — API Gateway & Luxury Storefront UI",
     description="Единый шлюз (API Gateway) и веб-интерфейс микросервисной системы бутика одежды MAD FASHION",
-    version="2.0.0",
+    version="3.0.0",
 )
 
 app.add_middleware(
@@ -64,6 +65,7 @@ def proxy_get_products(
     color: Optional[str] = None,
     gender: Optional[str] = None,
     size: Optional[str] = None,
+    only_new: Optional[bool] = None,
     sort: Optional[str] = None,
 ):
     params = {k: v for k, v in {
@@ -73,6 +75,7 @@ def proxy_get_products(
         "color": color,
         "gender": gender,
         "size": size,
+        "only_new": only_new,
         "sort": sort,
     }.items() if v is not None and v != ""}
     with httpx.Client(timeout=10.0) as client:
@@ -92,28 +95,41 @@ async def proxy_create_product(request: Request):
     body = await request.json()
     with httpx.Client(timeout=10.0) as client:
         r = client.post(f"{CATALOG_URL}/products", json=body)
-        return JSONResponse(status_code=r.status_code, content=r.json())
+        created = r.json()
+        # Автоматически регистрируем стартовый остаток в Warehouse Service, чтобы товар можно было сразу купить
+        if r.status_code == 201 and "id" in created:
+            exp_date = (date.today() + timedelta(days=90)).isoformat()
+            for sz in created.get("sizes", ["S", "M"]):
+                try:
+                    client.post(
+                        f"{WAREHOUSE_URL}/batches",
+                        json={
+                            "product_id": created["id"],
+                            "product_name": f"{created.get('brand', '')} — {created['name']}",
+                            "size": sz,
+                            "supplier_name": "Официальная поставка бутика MAD FASHION",
+                            "purchase_price": round(float(created["retail_price"]) * 0.45, 2),
+                            "quantity": 5,
+                            "expiry_date": exp_date,
+                        },
+                    )
+                except Exception:
+                    pass
+        return JSONResponse(status_code=r.status_code, content=created)
 
 
-@app.get("/api/catalog/filters")
-def proxy_get_filters():
-    with httpx.Client(timeout=10.0) as client:
-        r = client.get(f"{CATALOG_URL}/meta/filters")
-        return JSONResponse(status_code=r.status_code, content=r.json())
-
-
-@app.get("/api/warehouse/batches")
-def proxy_get_batches():
-    with httpx.Client(timeout=10.0) as client:
-        r = client.get(f"{WAREHOUSE_URL}/batches")
-        return JSONResponse(status_code=r.status_code, content=r.json())
-
-
-@app.post("/api/warehouse/batches")
-async def proxy_create_batch(request: Request):
+@app.patch("/api/catalog/products/{product_id}")
+async def proxy_update_product_price(product_id: str, request: Request):
     body = await request.json()
     with httpx.Client(timeout=10.0) as client:
-        r = client.post(f"{WAREHOUSE_URL}/batches", json=body)
+        r = client.patch(f"{CATALOG_URL}/products/{product_id}", json=body)
+        return JSONResponse(status_code=r.status_code, content=r.json())
+
+
+@app.delete("/api/catalog/products/{product_id}")
+def proxy_delete_product(product_id: str):
+    with httpx.Client(timeout=10.0) as client:
+        r = client.delete(f"{CATALOG_URL}/products/{product_id}")
         return JSONResponse(status_code=r.status_code, content=r.json())
 
 
@@ -124,73 +140,11 @@ def proxy_stock_summary():
         return JSONResponse(status_code=r.status_code, content=r.json())
 
 
-@app.get("/api/warehouse/alerts")
-def proxy_alerts():
-    with httpx.Client(timeout=10.0) as client:
-        r = client.get(f"{WAREHOUSE_URL}/alerts/expiring")
-        return JSONResponse(status_code=r.status_code, content=r.json())
-
-
-@app.get("/api/warehouse/writeoffs")
-def proxy_get_writeoffs(reason: Optional[str] = None):
-    params = {"reason": reason} if reason else {}
-    with httpx.Client(timeout=10.0) as client:
-        r = client.get(f"{WAREHOUSE_URL}/writeoffs", params=params)
-        return JSONResponse(status_code=r.status_code, content=r.json())
-
-
-@app.post("/api/warehouse/writeoffs")
-async def proxy_create_writeoff(request: Request):
-    body = await request.json()
-    with httpx.Client(timeout=10.0) as client:
-        r = client.post(f"{WAREHOUSE_URL}/writeoffs", json=body)
-        return JSONResponse(status_code=r.status_code, content=r.json())
-
-
-@app.post("/api/warehouse/writeoffs/auto-expired")
-def proxy_auto_expired():
-    with httpx.Client(timeout=10.0) as client:
-        r = client.post(f"{WAREHOUSE_URL}/writeoffs/auto-expired")
-        return JSONResponse(status_code=r.status_code, content=r.json())
-
-
-@app.get("/api/orders")
-def proxy_get_orders(start_date: Optional[str] = None, end_date: Optional[str] = None):
-    params = {k: v for k, v in {"start_date": start_date, "end_date": end_date}.items() if v}
-    with httpx.Client(timeout=10.0) as client:
-        r = client.get(f"{ORDER_URL}/orders", params=params)
-        return JSONResponse(status_code=r.status_code, content=r.json())
-
-
-@app.post("/api/orders")
-async def proxy_create_order(request: Request):
-    body = await request.json()
-    with httpx.Client(timeout=10.0) as client:
-        r = client.post(f"{ORDER_URL}/orders", json=body)
-        return JSONResponse(status_code=r.status_code, content=r.json())
-
-
 @app.post("/api/orders/checkout")
 async def proxy_checkout(request: Request):
     body = await request.json()
     with httpx.Client(timeout=10.0) as client:
         r = client.post(f"{ORDER_URL}/orders/checkout", json=body)
-        return JSONResponse(status_code=r.status_code, content=r.json())
-
-
-@app.get("/api/analytics/financial")
-def proxy_financial_report(
-    start_date: Optional[str] = None,
-    end_date: Optional[str] = None,
-    tax_rate: float = 6.0,
-):
-    params = {"tax_rate": tax_rate}
-    if start_date:
-        params["start_date"] = start_date
-    if end_date:
-        params["end_date"] = end_date
-    with httpx.Client(timeout=10.0) as client:
-        r = client.get(f"{ANALYTICS_URL}/reports/financial", params=params)
         return JSONResponse(status_code=r.status_code, content=r.json())
 
 
