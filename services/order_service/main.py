@@ -13,7 +13,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..",
 from database.mysql_client import mysql_load_orders, mysql_save_orders
 
 app = FastAPI(
-    title="MAD FASHION — Order & Checkout Microservice",
+    title="MONROE — Order & Checkout Microservice",
     description="Микросервис корзины, оформления заказов (BYN) и фиксации себестоимости партий поставщиков",
     version="2.0.0",
 )
@@ -34,7 +34,7 @@ class OrderCreate(BaseModel):
     product_id: str
     size: str
     quantity: int = Field(..., gt=0)
-    customer_name: str = Field(default="Клиент бутика MAD FASHION")
+    customer_name: str = Field(default="Клиент бутика MONROE")
     city: str = Field(default="Минск, Минская область, Беларусь")
     delivery_method: str = Field(default="Доставка курьером")
     payment_method: str = Field(default="Картой при получении")
@@ -56,8 +56,8 @@ class CheckoutRequest(BaseModel):
     city: str = Field(default="Минск, Минская область, Беларусь")
     delivery_method: str = Field(default="Доставка курьером")
     payment_method: str = Field(default="Картой при получении")
-    customer_name: str = Field(default="Покупатель MAD FASHION")
-    email: str = Field(default="client@madfashion.by")
+    customer_name: str = Field(default="Покупатель MONROE")
+    email: str = Field(default="client@monroe.by")
     phone: str = Field(default="+375 29 000-00-00")
     street: str = Field(default="пр. Победителей")
     house: str = Field(default="65")
@@ -240,7 +240,7 @@ def create_order(payload: OrderCreate):
         "total_revenue": total_revenue,
         "total_supplier_cost": total_supplier_cost,
         "gross_profit": gross_profit,
-        "customer_name": payload.customer_name or "Клиент бутика MAD FASHION",
+        "customer_name": payload.customer_name or "Клиент бутика MONROE",
         "city": payload.city,
         "delivery_method": payload.delivery_method,
         "payment_method": payload.payment_method,

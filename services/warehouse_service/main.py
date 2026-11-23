@@ -8,7 +8,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
 app = FastAPI(
-    title="MAD FASHION — Warehouse & Batches Microservice",
+    title="MONROE — Warehouse & Batches Microservice",
     description="Микросервис складского учета партий от поставщиков (в BYN), контроля сроков сезона и списаний",
     version="2.0.0",
 )

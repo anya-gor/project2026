@@ -1,13 +1,13 @@
 -- ============================================================================
--- База данных MySQL для микросервисной системы бутика одежды «MAD FASHION»
+-- База данных MySQL для микросервисной системы бутика одежды «MONROE»
 -- Для запуска в Open Server и просмотра в DBeaver
 -- ============================================================================
 
-CREATE DATABASE IF NOT EXISTS `mad_fashion_db`
+CREATE DATABASE IF NOT EXISTS `monroe_db`
   CHARACTER SET utf8mb4
   COLLATE utf8mb4_unicode_ci;
 
-USE `mad_fashion_db`;
+USE `monroe_db`;
 
 -- 1. Таблица пользователей (Покупатели и Администратор)
 CREATE TABLE IF NOT EXISTS `users` (
@@ -109,5 +109,5 @@ CREATE TABLE IF NOT EXISTS `orders` (
 
 -- Стартовые пользователи (Админ и Покупатель)
 INSERT IGNORE INTO `users` (`login`, `country`, `password`, `name`, `email`, `role`) VALUES
-('375291111111', 'Беларусь', 'admin123', 'Администратор MAD FASHION', 'admin@madfashion.by', 'admin'),
-('375445658384', 'Беларусь', '123', 'Анна Ковалева', 'client@madfashion.by', 'user');
+('375291111111', 'Беларусь', 'admin123', 'Администратор MONROE', 'admin@monroe.by', 'admin'),
+('375445658384', 'Беларусь', '123', 'Анна Ковалева', 'client@monroe.by', 'user');

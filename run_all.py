@@ -17,7 +17,7 @@ def main():
     processes = []
 
     print("=" * 68)
-    print(" MAD FASHION — Запуск микросервисной архитектуры")
+    print(" MONROE — Запуск микросервисной архитектуры")
     print("=" * 68)
 
     try:

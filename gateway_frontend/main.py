@@ -15,8 +15,8 @@ from database.mysql_client import check_mysql_status, mysql_load_users, mysql_sa
 RESET_CODES = {}
 
 app = FastAPI(
-    title="MAD FASHION — API Gateway & Luxury Storefront UI",
-    description="Единый шлюз (API Gateway), сервис профилей/авторизации и веб-интерфейс бутика одежды MAD FASHION",
+    title="MONROE — API Gateway & Luxury Storefront UI",
+    description="Единый шлюз (API Gateway), сервис профилей/авторизации и веб-интерфейс бутика одежды MONROE",
     version="3.6.0",
 )
 
@@ -40,22 +40,22 @@ DEFAULT_USERS = [
         "login": "375291111111",
         "country": "Беларусь",
         "password": "admin123",
-        "name": "Администратор MAD FASHION",
-        "email": "admin@madfashion.by",
+        "name": "Администратор MONROE",
+        "email": "admin@monroe.by",
         "role": "admin",
         "addresses": [
-            {"id": "addr-adm", "text": "г. Минск, пр. Победителей, д. 65 (Салон MAD FASHION)", "is_primary": True},
+            {"id": "addr-adm", "text": "г. Минск, пр. Победителей, д. 65 (Салон MONROE)", "is_primary": True},
         ],
     },
     {
         "login": "admin",
         "country": "Беларусь",
         "password": "admin123",
-        "name": "Администратор MAD FASHION",
-        "email": "admin@madfashion.by",
+        "name": "Администратор MONROE",
+        "email": "admin@monroe.by",
         "role": "admin",
         "addresses": [
-            {"id": "addr-adm", "text": "г. Минск, пр. Победителей, д. 65 (Салон MAD FASHION)", "is_primary": True},
+            {"id": "addr-adm", "text": "г. Минск, пр. Победителей, д. 65 (Салон MONROE)", "is_primary": True},
         ],
     },
     {
@@ -63,7 +63,7 @@ DEFAULT_USERS = [
         "country": "Беларусь",
         "password": "123",
         "name": "Анна Ковалева",
-        "email": "client@madfashion.by",
+        "email": "client@monroe.by",
         "role": "user",
         "addresses": [
             {"id": "addr-1", "text": "г. Минск, пр. Победителей, д. 65, кв. 12", "is_primary": True},
@@ -124,7 +124,7 @@ async def auth_login(request: Request):
         "country": country,
         "password": password or "123",
         "name": login,
-        "email": f"{login}@madfashion.by",
+        "email": f"{login}@monroe.by",
         "role": "user",
         "addresses": [
             {"id": "addr-1", "text": "г. Минск, пр. Победителей, д. 65", "is_primary": True},
@@ -144,7 +144,7 @@ async def auth_register(request: Request):
     password = str(body.get("password", "")).strip()
     country = body.get("country", "Беларусь")
     name = str(body.get("name", "")).strip() or login
-    email = str(body.get("email", "")).strip() or f"{login}@madfashion.by"
+    email = str(body.get("email", "")).strip() or f"{login}@monroe.by"
 
     if not login or not password:
         raise HTTPException(status_code=400, detail="Заполните номер телефона и пароль")
@@ -292,7 +292,7 @@ async def proxy_create_product(request: Request):
                             "product_id": created["id"],
                             "product_name": f"{created.get('brand', '')} — {created['name']}",
                             "size": sz,
-                            "supplier_name": "Официальная поставка бутика MAD FASHION",
+                            "supplier_name": "Официальная поставка бутика MONROE",
                             "purchase_price": round(float(created["retail_price"]) * 0.45, 2),
                             "quantity": 5,
                             "expiry_date": exp_date,

@@ -11,7 +11,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..",
 from database.mysql_client import mysql_load_products, mysql_save_products
 
 app = FastAPI(
-    title="MAD FASHION — Catalog Microservice",
+    title="MONROE — Catalog Microservice",
     description="Микросервис управления каталогом одежды, аксессуаров, новинками и ценами (BYN)",
     version="3.0.0",
 )
@@ -110,8 +110,8 @@ DEFAULT_PRODUCTS = [
         "brand_story": GIUSEPPE_STORY,
         "description": "Приталенное двубортное пальто макси из 100% итальянской шерсти с четкой линией плеча.",
         "care": "Только профессиональная сухая чистка.",
-        "boutique_name": "Бутик «MAD FASHION»",
-        "boutique_address": "САЛОН «MAD FASHION» Г. МИНСК, ПР. ПОБЕДИТЕЛЕЙ, 65"
+        "boutique_name": "Бутик «MONROE»",
+        "boutique_address": "САЛОН «MONROE» Г. МИНСК, ПР. ПОБЕДИТЕЛЕЙ, 65"
     },
     {
         "id": "prod-3",
@@ -131,8 +131,8 @@ DEFAULT_PRODUCTS = [
         "brand_story": GIUSEPPE_STORY,
         "description": "Акцентные серьги с кристаллами паве и серебристым покрытием. Сделано в Италии.",
         "care": "Хранить в индивидуальном футляре.",
-        "boutique_name": "Бутик «MAD FASHION»",
-        "boutique_address": "САЛОН «MAD FASHION» Г. МИНСК, ПР. ПОБЕДИТЕЛЕЙ, 65"
+        "boutique_name": "Бутик «MONROE»",
+        "boutique_address": "САЛОН «MONROE» Г. МИНСК, ПР. ПОБЕДИТЕЛЕЙ, 65"
     },
     {
         "id": "prod-4",
@@ -152,8 +152,8 @@ DEFAULT_PRODUCTS = [
         "brand_story": GIUSEPPE_STORY,
         "description": "Джемпер из мериносовой шерсти с высоким воротом и вставкой из тонкого кружева шантильи.",
         "care": "Ручная стирка или сухая чистка.",
-        "boutique_name": "Бутик «MAD FASHION»",
-        "boutique_address": "САЛОН «MAD FASHION» Г. МИНСК, ПР. ПОБЕДИТЕЛЕЙ, 65"
+        "boutique_name": "Бутик «MONROE»",
+        "boutique_address": "САЛОН «MONROE» Г. МИНСК, ПР. ПОБЕДИТЕЛЕЙ, 65"
     },
     {
         "id": "prod-5",
@@ -173,8 +173,8 @@ DEFAULT_PRODUCTS = [
         "brand_story": GIUSEPPE_STORY,
         "description": "Классические широкие брюки-палаццо с высокой посадкой и глубокими защипами у пояса.",
         "care": "Деликатная химчистка.",
-        "boutique_name": "Бутик «MAD FASHION»",
-        "boutique_address": "САЛОН «MAD FASHION» Г. МИНСК, ПР. ПОБЕДИТЕЛЕЙ, 65"
+        "boutique_name": "Бутик «MONROE»",
+        "boutique_address": "САЛОН «MONROE» Г. МИНСК, ПР. ПОБЕДИТЕЛЕЙ, 65"
     },
     {
         "id": "prod-6",
@@ -236,8 +236,8 @@ DEFAULT_PRODUCTS = [
         "brand_story": GIUSEPPE_STORY,
         "description": "Платок-каре из 100% натурального шелка твил в пудрово-бежевой гамме.",
         "care": "Только сухая чистка.",
-        "boutique_name": "Бутик «MAD FASHION»",
-        "boutique_address": "САЛОН «MAD FASHION» Г. МИНСК, ПР. ПОБЕДИТЕЛЕЙ, 65"
+        "boutique_name": "Бутик «MONROE»",
+        "boutique_address": "САЛОН «MONROE» Г. МИНСК, ПР. ПОБЕДИТЕЛЕЙ, 65"
     },
     {
         "id": "prod-9",
@@ -280,8 +280,8 @@ DEFAULT_PRODUCTS = [
         "brand_story": GIUSEPPE_STORY,
         "description": "Классическое однобортное мужское пальто из смеси шерсти и кашемира.",
         "care": "Профессиональная химчистка.",
-        "boutique_name": "Бутик «MAD FASHION»",
-        "boutique_address": "САЛОН «MAD FASHION» Г. МИНСК, ПР. ПОБЕДИТЕЛЕЙ, 65"
+        "boutique_name": "Бутик «MONROE»",
+        "boutique_address": "САЛОН «MONROE» Г. МИНСК, ПР. ПОБЕДИТЕЛЕЙ, 65"
     },
     {
         "id": "prod-11",
@@ -322,8 +322,8 @@ DEFAULT_PRODUCTS = [
         "brand_story": GIUSEPPE_STORY,
         "description": "Мягкий джемпер из мериносовой шерсти в светло-бежевом оттенке.",
         "care": "Ручная стирка при 30°C.",
-        "boutique_name": "Бутик «MAD FASHION»",
-        "boutique_address": "САЛОН «MAD FASHION» Г. МИНСК, ПР. ПОБЕДИТЕЛЕЙ, 65"
+        "boutique_name": "Бутик «MONROE»",
+        "boutique_address": "САЛОН «MONROE» Г. МИНСК, ПР. ПОБЕДИТЕЛЕЙ, 65"
     },
     {
         "id": "prod-13",
@@ -385,8 +385,8 @@ DEFAULT_PRODUCTS = [
         "brand_story": GIUSEPPE_STORY,
         "description": "Минималистичный мужской рюкзак из зернистой телячьей кожи с отделением для ноутбука.",
         "care": "Уход средствами для натуральной кожи.",
-        "boutique_name": "Бутик «MAD FASHION»",
-        "boutique_address": "САЛОН «MAD FASHION» Г. МИНСК, ПР. ПОБЕДИТЕЛЕЙ, 65"
+        "boutique_name": "Бутик «MONROE»",
+        "boutique_address": "САЛОН «MONROE» Г. МИНСК, ПР. ПОБЕДИТЕЛЕЙ, 65"
     }
 ]
 

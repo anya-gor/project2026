@@ -9,7 +9,7 @@ MYSQL_HOST = os.getenv("MYSQL_HOST", "127.0.0.1")
 MYSQL_PORT = int(os.getenv("MYSQL_PORT", "3306"))
 MYSQL_USER = os.getenv("MYSQL_USER", "root")
 MYSQL_PASSWORD_ENV = os.getenv("MYSQL_PASSWORD", None)
-MYSQL_DB = os.getenv("MYSQL_DATABASE", "mad_fashion_db")
+MYSQL_DB = os.getenv("MYSQL_DATABASE", "monroe_db")
 
 _working_password = None
 _last_port_check_time = 0.0
@@ -111,7 +111,7 @@ def check_mysql_status() -> dict:
 
 
 def init_mysql_schema():
-    """Создает базу данных mad_fashion_db и все таблицы в MySQL (Open Server), если их еще нет."""
+    """Создает базу данных monroe_db и все таблицы в MySQL (Open Server), если их еще нет."""
     conn = _get_server_connection(include_db=False)
     try:
         with conn.cursor() as cur:

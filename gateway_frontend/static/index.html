@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>MAD FASHION — Осень 2026 | Бутик брендовой одежды</title>
+  <title>MONROE — Осень 2026 | Бутик брендовой одежды</title>
   <style>
     /* СВЕТЛАЯ ПАЛИТРА САЙТА (ДОМИНИРУЮЩИЕ СВЕТЛЫЕ ОТТЕНКИ) */
     :root {
@@ -1114,7 +1114,7 @@
 
   <!-- ВЕРХНЯЯ ПАНЕЛЬ СТАТУСА МИКРОСЕРВИСОВ -->
   <div class="ms-top-strip">
-    <div>Микросервисная платформа <b>MAD FASHION</b></div>
+    <div>Микросервисная платформа <b>MONROE</b></div>
     <div class="ms-indicators" id="ms-status-bar">Проверка сервисов...</div>
   </div>
 
@@ -1122,7 +1122,7 @@
   <header>
     <div class="header-left">
       <div class="logo" onclick="navigateTo('home')">
-        <span class="logo-main">MAD</span>
+        <span class="logo-main">MONROE</span>
         <span class="logo-sub">— FASHION —</span>
       </div>
       <nav class="main-nav">
@@ -1189,9 +1189,9 @@
     <!-- ================================================================= -->
     <section id="view-home" class="page-view active">
       <div class="hero-banner" onclick="openCatalogSection('ДЛЯ НЕЁ', false)">
-        <img src="https://images.unsplash.com/photo-1490481651871-ab68de25d43d?auto=format&fit=crop&w=1600&q=85" alt="MAD - осень 2026" />
+        <img src="https://images.unsplash.com/photo-1490481651871-ab68de25d43d?auto=format&fit=crop&w=1600&q=85" alt="MONROE - осень 2026" />
         <div class="hero-overlay">
-          <h1 class="hero-title">MAD - осень 2026</h1>
+          <h1 class="hero-title">MONROE - осень 2026</h1>
         </div>
       </div>
 
@@ -1543,7 +1543,7 @@
             </div>
             <div class="float-field">
               <label>E-Mail *</label>
-              <input type="email" id="chk-email" value="client@madfashion.by" />
+              <input type="email" id="chk-email" value="client@monroe.by" />
             </div>
           </div>
 
@@ -1763,7 +1763,7 @@
           <li style="color:var(--espresso); font-weight:500;">🇧🇾 Беларусь ⌄</li>
           <li style="color:var(--espresso); font-weight:500;">+375 (29) 345-00-29</li>
           <li>10:00 - 19:00 Пн-Вс</li>
-          <li>info@madfashion.by</li>
+          <li>info@monroe.by</li>
         </ul>
       </div>
       <div class="footer-col">
@@ -2174,7 +2174,7 @@
                     <div style="display:flex; align-items:center; gap:14px;">
                       <img src="${prod.image_main || ''}" style="width:48px; height:64px; object-fit:cover; background:#f4f4f4;" />
                       <div>
-                        <div style="font-size:12px; text-transform:uppercase;">${prod.brand || 'MAD FASHION'}</div>
+                        <div style="font-size:12px; text-transform:uppercase;">${prod.brand || 'MONROE'}</div>
                         <div style="font-size:12px; color:#777;">${prod.name || it.product_name} (Размер: ${it.size}, ${it.quantity} ед.)</div>
                       </div>
                     </div>
@@ -2385,7 +2385,7 @@
         const dbHtml = `
           <span class="ms-pill" title="${db.online ? 'Подключено к MySQL (Open Server)' : 'Ожидание запуска MySQL в Open Server (:3306)'}">
             <span class="ms-dot ${db.online ? 'online' : ''}"></span>
-            <span>MySQL DB (${db.online ? 'mad_fashion_db :3306' : 'JSON + ожидание OpenServer :3306'})</span>
+            <span>MySQL DB (${db.online ? 'monroe_db :3306' : 'JSON + ожидание OpenServer :3306'})</span>
           </span>
         `;
         document.getElementById('ms-status-bar').innerHTML = msHtml + dbHtml;
