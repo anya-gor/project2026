@@ -1471,9 +1471,41 @@
             </div>
           </div>
 
-          <div class="float-field" style="margin-bottom: 18px;">
+          <div class="float-field" style="margin-bottom: 16px;">
             <label>Ссылка на изображение товара (URL)</label>
             <input type="text" id="adm-new-img" placeholder="https://images.unsplash.com/..." />
+          </div>
+
+          <div style="margin-bottom: 18px; border: 1px solid var(--border); background: var(--soft-white); padding: 12px 14px;">
+            <div style="font-size: 11.5px; color: var(--coffee); font-weight: 500; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.4px;">
+              Количество товара в наличии по размерам (шт.)
+            </div>
+            <div style="display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px;">
+              <div>
+                <div style="font-size: 11px; color: #666; margin-bottom: 4px; text-align: center;">XS</div>
+                <input type="number" id="adm-qty-XS" min="0" value="3" style="width: 100%; border: 1px solid #ddd; padding: 6px; font-size: 12px; text-align: center; background: #fff;" />
+              </div>
+              <div>
+                <div style="font-size: 11px; color: #666; margin-bottom: 4px; text-align: center;">S</div>
+                <input type="number" id="adm-qty-S" min="0" value="5" style="width: 100%; border: 1px solid #ddd; padding: 6px; font-size: 12px; text-align: center; background: #fff;" />
+              </div>
+              <div>
+                <div style="font-size: 11px; color: #666; margin-bottom: 4px; text-align: center;">M</div>
+                <input type="number" id="adm-qty-M" min="0" value="5" style="width: 100%; border: 1px solid #ddd; padding: 6px; font-size: 12px; text-align: center; background: #fff;" />
+              </div>
+              <div>
+                <div style="font-size: 11px; color: #666; margin-bottom: 4px; text-align: center;">L</div>
+                <input type="number" id="adm-qty-L" min="0" value="4" style="width: 100%; border: 1px solid #ddd; padding: 6px; text-align: center; font-size: 12px; background: #fff;" />
+              </div>
+              <div>
+                <div style="font-size: 11px; color: #666; margin-bottom: 4px; text-align: center;">XL</div>
+                <input type="number" id="adm-qty-XL" min="0" value="2" style="width: 100%; border: 1px solid #ddd; padding: 6px; text-align: center; font-size: 12px; background: #fff;" />
+              </div>
+              <div>
+                <div style="font-size: 11px; color: #666; margin-bottom: 4px; text-align: center;">XXL</div>
+                <input type="number" id="adm-qty-XXL" min="0" value="1" style="width: 100%; border: 1px solid #ddd; padding: 6px; text-align: center; font-size: 12px; background: #fff;" />
+              </div>
+            </div>
           </div>
 
           <div style="text-align:center; margin-bottom: 28px;">
@@ -1889,6 +1921,17 @@
       return (currentUser && currentUser.login) ? String(currentUser.login) : 'guest';
     }
 
+    function getUserDisplayName(u = currentUser) {
+      if (!u) return 'Гость';
+      const n = String(u.name || '').trim();
+      return n ? n : String(u.login || 'Гость');
+    }
+
+    function updateProfileGreeting() {
+      const el = document.getElementById('lk-user-login');
+      if (el) el.textContent = getUserDisplayName();
+    }
+
     let userAddresses = JSON.parse(localStorage.getItem('mad_addresses_' + getUserStorageKey()) || JSON.stringify([
       { id: 'a1', text: 'г. Минск, пр. Победителей, д. 65, кв. 12', is_primary: true },
       { id: 'a2', text: 'г. Минск, ул. М. Танка, д. 69, кв. 5', is_primary: false }
@@ -1930,6 +1973,18 @@
 
     async function syncUserPersonalData() {
       const key = getUserStorageKey();
+      if (currentUser && currentUser.login) {
+        try {
+          const pRes = await fetch(`/api/user/${encodeURIComponent(currentUser.login)}/profile`);
+          if (pRes.ok) {
+            const pData = await pRes.json();
+            if (pData && pData.user) {
+              currentUser = pData.user;
+              localStorage.setItem('mad_user', JSON.stringify(currentUser));
+            }
+          }
+        } catch {}
+      }
       userCurrentOrders = JSON.parse(localStorage.getItem('mad_current_orders_' + key) || '[]');
       userAddresses = JSON.parse(localStorage.getItem('mad_addresses_' + key) || JSON.stringify(
         key === '375445658384' ? [
@@ -1940,6 +1995,7 @@
       favorites = JSON.parse(localStorage.getItem('mad_favorites_' + key) || '[]');
       await loadMyFavoritesFromDB();
       await loadMyCartFromDB();
+      updateProfileGreeting();
       updateHeaderBadges();
     }
 
@@ -2169,7 +2225,7 @@
         showToast('Вы вошли как Администратор');
       } else {
         switchProfileTab('orders');
-        showToast(`Здравствуйте, ${currentUser.login}`);
+        showToast(`Здравствуйте, ${getUserDisplayName()}`);
       }
     }
 
@@ -2341,13 +2397,32 @@
       // В Личном кабинете Покупателя: разделение на "Текущие заказы" и "История заказов"
       document.querySelector('.lk-orders-subtabs').style.display = 'flex';
 
-      // В "Текущие заказы" показываем заказы этой сессии или активные заявки на возврат
+      // Фильтруем заказы: покупатель видит ТОЛЬКО свои заказы (по логину/телефону, имени или ID из сессии)
       const currentOrderIds = userCurrentOrders.map(u => u.id);
-      const currentList = allServerOrders.filter(o =>
-        currentOrderIds.includes(o.order_id) || o.return_status === 'RETURN_REQUESTED'
+      const uLogin = (currentUser && currentUser.login ? String(currentUser.login) : '').trim().toLowerCase();
+      const uDigits = uLogin.replace(/\D/g, '');
+      const uName = (currentUser && currentUser.name ? String(currentUser.name) : '').trim().toLowerCase();
+
+      const myServerOrders = allServerOrders.filter(o => {
+        if (!currentUser) return false;
+        const oPhoneRaw = String(o.phone || '').trim().toLowerCase();
+        const oPhoneDigits = oPhoneRaw.replace(/\D/g, '');
+        const oName = String(o.customer_name || '').trim().toLowerCase();
+        if (oPhoneRaw && oPhoneRaw === uLogin) return true;
+        if (uDigits.length >= 7 && oPhoneDigits && oPhoneDigits === uDigits) return true;
+        if (uName && oName && oName === uName) return true;
+        if (currentOrderIds.includes(o.order_id)) return true;
+        return false;
+      });
+
+      // В "Текущие заказы" показываем заказы этого пользователя из текущей сессии, ожидающие оплаты или с активной заявкой на возврат
+      const currentList = myServerOrders.filter(o =>
+        currentOrderIds.includes(o.order_id) ||
+        o.payment_status === 'UNPAID' ||
+        o.return_status === 'RETURN_REQUESTED'
       );
-      // В "История заказов" показываем все заказы пользователя (включая завершенные и с возможностью оформить возврат)
-      const listToShow = currentOrdersSubtab === 'current' ? currentList : allServerOrders;
+      // В "История заказов" показываем ТОЛЬКО личную историю заказов этого пользователя
+      const listToShow = currentOrdersSubtab === 'current' ? currentList : myServerOrders;
 
       if (listToShow.length === 0) {
         container.innerHTML = `
@@ -2539,7 +2614,8 @@
 
     function renderProfilePersonalData() {
       document.getElementById('lk-data-login').value = currentUser ? currentUser.login : '375445658384';
-      document.getElementById('lk-data-name').value = currentUser ? (currentUser.name || 'Анна Ковалева') : 'Анна Ковалева';
+      document.getElementById('lk-data-name').value = currentUser ? (currentUser.name || currentUser.login || '') : '';
+      updateProfileGreeting();
     }
 
     async function renderAdminCatalogList() {
@@ -2569,11 +2645,34 @@
       `).join('');
     }
 
-    function saveProfilePersonalData() {
-      if (!currentUser) currentUser = { login: '375445658384' };
-      currentUser.name = document.getElementById('lk-data-name').value.trim();
+    async function saveProfilePersonalData() {
+      if (!currentUser) currentUser = { login: '375445658384', role: 'user' };
+      const newName = document.getElementById('lk-data-name').value.trim();
+      if (!newName) {
+        showToast('Введите ваше Ф.И.О.');
+        return;
+      }
+      currentUser.name = newName;
+      try {
+        const res = await fetch('/api/auth/update-profile', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            login: currentUser.login,
+            name: newName,
+            addresses: userAddresses
+          })
+        });
+        if (res.ok) {
+          const data = await res.json();
+          if (data && data.user) {
+            currentUser = data.user;
+          }
+        }
+      } catch {}
       saveState();
-      showToast('Личные данные сохранены');
+      updateProfileGreeting();
+      showToast(`Личные данные сохранены: ${getUserDisplayName()}`);
     }
 
     /* ==================== НАВИГАЦИЯ ==================== */
@@ -2599,7 +2698,7 @@
         loadCatalogProducts();
       } else if (viewName === 'profile') {
         setActiveNav('');
-        document.getElementById('lk-user-login').textContent = currentUser ? currentUser.login : '375445658384';
+        updateProfileGreeting();
         updateProfileRoleUI();
         renderProfileOrders();
         renderFavoritesView();
@@ -3196,6 +3295,14 @@
 
     async function renderCheckoutSummary() {
       await fetchAllProducts();
+      if (currentUser) {
+        const nameInp = document.getElementById('chk-name');
+        const phoneInp = document.getElementById('chk-phone');
+        const emailInp = document.getElementById('chk-email');
+        if (nameInp) nameInp.value = getUserDisplayName();
+        if (phoneInp) phoneInp.value = currentUser.login || '';
+        if (emailInp) emailInp.value = currentUser.email || `${currentUser.login}@monroe.by`;
+      }
       const box = document.getElementById('checkout-right-summary');
       if (cart.length === 0) {
         box.innerHTML = `<div style="font-size:12px; color:#777;">Корзина пуста</div>`;
@@ -3253,9 +3360,10 @@
         city: document.getElementById('chk-city').value,
         delivery_method: delivery,
         payment_method: payment,
-        customer_name: document.getElementById('chk-name').value,
+        customer_name: document.getElementById('chk-name').value || getUserDisplayName(),
         email: document.getElementById('chk-email').value,
-        phone: document.getElementById('chk-phone').value,
+        phone: (currentUser && currentUser.login) ? currentUser.login : document.getElementById('chk-phone').value,
+        user_login: (currentUser && currentUser.login) ? currentUser.login : '',
         street: street,
         house: house,
         apartment: apt,
@@ -3324,8 +3432,22 @@
         return;
       }
 
+      const allInputSizes = ["XS", "S", "M", "L", "XL", "XXL"];
+      const stock_by_size = {};
+      allInputSizes.forEach(sz => {
+        const el = document.getElementById('adm-qty-' + sz);
+        stock_by_size[sz] = el ? Math.max(0, parseInt(el.value || '0', 10) || 0) : 0;
+      });
       const isAcc = WOMEN_ACCESSORY_CATEGORIES.some(a => a.name === category) || MEN_ACCESSORY_CATEGORIES.some(a => a.name === category);
-      const sizes = isAcc ? ["ONE SIZE"] : (gender === "ДЛЯ НЕГО" ? ["S", "M", "L", "XL", "XXL"] : ["XS", "S", "M", "L"]);
+      let sizes;
+      if (isAcc) {
+        sizes = ["ONE SIZE"];
+        const totalAccQty = Object.values(stock_by_size).reduce((a, b) => a + b, 0);
+        stock_by_size["ONE SIZE"] = totalAccQty > 0 ? totalAccQty : 5;
+      } else {
+        const activeSizes = allInputSizes.filter(sz => stock_by_size[sz] > 0);
+        sizes = activeSizes.length > 0 ? activeSizes : (gender === "ДЛЯ НЕГО" ? ["S", "M", "L", "XL", "XXL"] : ["XS", "S", "M", "L"]);
+      }
 
       const res = await fetch('/api/catalog/products', {
         method: 'POST',
@@ -3340,6 +3462,7 @@
           collection: "Осень 2026",
           retail_price: price,
           sizes,
+          stock_by_size,
           color: "Черный",
           is_new: true,
           image_main: img,

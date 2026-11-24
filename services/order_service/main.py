@@ -65,6 +65,7 @@ class CheckoutRequest(BaseModel):
     floor: str = Field(default="")
     comment: str = Field(default="")
     coupon_code: str = Field(default="")
+    user_login: str = Field(default="")
 
 
 class ReturnRequestPayload(BaseModel):
@@ -73,6 +74,40 @@ class ReturnRequestPayload(BaseModel):
 
 class ReturnDecisionPayload(BaseModel):
     decision: str = Field(..., description="APPROVE (Одобрить) или REJECT (Отклонить)")
+
+
+# Статусы оплаты заказа (payment_status):
+#   UNPAID   — оформлен, но денег ещё нет (оплата при получении: курьеру, наличными)
+#   PAID     — деньги получены магазином (онлайн-карта, E-POS, ЕРИП — либо отмечено админом после получения оплаты от курьера)
+#   REFUNDED  — деньги возвращены клиенту по одобренному возврату
+#   CANCELLED — отменён до оплаты (товар вернулся на склад)
+PAYMENT_UNPAID = "UNPAID"
+PAYMENT_PAID = "PAID"
+PAYMENT_REFUNDED = "REFUNDED"
+PAYMENT_CANCELLED = "CANCELLED"
+
+
+def compute_initial_payment_status(payment_method: str) -> str:
+    """Оплата при получении = деньги ещё не у магазина. Всё остальное (онлайн-карта, E-POS, ЕРИП) = оплачен сразу."""
+    method = (payment_method or "").lower()
+    if "при получении" in method:
+        return PAYMENT_UNPAID
+    return PAYMENT_PAID
+
+
+def normalize_orders(orders: List[dict]) -> List[dict]:
+    """Добавляет поля payment_status/return_status заказам из старых записей (JSON-файла или MySQL)."""
+    for o in orders:
+        if not o.get("payment_status"):
+            if o.get("return_status") == "RETURN_APPROVED":
+                o["payment_status"] = PAYMENT_REFUNDED
+            else:
+                o["payment_status"] = compute_initial_payment_status(o.get("payment_method", ""))
+        o.setdefault("return_status", "NONE")
+        o.setdefault("return_reason", "")
+        o.setdefault("paid_at", "")
+        o.setdefault("refunded_at", "")
+    return orders
 
 
 def generate_seed_orders() -> List[dict]:
@@ -92,6 +127,8 @@ def generate_seed_orders() -> List[dict]:
             "city": "Минск, Минская область, Беларусь",
             "delivery_method": "Доставка курьером",
             "payment_method": "Онлайн картой на сайте",
+            "payment_status": PAYMENT_PAID,
+            "paid_at": (today - timedelta(days=5)).isoformat(),
             "sale_date": (today - timedelta(days=5)).isoformat(),
             "allocations": [
                 {
@@ -117,6 +154,8 @@ def generate_seed_orders() -> List[dict]:
             "city": "Минск, Минская область, Беларусь",
             "delivery_method": "Самовывоз",
             "payment_method": "Картой при получении",
+            "payment_status": PAYMENT_UNPAID,
+            "paid_at": "",
             "sale_date": (today - timedelta(days=3)).isoformat(),
             "allocations": [
                 {
@@ -142,6 +181,8 @@ def generate_seed_orders() -> List[dict]:
             "city": "Минск, Минская область, Беларусь",
             "delivery_method": "Доставка курьером",
             "payment_method": "Экспресс Платежи - ЕРИП",
+            "payment_status": PAYMENT_PAID,
+            "paid_at": (today - timedelta(days=1)).isoformat(),
             "sale_date": (today - timedelta(days=1)).isoformat(),
             "allocations": [
                 {
@@ -159,7 +200,7 @@ def generate_seed_orders() -> List[dict]:
 def load_orders() -> List[dict]:
     mysql_data = mysql_load_orders(generate_seed_orders())
     if mysql_data is not None:
-        return mysql_data
+        return normalize_orders(mysql_data)
     if not os.path.exists(DATA_FILE):
         seed = generate_seed_orders()
         save_orders(seed)
@@ -170,7 +211,7 @@ def load_orders() -> List[dict]:
         seed = generate_seed_orders()
         save_orders(seed)
         return seed
-    return data
+    return normalize_orders(data)
 
 
 def save_orders(orders: List[dict]):
@@ -257,6 +298,8 @@ def create_order(payload: OrderCreate):
         "address": payload.address,
         "comment": payload.comment,
         "sale_date": date.today().isoformat(),
+        "payment_status": compute_initial_payment_status(payload.payment_method),
+        "paid_at": "",
         "return_status": "NONE",
         "return_reason": "",
         "allocations": deduction["allocations"],
@@ -273,6 +316,16 @@ def request_order_return(order_id: str, payload: ReturnRequestPayload):
     orders = load_orders()
     for o in orders:
         if o["order_id"] == order_id:
+            pay_status = o.get("payment_status", PAYMENT_PAID)
+            if pay_status == PAYMENT_CANCELLED:
+                raise HTTPException(status_code=400, detail="Заказ отменён — возврат невозможен")
+            if pay_status == PAYMENT_REFUNDED:
+                raise HTTPException(status_code=400, detail="По этому заказу деньги уже возвращены")
+            if pay_status != PAYMENT_PAID:
+                raise HTTPException(
+                    status_code=400,
+                    detail="Заказ ещё не оплачен — возврат не оформляется. Отмените заказ (товар вернётся на склад).",
+                )
             curr = o.get("return_status", "NONE")
             if curr == "RETURN_APPROVED":
                 raise HTTPException(status_code=400, detail="Возврат по этому заказу уже одобрен")
@@ -306,8 +359,59 @@ def decide_order_return(order_id: str, payload: ReturnDecisionPayload):
                     except Exception:
                         pass
                 o["return_status"] = "RETURN_APPROVED"
+                # Деньги возвращаются клиенту тем же способом, как он платил
+                if o.get("payment_status") == PAYMENT_PAID:
+                    o["payment_status"] = PAYMENT_REFUNDED
+                    o["refunded_at"] = date.today().isoformat()
             else:
                 o["return_status"] = "RETURN_REJECTED"
+            save_orders(orders)
+            return o
+    raise HTTPException(status_code=404, detail="Заказ не найден")
+
+
+@app.post("/orders/{order_id}/mark-paid")
+def mark_order_paid(order_id: str):
+    """Администратор фиксирует, что клиент расплатился при получении (курьеру картой или наличными)."""
+    orders = load_orders()
+    for o in orders:
+        if o["order_id"] == order_id:
+            if o.get("payment_status") != PAYMENT_UNPAID:
+                raise HTTPException(status_code=400, detail="Этот заказ не в статусе «Не оплачен»")
+            o["payment_status"] = PAYMENT_PAID
+            o["paid_at"] = date.today().isoformat()
+            save_orders(orders)
+            return o
+    raise HTTPException(status_code=404, detail="Заказ не найден")
+
+
+@app.post("/orders/{order_id}/cancel")
+def cancel_order(order_id: str):
+    """Отмена неоплаченного заказа: денег не было — возвращать нечего, товар уходит обратно на склад."""
+    orders = load_orders()
+    for o in orders:
+        if o["order_id"] == order_id:
+            if o.get("payment_status") != PAYMENT_UNPAID:
+                raise HTTPException(
+                    status_code=400,
+                    detail="Отменить можно только неоплаченный заказ. Для оплаченного оформите возврат.",
+                )
+            if o.get("return_status", "NONE") not in ("NONE", "RETURN_REJECTED"):
+                raise HTTPException(status_code=400, detail="По заказу уже есть активная заявка на возврат")
+            with httpx.Client(timeout=10.0) as client:
+                try:
+                    client.post(
+                        f"{WAREHOUSE_SERVICE_URL}/stock/return-item",
+                        json={
+                            "product_id": o["product_id"],
+                            "size": o["size"],
+                            "quantity": o["quantity"],
+                            "is_defect": False,
+                        },
+                    )
+                except Exception:
+                    pass
+            o["payment_status"] = PAYMENT_CANCELLED
             save_orders(orders)
             return o
     raise HTTPException(status_code=404, detail="Заказ не найден")
@@ -335,7 +439,7 @@ def checkout_cart(payload: CheckoutRequest):
                 delivery_method=payload.delivery_method,
                 payment_method=payload.payment_method,
                 email=payload.email,
-                phone=payload.phone,
+                phone=payload.user_login.strip() or payload.phone,
                 address=address_str,
                 comment=payload.comment,
                 discount_percent=discount,

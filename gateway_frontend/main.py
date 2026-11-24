@@ -226,6 +226,42 @@ async def reset_password_confirm(request: Request):
     raise HTTPException(status_code=404, detail="Пользователь не найден")
 
 
+@app.post("/api/auth/update-profile")
+async def update_user_profile(request: Request):
+    """Сохраняет обновленное Ф.И.О. (и адреса) пользователя в таблицу users MySQL и users_db.json."""
+    body = await request.json()
+    raw_login = str(body.get("login", "")).strip()
+    digits_only = "".join(ch for ch in raw_login if ch.isdigit())
+    login = digits_only if len(digits_only) >= 7 else raw_login
+    new_name = str(body.get("name", "")).strip()
+    new_addresses = body.get("addresses", None)
+
+    if not login:
+        raise HTTPException(status_code=400, detail="Не указан логин пользователя")
+
+    users = load_users()
+    for u in users:
+        if u["login"].lower() == login.lower() or u["login"].lower() == raw_login.lower():
+            if new_name:
+                u["name"] = new_name
+            if isinstance(new_addresses, list):
+                u["addresses"] = new_addresses
+            save_users(users)
+            return {"status": "ok", "user": u}
+
+    raise HTTPException(status_code=404, detail="Пользователь не найден")
+
+
+@app.get("/api/user/{user_login}/profile")
+def get_user_profile(user_login: str):
+    """Возвращает актуальный профиль пользователя (с актуальным Ф.И.О. из БД)."""
+    users = load_users()
+    for u in users:
+        if u["login"].lower() == user_login.lower():
+            return {"status": "ok", "user": u}
+    raise HTTPException(status_code=404, detail="Пользователь не найден")
+
+
 @app.get("/api/system-status")
 def check_microservices_health():
     services = [
@@ -288,12 +324,20 @@ def proxy_get_product_detail(product_id: str):
 @app.post("/api/catalog/products")
 async def proxy_create_product(request: Request):
     body = await request.json()
+    stock_by_size = body.pop("stock_by_size", None) or {}
     with httpx.Client(timeout=10.0) as client:
         r = client.post(f"{CATALOG_URL}/products", json=body)
         created = r.json()
         if r.status_code == 201 and "id" in created:
             exp_date = (date.today() + timedelta(days=90)).isoformat()
             for sz in created.get("sizes", ["S", "M"]):
+                raw_qty = stock_by_size.get(sz, 5)
+                try:
+                    qty = int(raw_qty)
+                except Exception:
+                    qty = 5
+                if qty <= 0:
+                    continue
                 try:
                     client.post(
                         f"{WAREHOUSE_URL}/batches",
@@ -303,7 +347,7 @@ async def proxy_create_product(request: Request):
                             "size": sz,
                             "supplier_name": "Официальная поставка бутика MONROE",
                             "purchase_price": round(float(created["retail_price"]) * 0.45, 2),
-                            "quantity": 5,
+                            "quantity": qty,
                             "expiry_date": exp_date,
                         },
                     )

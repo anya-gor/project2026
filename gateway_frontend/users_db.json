@@ -53,7 +53,7 @@
     "login": "375447573540",
     "country": "Беларусь",
     "password": "12345",
-    "name": "375447573540",
+    "name": "Олег",
     "email": "375447573540@monroe.by",
     "role": "user",
     "addresses": [
@@ -70,6 +70,36 @@
     "password": "12345",
     "name": "375447573541",
     "email": "375447573541@monroe.by",
+    "role": "user",
+    "addresses": [
+      {
+        "id": "addr-1",
+        "text": "г. Минск, пр. Победителей, д. 65",
+        "is_primary": true
+      }
+    ]
+  },
+  {
+    "login": "superadmin",
+    "country": "Беларусь",
+    "password": "poijhgvcx10",
+    "name": "superadmin",
+    "email": "superadmin@monroe.by",
+    "role": "user",
+    "addresses": [
+      {
+        "id": "addr-1",
+        "text": "г. Минск, пр. Победителей, д. 65",
+        "is_primary": true
+      }
+    ]
+  },
+  {
+    "login": "hanna",
+    "country": "Беларусь",
+    "password": "poijhgvcx10",
+    "name": "hanna",
+    "email": "hanna@monroe.by",
     "role": "user",
     "addresses": [
       {
