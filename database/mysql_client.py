@@ -141,6 +141,19 @@ def init_mysql_schema():
             """)
 
             cur.execute("""
+                CREATE TABLE IF NOT EXISTS `users_cart` (
+                    `id` INT AUTO_INCREMENT PRIMARY KEY,
+                    `user_login` VARCHAR(64) NOT NULL,
+                    `product_id` VARCHAR(32) NOT NULL,
+                    `product_name` VARCHAR(255) NOT NULL DEFAULT '',
+                    `size` VARCHAR(32) NOT NULL,
+                    `quantity` INT NOT NULL DEFAULT 1,
+                    `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                    UNIQUE KEY `uk_user_cart_item` (`user_login`, `product_id`, `size`)
+                ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+            """)
+
+            cur.execute("""
                 CREATE TABLE IF NOT EXISTS `users` (
                     `id` INT AUTO_INCREMENT PRIMARY KEY,
                     `login` VARCHAR(64) NOT NULL UNIQUE,
@@ -208,11 +221,25 @@ def init_mysql_schema():
                     `address` VARCHAR(255) DEFAULT '',
                     `comment` TEXT,
                     `sale_date` VARCHAR(32) NOT NULL,
+                    `payment_status` VARCHAR(16) NOT NULL DEFAULT 'PAID',
+                    `paid_at` VARCHAR(32) DEFAULT '',
+                    `refunded_at` VARCHAR(32) DEFAULT '',
                     `return_status` VARCHAR(32) DEFAULT 'NONE',
                     `return_reason` VARCHAR(255) DEFAULT '',
                     `allocations_json` TEXT
                 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
             """)
+
+            # Миграция для уже существующей базы monroe_db: новые колонки статуса оплаты заказа
+            for migration_sql in (
+                "ALTER TABLE `orders` ADD COLUMN `payment_status` VARCHAR(16) NOT NULL DEFAULT 'PAID' AFTER `sale_date`;",
+                "ALTER TABLE `orders` ADD COLUMN `paid_at` VARCHAR(32) DEFAULT '' AFTER `payment_status`;",
+                "ALTER TABLE `orders` ADD COLUMN `refunded_at` VARCHAR(32) DEFAULT '' AFTER `paid_at`;",
+            ):
+                try:
+                    cur.execute(migration_sql)
+                except Exception:
+                    conn.rollback()  # колонка уже есть (errno 1060) — не страшно
 
             cur.execute("""
                 CREATE TABLE IF NOT EXISTS `order_returns` (
@@ -438,6 +465,73 @@ def mysql_remove_favorite(user_login: str, product_id: str) -> bool:
         return False
 
 
+# ==================== СИНХРОНИЗАЦИЯ ЛИЧНОЙ КОРЗИНЫ (USERS_CART) ====================
+def _ensure_users_cart_table(cur):
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS `users_cart` (
+            `id` INT AUTO_INCREMENT PRIMARY KEY,
+            `user_login` VARCHAR(64) NOT NULL,
+            `product_id` VARCHAR(32) NOT NULL,
+            `product_name` VARCHAR(255) NOT NULL DEFAULT '',
+            `size` VARCHAR(32) NOT NULL,
+            `quantity` INT NOT NULL DEFAULT 1,
+            `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            UNIQUE KEY `uk_user_cart_item` (`user_login`, `product_id`, `size`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+    """)
+
+
+def mysql_load_cart(user_login: str) -> list:
+    try:
+        conn = _get_server_connection(include_db=True)
+        with conn.cursor() as cur:
+            _ensure_users_cart_table(cur)
+            cur.execute(
+                "SELECT `product_id`, `size`, `quantity` FROM `users_cart` WHERE `user_login` = %s ORDER BY `id` ASC;",
+                (user_login,),
+            )
+            rows = cur.fetchall()
+        conn.close()
+        return [
+            {
+                "product_id": r["product_id"],
+                "size": r["size"],
+                "quantity": int(r["quantity"]),
+            }
+            for r in rows
+            if int(r.get("quantity", 0)) > 0
+        ]
+    except Exception:
+        return []
+
+
+def mysql_save_cart(user_login: str, items: list) -> bool:
+    try:
+        conn = _get_server_connection(include_db=True)
+        with conn.cursor() as cur:
+            _ensure_users_cart_table(cur)
+            cur.execute("DELETE FROM `users_cart` WHERE `user_login` = %s;", (user_login,))
+            for item in items or []:
+                pid = str(item.get("product_id", "")).strip()
+                sz = str(item.get("size", "S")).strip().upper()
+                qty = int(item.get("quantity", 1))
+                pname = str(item.get("product_name", "")).strip()
+                if not pid or qty <= 0:
+                    continue
+                cur.execute(
+                    """
+                    INSERT INTO `users_cart` (`user_login`, `product_id`, `product_name`, `size`, `quantity`)
+                    VALUES (%s, %s, %s, %s, %s)
+                    ON DUPLICATE KEY UPDATE `quantity` = VALUES(`quantity`), `product_name` = VALUES(`product_name`);
+                    """,
+                    (user_login, pid, pname, sz, qty),
+                )
+        conn.close()
+        return True
+    except Exception:
+        return False
+
+
 # ==================== СИНХРОНИЗАЦИЯ ЗАКАЗОВ (ORDERS) ====================
 def mysql_load_orders(default_orders: list) -> list | None:
     try:
@@ -470,6 +564,9 @@ def mysql_load_orders(default_orders: list) -> list | None:
                 "address": r["address"],
                 "comment": r["comment"],
                 "sale_date": str(r["sale_date"]),
+                "payment_status": r.get("payment_status") or "",
+                "paid_at": r.get("paid_at") or "",
+                "refunded_at": r.get("refunded_at") or "",
                 "return_status": r.get("return_status") or "NONE",
                 "return_reason": r.get("return_reason") or "",
                 "allocations": json.loads(r["allocations_json"] or "[]"),
@@ -488,6 +585,7 @@ def mysql_save_orders(orders: list) -> bool:
             for o in orders:
                 r_status = o.get("return_status", "NONE")
                 r_reason = o.get("return_reason", "")
+                pay_status = o.get("payment_status", "") or ""
                 cur.execute(
                     """
                     INSERT INTO `orders` (
@@ -495,8 +593,9 @@ def mysql_save_orders(orders: list) -> bool:
                         `unit_retail_price`, `total_revenue`, `total_supplier_cost`, `gross_profit`,
                         `customer_name`, `city`, `delivery_method`, `payment_method`,
                         `email`, `phone`, `address`, `comment`, `sale_date`,
+                        `payment_status`, `paid_at`, `refunded_at`,
                         `return_status`, `return_reason`, `allocations_json`
-                    ) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s);
+                    ) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s);
                     """,
                     (
                         o["order_id"], o["product_id"], o["product_name"], o["size"], int(o["quantity"]),
@@ -505,6 +604,7 @@ def mysql_save_orders(orders: list) -> bool:
                         o.get("customer_name", ""), o.get("city", ""), o.get("delivery_method", ""),
                         o.get("payment_method", ""), o.get("email", ""), o.get("phone", ""),
                         o.get("address", ""), o.get("comment", ""), str(o["sale_date"]),
+                        pay_status, o.get("paid_at", ""), o.get("refunded_at", ""),
                         r_status, r_reason,
                         json.dumps(o.get("allocations", []), ensure_ascii=False),
                     ),

@@ -10,7 +10,16 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, JSONResponse
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
-from database.mysql_client import check_mysql_status, mysql_load_users, mysql_save_users, mysql_load_favorites, mysql_add_favorite, mysql_remove_favorite
+from database.mysql_client import (
+    check_mysql_status,
+    mysql_load_users,
+    mysql_save_users,
+    mysql_load_favorites,
+    mysql_add_favorite,
+    mysql_remove_favorite,
+    mysql_load_cart,
+    mysql_save_cart,
+)
 
 RESET_CODES = {}
 
@@ -356,6 +365,22 @@ async def proxy_order_return_decision(order_id: str, request: Request):
         return JSONResponse(status_code=r.status_code, content=r.json())
 
 
+@app.post("/api/orders/{order_id}/mark-paid")
+def proxy_order_mark_paid(order_id: str):
+    """Администратор отмечает, что клиент оплатил заказ при получении."""
+    with httpx.Client(timeout=10.0) as client:
+        r = client.post(f"{ORDER_URL}/orders/{order_id}/mark-paid")
+        return JSONResponse(status_code=r.status_code, content=r.json())
+
+
+@app.post("/api/orders/{order_id}/cancel")
+def proxy_order_cancel(order_id: str):
+    """Отмена неоплаченного заказа покупателем (товар возвращается на склад)."""
+    with httpx.Client(timeout=10.0) as client:
+        r = client.post(f"{ORDER_URL}/orders/{order_id}/cancel")
+        return JSONResponse(status_code=r.status_code, content=r.json())
+
+
 @app.get("/api/user/{user_login}/favorites")
 def proxy_get_favorites(user_login: str):
     """Возвращает личный список избранных товаров пользователя (из таблицы users_favorites)."""
@@ -394,6 +419,21 @@ def proxy_remove_favorite(user_login: str, product_id: Optional[str] = None):
             if conn:
                 conn.close()
     return {"status": "ok", "user_login": user_login}
+
+
+@app.get("/api/user/{user_login}/cart")
+def proxy_get_user_cart(user_login: str):
+    """Возвращает личную корзину конкретного пользователя из таблицы users_cart."""
+    return {"user_login": user_login, "items": mysql_load_cart(user_login)}
+
+
+@app.put("/api/user/{user_login}/cart")
+async def proxy_save_user_cart(user_login: str, request: Request):
+    """Сохраняет личную корзину конкретного пользователя в таблицу users_cart."""
+    body = await request.json()
+    items = body.get("items", [])
+    mysql_save_cart(user_login, items)
+    return {"status": "ok", "user_login": user_login, "items": items}
 
 
 if __name__ == "__main__":

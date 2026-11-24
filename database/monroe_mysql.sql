@@ -75,6 +75,9 @@ CREATE TABLE IF NOT EXISTS `orders` (
     `address` VARCHAR(255) DEFAULT '',
     `comment` TEXT,
     `sale_date` DATE NOT NULL COMMENT 'Дата оформления заказа',
+    `payment_status` VARCHAR(16) NOT NULL DEFAULT 'PAID' COMMENT 'Статус оплаты: UNPAID (не оплачен), PAID (оплачен), REFUNDED (деньги возвращены), CANCELLED (отменен до оплаты)',
+    `paid_at` VARCHAR(32) NOT NULL DEFAULT '' COMMENT 'Дата получения оплаты (если оплата при получении — фиксирует администратор)',
+    `refunded_at` VARCHAR(32) NOT NULL DEFAULT '' COMMENT 'Дата возврата денег клиенту по одобренному возврату',
     `return_status` VARCHAR(32) NOT NULL DEFAULT 'NONE' COMMENT 'Статус возврата: NONE, RETURN_REQUESTED, RETURN_APPROVED, RETURN_REJECTED',
     `return_reason` VARCHAR(255) NOT NULL DEFAULT '' COMMENT 'Причина возврата от покупателя'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
@@ -95,7 +98,7 @@ CREATE TABLE IF NOT EXISTS `order_returns` (
     CONSTRAINT `fk_return_order` FOREIGN KEY (`order_id`) REFERENCES `orders`(`order_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- 5. Таблица личного избранного пользователей (Личный кабинет -> Избранное)
+-- 6. Таблица личного избранного пользователей (Личный кабинет -> Избранное)
 CREATE TABLE IF NOT EXISTS `users_favorites` (
     `id` INT AUTO_INCREMENT PRIMARY KEY,
     `user_login` VARCHAR(64) NOT NULL COMMENT 'Номер телефона пользователя',
@@ -104,6 +107,19 @@ CREATE TABLE IF NOT EXISTS `users_favorites` (
     `added_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT 'Когда добавили в Избранное',
     CONSTRAINT `fk_fav_user` FOREIGN KEY (`user_login`) REFERENCES `users`(`login`) ON DELETE CASCADE,
     UNIQUE KEY `uk_user_product` (`user_login`, `product_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- 7. Таблица личной корзины каждого покупателя (Корзина изолирована по аккаунтам)
+CREATE TABLE IF NOT EXISTS `users_cart` (
+    `id` INT AUTO_INCREMENT PRIMARY KEY,
+    `user_login` VARCHAR(64) NOT NULL COMMENT 'Номер телефона пользователя',
+    `product_id` VARCHAR(32) NOT NULL COMMENT 'ID товара из таблицы products',
+    `product_name` VARCHAR(255) NOT NULL DEFAULT '' COMMENT 'Название товара',
+    `size` VARCHAR(32) NOT NULL COMMENT 'Выбранный размер (XS, S, M, L, XL...)',
+    `quantity` INT NOT NULL DEFAULT 1 COMMENT 'Количество единиц в корзине',
+    `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    CONSTRAINT `fk_cart_user` FOREIGN KEY (`user_login`) REFERENCES `users`(`login`) ON DELETE CASCADE,
+    UNIQUE KEY `uk_user_cart_item` (`user_login`, `product_id`, `size`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- Стартовые пользователи (Админ и Покупатель)

@@ -1884,37 +1884,96 @@
     let currentOrdersSubtab = "current";
 
     let currentUser = JSON.parse(localStorage.getItem('mad_user') || 'null');
-    let userAddresses = JSON.parse(localStorage.getItem('mad_addresses') || JSON.stringify([
+
+    function getUserStorageKey() {
+      return (currentUser && currentUser.login) ? String(currentUser.login) : 'guest';
+    }
+
+    let userAddresses = JSON.parse(localStorage.getItem('mad_addresses_' + getUserStorageKey()) || JSON.stringify([
       { id: 'a1', text: 'г. Минск, пр. Победителей, д. 65, кв. 12', is_primary: true },
       { id: 'a2', text: 'г. Минск, ул. М. Танка, д. 69, кв. 5', is_primary: false }
     ]));
-    // Текущие заказы, оформленные пользователем в этой сессии
-    let userCurrentOrders = JSON.parse(localStorage.getItem('mad_current_orders') || '[]');
-    let favorites = JSON.parse(localStorage.getItem('mad_favorites') || '["prod-1"]');
-    let cart = JSON.parse(localStorage.getItem('mad_cart') || '[{"product_id":"prod-1","size":"S","quantity":1}]');
+    // Текущие заказы, оформленные этим пользователем
+    let userCurrentOrders = JSON.parse(localStorage.getItem('mad_current_orders_' + getUserStorageKey()) || '[]');
+    let favorites = JSON.parse(localStorage.getItem('mad_favorites_' + getUserStorageKey()) || '[]');
+    let cart = JSON.parse(localStorage.getItem('mad_cart_' + getUserStorageKey()) || '[]');
+
+    async function loadMyCartFromDB() {
+      const key = getUserStorageKey();
+      if (!currentUser || currentUser.role === 'admin') {
+        cart = currentUser ? [] : JSON.parse(localStorage.getItem('mad_cart_guest') || '[]');
+        return cart;
+      }
+      try {
+        const res = await fetch(`/api/user/${encodeURIComponent(currentUser.login)}/cart`);
+        if (res.ok) {
+          const data = await res.json();
+          cart = Array.isArray(data.items) ? data.items : [];
+          localStorage.setItem('mad_cart_' + key, JSON.stringify(cart));
+          return cart;
+        }
+      } catch {}
+      cart = JSON.parse(localStorage.getItem('mad_cart_' + key) || '[]');
+      return cart;
+    }
+
+    async function saveMyCartToDB() {
+      if (!currentUser || currentUser.role === 'admin') return;
+      try {
+        await fetch(`/api/user/${encodeURIComponent(currentUser.login)}/cart`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ items: cart })
+        });
+      } catch {}
+    }
+
+    async function syncUserPersonalData() {
+      const key = getUserStorageKey();
+      userCurrentOrders = JSON.parse(localStorage.getItem('mad_current_orders_' + key) || '[]');
+      userAddresses = JSON.parse(localStorage.getItem('mad_addresses_' + key) || JSON.stringify(
+        key === '375445658384' ? [
+          { id: 'a1', text: 'г. Минск, пр. Победителей, д. 65, кв. 12', is_primary: true },
+          { id: 'a2', text: 'г. Минск, ул. М. Танка, д. 69, кв. 5', is_primary: false }
+        ] : []
+      ));
+      favorites = JSON.parse(localStorage.getItem('mad_favorites_' + key) || '[]');
+      await loadMyFavoritesFromDB();
+      await loadMyCartFromDB();
+      updateHeaderBadges();
+    }
 
     function saveState() {
-      localStorage.setItem('mad_favorites', JSON.stringify(favorites));
-      localStorage.setItem('mad_cart', JSON.stringify(cart));
-      localStorage.setItem('mad_addresses', JSON.stringify(userAddresses));
-      localStorage.setItem('mad_current_orders', JSON.stringify(userCurrentOrders));
+      const key = getUserStorageKey();
+      localStorage.setItem('mad_favorites_' + key, JSON.stringify(favorites));
+      localStorage.setItem('mad_cart_' + key, JSON.stringify(cart));
+      localStorage.setItem('mad_addresses_' + key, JSON.stringify(userAddresses));
+      localStorage.setItem('mad_current_orders_' + key, JSON.stringify(userCurrentOrders));
       if (currentUser) {
         localStorage.setItem('mad_user', JSON.stringify(currentUser));
       } else {
         localStorage.removeItem('mad_user');
       }
+      saveMyCartToDB();
       updateHeaderBadges();
     }
 
     function updateHeaderBadges() {
+      const favList = (currentUser && currentUser.role !== 'admin' && Array.isArray(globalThis.__personalFavorites))
+        ? globalThis.__personalFavorites
+        : favorites;
       const favBadge = document.getElementById('fav-badge');
-      favBadge.textContent = favorites.length;
-      favBadge.classList.toggle('visible', favorites.length > 0);
+      if (favBadge) {
+        favBadge.textContent = favList.length;
+        favBadge.classList.toggle('visible', favList.length > 0);
+      }
 
       const totalCartCount = cart.reduce((acc, item) => acc + item.quantity, 0);
       const cartBadge = document.getElementById('cart-badge');
-      cartBadge.textContent = totalCartCount;
-      cartBadge.classList.toggle('visible', totalCartCount > 0);
+      if (cartBadge) {
+        cartBadge.textContent = totalCartCount;
+        cartBadge.classList.toggle('visible', totalCartCount > 0);
+      }
     }
 
     function showToast(htmlMsg) {
@@ -2100,7 +2159,8 @@
         return;
       }
       currentUser = data.user;
-      saveState();
+      localStorage.setItem('mad_user', JSON.stringify(currentUser));
+      await syncUserPersonalData();
       updateProfileRoleUI();
       closeAuthModal();
       navigateTo('profile');
@@ -2132,7 +2192,8 @@
         return;
       }
       currentUser = data.user;
-      saveState();
+      localStorage.setItem('mad_user', JSON.stringify(currentUser));
+      await syncUserPersonalData();
       updateProfileRoleUI();
       closeAuthModal();
       showToast('Регистрация прошла успешно!');
@@ -2140,9 +2201,11 @@
       switchProfileTab('orders');
     }
 
-    function logoutUser() {
+    async function logoutUser() {
       currentUser = null;
-      saveState();
+      globalThis.__personalFavorites = null;
+      localStorage.removeItem('mad_user');
+      await syncUserPersonalData();
       updateProfileRoleUI();
       openAuthModal();
     }
@@ -2173,6 +2236,39 @@
       renderProfileOrders();
     }
 
+    /* ===== СТАТУСЫ ОПЛАТЫ И ВОЗВРАТА ЗАКАЗА ===== */
+    // payment_status: UNPAID (оформлен, курьер везёт) / PAID / REFUNDED (деньги возвращены) / CANCELLED
+    function paymentBadgeHtml(o) {
+      const ps = o.payment_status || 'PAID';
+      if (ps === 'PAID') {
+        return '<span style="border:1px solid #15803d; color:#15803d; padding:4px 10px; font-size:11px; text-transform:uppercase;">✓ Оплачен</span>';
+      }
+      if (ps === 'UNPAID') {
+        return '<span style="border:1px solid #b45309; color:#b45309; padding:4px 10px; font-size:11px; text-transform:uppercase;">Ожидает оплаты</span>';
+      }
+      if (ps === 'REFUNDED') {
+        return '<span style="border:1px solid #634f44; color:#634f44; padding:4px 10px; font-size:11px; text-transform:uppercase;">Возврат средств</span>';
+      }
+      if (ps === 'CANCELLED') {
+        return '<span style="border:1px solid #b91c1c; color:#b91c1c; padding:4px 10px; font-size:11px; text-transform:uppercase;">✕ Отменён</span>';
+      }
+      return '';
+    }
+
+    function returnBadgeHtml(o) {
+      const rStatus = o.return_status || 'NONE';
+      if (rStatus === 'RETURN_REQUESTED') {
+        return '<span style="border:1px solid #b45309; color:#b45309; padding:4px 10px; font-size:11px; font-weight:600;">⏳ Заявка на возврат</span>';
+      }
+      if (rStatus === 'RETURN_APPROVED') {
+        return '<span style="border:1px solid #15803d; color:#15803d; padding:4px 10px; font-size:11px;">✓ Возврат одобрен</span>';
+      }
+      if (rStatus === 'RETURN_REJECTED') {
+        return '<span style="border:1px solid #b91c1c; color:#b91c1c; padding:4px 10px; font-size:11px;">✕ Возврат отклонён</span>';
+      }
+      return '';
+    }
+
     async function renderProfileOrders() {
       await fetchAllProducts();
       const container = document.getElementById('lk-orders-content');
@@ -2190,14 +2286,11 @@
         }
         container.innerHTML = allServerOrders.map(o => {
           const rStatus = o.return_status || 'NONE';
-          let badgeHtml = `<span style="border:1px solid #222; padding:4px 10px; font-size:11px;">Оформлен</span>`;
-          if (rStatus === 'RETURN_REQUESTED') {
-            badgeHtml = `<span style="border:1px solid #b45309; color:#b45309; padding:4px 10px; font-size:11px; font-weight:600;">⏳ Заявка на возврат</span>`;
-          } else if (rStatus === 'RETURN_APPROVED') {
-            badgeHtml = `<span style="border:1px solid #15803d; color:#15803d; padding:4px 10px; font-size:11px;">✓ Возврат одобрен</span>`;
-          } else if (rStatus === 'RETURN_REJECTED') {
-            badgeHtml = `<span style="border:1px solid #b91c1c; color:#b91c1c; padding:4px 10px; font-size:11px;">✕ Возврат отклонен</span>`;
-          }
+          const badgeHtml = `
+            <div style="display:flex; gap:6px; flex-wrap:wrap; justify-content:flex-end;">
+              ${paymentBadgeHtml(o)}
+              ${returnBadgeHtml(o)}
+            </div>`;
 
           return `
             <div class="lk-framed-box" style="max-width: 680px;">
@@ -2213,6 +2306,16 @@
                 <div>${o.product_name} (Размер: <b>${o.size}</b>, ${o.quantity} ед.)</div>
                 <div style="font-weight:600;">${formatBYN(o.total_revenue)}</div>
               </div>
+
+              ${o.payment_status === 'UNPAID' ? `
+                <div style="background:#F4F5F6; border:1px solid var(--border); padding:12px 14px; margin-top:10px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+                  <div style="font-size:12px;">
+                    Клиент платит <b>${(o.payment_method || 'при получении').toLowerCase()}</b> — деньги ещё не поступили.
+                    После получения оплаты от курьера подтвердите её.
+                  </div>
+                  <button class="btn-thin-box" style="padding:6px 14px; font-size:11px;" onclick="adminMarkPaid('${o.order_id}')">💵 Отметить оплаченным</button>
+                </div>
+              ` : ''}
 
               ${rStatus === 'RETURN_REQUESTED' ? `
                 <div style="background:var(--soft-white); border:1px solid var(--border); padding:12px 14px; margin-top:10px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
@@ -2260,14 +2363,11 @@
         const prod = allProducts.find(p => p.id === o.product_id) || {};
         const rStatus = o.return_status || 'NONE';
 
-        let statusBadge = `<span style="border:1px solid #222; padding:4px 10px; font-size:11px; text-transform:uppercase;">Оформлен</span>`;
-        if (rStatus === 'RETURN_REQUESTED') {
-          statusBadge = `<span style="border:1px solid #b45309; color:#b45309; padding:4px 10px; font-size:11px;">Заявка на возврат (На рассмотрении)</span>`;
-        } else if (rStatus === 'RETURN_APPROVED') {
-          statusBadge = `<span style="border:1px solid #15803d; color:#15803d; padding:4px 10px; font-size:11px;">✓ Возврат одобрен администратором</span>`;
-        } else if (rStatus === 'RETURN_REJECTED') {
-          statusBadge = `<span style="border:1px solid #b91c1c; color:#b91c1c; padding:4px 10px; font-size:11px;">✕ В возврате отказано</span>`;
-        }
+        const statusBadge = `
+          <div style="display:flex; gap:6px; flex-wrap:wrap;">
+            ${paymentBadgeHtml(o)}
+            ${returnBadgeHtml(o)}
+          </div>`;
 
         return `
           <div class="lk-framed-box" style="max-width: 660px;">
@@ -2290,7 +2390,24 @@
               <div style="font-size:13.5px; font-weight:600;">${formatBYN(o.total_revenue)}</div>
             </div>
 
-            ${rStatus === 'NONE' ? `
+            ${o.payment_status === 'CANCELLED' ? `
+              <div style="border-top:1px solid #f0f0f0; padding-top:14px; margin-top:12px; font-size:11.5px; color:var(--muted);">
+                Заказ отменён до оплаты — деньги не списывались, товар вернулся на склад.
+              </div>
+            ` : o.payment_status === 'REFUNDED' ? `
+              <div style="border-top:1px solid #f0f0f0; padding-top:14px; margin-top:12px; font-size:11.5px; color:var(--muted);">
+                Деньги возвращены тем же способом, как были оплачены (${(o.payment_method || 'как оплачивали').toLowerCase()}).
+              </div>
+            ` : o.payment_status === 'UNPAID' ? `
+              <div style="border-top:1px solid #f0f0f0; padding-top:14px; margin-top:12px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+                <div style="font-size:11.5px; color:var(--muted);">
+                  Оплата ожидается при получении. Возврат оформляется после оплаты — пока можно отменить заказ.
+                </div>
+                <button class="btn-thin-light" style="padding:7px 16px; font-size:11.5px;" onclick="customerCancelOrder('${o.order_id}')">
+                  Отменить заказ
+                </button>
+              </div>
+            ` : rStatus === 'NONE' ? `
               <div style="border-top:1px solid #f0f0f0; padding-top:14px; margin-top:12px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
                 <select id="ret-reason-${o.order_id}" style="border:1px solid #e0e0e0; padding:7px 10px; font-size:11.5px; color:#444; background:#fff;">
                   <option value="Не подошел размер">Причина возврата: Не подошел размер</option>
@@ -2336,11 +2453,35 @@
       });
       if (res.ok) {
         if (decision === 'APPROVE') {
-          showToast(`✓ Возврат по заказу № ${orderId} одобрен! Размер автоматически возвращен в наличие на склад.`);
+          showToast(`✓ Возврат по заказу № ${orderId} одобрен! Деньги возвращены клиенту, товар учтён на складе.`);
         } else {
           showToast(`✕ Заявка на возврат по заказу № ${orderId} отклонена.`);
         }
         await renderProfileOrders();
+      }
+    }
+
+    // Администратор подтверждает, что клиент расплатился при получении (курьеру)
+    async function adminMarkPaid(orderId) {
+      const res = await fetch(`/api/orders/${orderId}/mark-paid`, { method: 'POST' });
+      if (res.ok) {
+        showToast(`💵 Заказ № ${orderId} отмечен как оплаченный.`);
+        await renderProfileOrders();
+      } else {
+        const d = await res.json().catch(() => ({}));
+        showToast(d.detail || 'Не удалось отметить заказ оплаченным');
+      }
+    }
+
+    // Покупатель отменяет неоплаченный заказ (товар возвращается на склад, деньги не списывались)
+    async function customerCancelOrder(orderId) {
+      const res = await fetch(`/api/orders/${orderId}/cancel`, { method: 'POST' });
+      if (res.ok) {
+        showToast(`Заказ № ${orderId} отменён. Товар возвращён в наличие.`);
+        await renderProfileOrders();
+      } else {
+        const d = await res.json().catch(() => ({}));
+        showToast(d.detail || 'Не удалось отменить заказ');
       }
     }
 
@@ -2887,6 +3028,7 @@
           }
           showToast('Добавлено в Избранное ♥');
         }
+        updateHeaderBadges();
         await renderFavoritesView();
         await renderProductDetail();
         return;
@@ -3156,7 +3298,11 @@
 
       cart = [];
       saveState();
-      showToast(`Заказ № ${orderSummaryObj.id} оформлен и отображен в Личном кабинете!`);
+      const firstOrder = (data.orders && data.orders[0]) || {};
+      const payNote = firstOrder.payment_status === 'PAID'
+        ? ' Оплата на сайте прошла — статус «Оплачен».'
+        : ' Оплата при получении — статус «Ожидает оплаты».';
+      showToast(`Заказ № ${orderSummaryObj.id} оформлен и отображен в Личном кабинете!${payNote}`);
 
       // Сразу переводим в Личный кабинет -> Ваши заказы -> Текущие заказы
       navigateTo('profile');
@@ -3237,8 +3383,8 @@
 
     window.addEventListener('DOMContentLoaded', async () => {
       initSidebarLists("ДЛЯ НЕЁ");
-      updateHeaderBadges();
       updateProfileRoleUI();
+      await syncUserPersonalData();
       await checkMicroservicesHealth();
       setInterval(checkMicroservicesHealth, 8000);
       await loadHomeNovelties();
