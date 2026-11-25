@@ -67,10 +67,17 @@ def generate_financial_report(
     total_revenue = 0.0
     total_supplier_cost = 0.0
 
+    # Деньги, которые вернулись клиенту (отмена до оплаты, возврат по одобренной заявке),
+    # не считаются выручкой бутика
+    money_kept_orders = [
+        o for o in orders if o.get("payment_status", "PAID") not in ("CANCELLED", "REFUNDED")
+    ]
+    excluded_orders_count = len(orders) - len(money_kept_orders)
+
     # Группировка поштучно по моделям одежды
     by_product = {}
 
-    for o in orders:
+    for o in money_kept_orders:
         qty = int(o["quantity"])
         rev = float(o["total_revenue"])
         cost = float(o["total_supplier_cost"])
@@ -137,6 +144,7 @@ def generate_financial_report(
         "tax_rate_percent": tax_rate,
         "summary": {
             "total_orders_count": len(orders),
+            "excluded_no_money_orders_count": excluded_orders_count,
             "total_items_sold": total_items_sold,
             "total_revenue": round(total_revenue, 2),
             "total_supplier_cost": round(total_supplier_cost, 2),

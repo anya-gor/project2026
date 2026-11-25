@@ -108,5 +108,14 @@
         "is_primary": true
       }
     ]
+  },
+  {
+    "login": "375447573562",
+    "country": "Беларусь",
+    "password": "12345",
+    "name": "Виктория",
+    "email": "375447573562@monroe.by",
+    "role": "user",
+    "addresses": []
   }
 ]

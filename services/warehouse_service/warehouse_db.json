@@ -8,7 +8,7 @@
       "supplier_name": "Tessilform S.p.A. (Флоренция, Италия)",
       "purchase_price": 420.0,
       "initial_quantity": 10,
-      "remaining_quantity": 6,
+      "remaining_quantity": 2,
       "arrival_date": "2026-10-29",
       "expiry_date": "2027-01-22"
     },
@@ -80,7 +80,7 @@
       "supplier_name": "Morabito Atelier Milano",
       "purchase_price": 210.0,
       "initial_quantity": 15,
-      "remaining_quantity": 11,
+      "remaining_quantity": 10,
       "arrival_date": "2026-11-08",
       "expiry_date": "2027-01-22"
     },
@@ -248,7 +248,7 @@
       "supplier_name": "Morabito Atelier Milano",
       "purchase_price": 1100.0,
       "initial_quantity": 4,
-      "remaining_quantity": 3,
+      "remaining_quantity": 2,
       "arrival_date": "2026-11-18",
       "expiry_date": "2027-01-22"
     },
@@ -344,7 +344,7 @@
       "supplier_name": "Morabito Atelier Milano",
       "purchase_price": 1800.0,
       "initial_quantity": 5,
-      "remaining_quantity": 4,
+      "remaining_quantity": 3,
       "arrival_date": "2026-11-18",
       "expiry_date": "2027-01-22"
     },
@@ -416,7 +416,7 @@
       "supplier_name": "Tessilform S.p.A.",
       "purchase_price": 180.0,
       "initial_quantity": 8,
-      "remaining_quantity": 6,
+      "remaining_quantity": 5,
       "arrival_date": "2026-11-18",
       "expiry_date": "2027-01-22"
     },
@@ -491,6 +491,102 @@
       "remaining_quantity": 3,
       "arrival_date": "2026-11-18",
       "expiry_date": "2027-01-22"
+    },
+    {
+      "batch_id": "BATCH-D5C62",
+      "product_id": "prod-678eaf",
+      "product_name": "PATRIZIA PEPE — Пальто из кашемира с цепоцкой мониль",
+      "size": "XS",
+      "supplier_name": "Официальная поставка бутика MONROE",
+      "purchase_price": 225.0,
+      "initial_quantity": 5,
+      "remaining_quantity": 5,
+      "arrival_date": "2026-11-24",
+      "expiry_date": "2027-02-22"
+    },
+    {
+      "batch_id": "BATCH-43B81",
+      "product_id": "prod-678eaf",
+      "product_name": "PATRIZIA PEPE — Пальто из кашемира с цепоцкой мониль",
+      "size": "S",
+      "supplier_name": "Официальная поставка бутика MONROE",
+      "purchase_price": 225.0,
+      "initial_quantity": 5,
+      "remaining_quantity": 5,
+      "arrival_date": "2026-11-24",
+      "expiry_date": "2027-02-22"
+    },
+    {
+      "batch_id": "BATCH-F3589",
+      "product_id": "prod-678eaf",
+      "product_name": "PATRIZIA PEPE — Пальто из кашемира с цепоцкой мониль",
+      "size": "M",
+      "supplier_name": "Официальная поставка бутика MONROE",
+      "purchase_price": 225.0,
+      "initial_quantity": 5,
+      "remaining_quantity": 5,
+      "arrival_date": "2026-11-24",
+      "expiry_date": "2027-02-22"
+    },
+    {
+      "batch_id": "BATCH-16EC9",
+      "product_id": "prod-678eaf",
+      "product_name": "PATRIZIA PEPE — Пальто из кашемира с цепоцкой мониль",
+      "size": "L",
+      "supplier_name": "Официальная поставка бутика MONROE",
+      "purchase_price": 225.0,
+      "initial_quantity": 5,
+      "remaining_quantity": 5,
+      "arrival_date": "2026-11-24",
+      "expiry_date": "2027-02-22"
+    },
+    {
+      "batch_id": "BATCH-2BEFC",
+      "product_id": "prod-32ae11",
+      "product_name": "PATRIZIA PEPE — Пальто из кашемира с цепоцкой мониль",
+      "size": "XS",
+      "supplier_name": "Официальная поставка бутика MONROE",
+      "purchase_price": 225.0,
+      "initial_quantity": 5,
+      "remaining_quantity": 5,
+      "arrival_date": "2026-11-24",
+      "expiry_date": "2027-02-22"
+    },
+    {
+      "batch_id": "BATCH-6D158",
+      "product_id": "prod-32ae11",
+      "product_name": "PATRIZIA PEPE — Пальто из кашемира с цепоцкой мониль",
+      "size": "S",
+      "supplier_name": "Официальная поставка бутика MONROE",
+      "purchase_price": 225.0,
+      "initial_quantity": 5,
+      "remaining_quantity": 5,
+      "arrival_date": "2026-11-24",
+      "expiry_date": "2027-02-22"
+    },
+    {
+      "batch_id": "BATCH-B4766",
+      "product_id": "prod-32ae11",
+      "product_name": "PATRIZIA PEPE — Пальто из кашемира с цепоцкой мониль",
+      "size": "M",
+      "supplier_name": "Официальная поставка бутика MONROE",
+      "purchase_price": 225.0,
+      "initial_quantity": 5,
+      "remaining_quantity": 5,
+      "arrival_date": "2026-11-24",
+      "expiry_date": "2027-02-22"
+    },
+    {
+      "batch_id": "BATCH-91F9B",
+      "product_id": "prod-32ae11",
+      "product_name": "PATRIZIA PEPE — Пальто из кашемира с цепоцкой мониль",
+      "size": "L",
+      "supplier_name": "Официальная поставка бутика MONROE",
+      "purchase_price": 225.0,
+      "initial_quantity": 5,
+      "remaining_quantity": 5,
+      "arrival_date": "2026-11-24",
+      "expiry_date": "2027-02-22"
     }
   ],
   "writeoffs": [

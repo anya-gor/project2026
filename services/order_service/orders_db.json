@@ -1,5 +1,39 @@
 [
   {
+    "order_id": "ORD-82AC5",
+    "product_id": "prod-8",
+    "product_name": "GIUSEPPE DI MORABITO — Шелковый платок с монограммой",
+    "size": "ONE SIZE",
+    "quantity": 1,
+    "unit_retail_price": 620.0,
+    "total_revenue": 620.0,
+    "total_supplier_cost": 260.0,
+    "gross_profit": 360.0,
+    "customer_name": "Виктория",
+    "city": "Минск, Минская область, Беларусь",
+    "delivery_method": "Доставка курьером",
+    "payment_method": "Онлайн картой на сайте",
+    "email": "375447573562@monroe.by",
+    "phone": "375447573562",
+    "address": "пр. Победителей, д. 65, кв. 12",
+    "comment": "",
+    "sale_date": "2026-11-24",
+    "payment_status": "REFUNDED",
+    "paid_at": "",
+    "refunded_at": "2026-11-24",
+    "return_status": "RETURN_APPROVED",
+    "return_reason": "Не подошел фасон / цвет",
+    "allocations": [
+      {
+        "batch_id": "BATCH-213",
+        "supplier_name": "Tessilform S.p.A. (Флоренция, Италия)",
+        "quantity": 1,
+        "unit_purchase_price": 260.0,
+        "subtotal_cost": 260.0
+      }
+    ]
+  },
+  {
     "order_id": "ORD-8E1A5",
     "product_id": "prod-13",
     "product_name": "PATRIZIA PEPE — Мужской кожаный картхолдер",
@@ -20,6 +54,7 @@
     "sale_date": "2026-11-24",
     "payment_status": "PAID",
     "paid_at": "",
+    "refunded_at": "",
     "return_status": "NONE",
     "return_reason": "",
     "allocations": [
@@ -29,6 +64,40 @@
         "quantity": 1,
         "unit_purchase_price": 180.0,
         "subtotal_cost": 180.0
+      }
+    ]
+  },
+  {
+    "order_id": "ORD-AA321",
+    "product_id": "prod-1",
+    "product_name": "PATRIZIA PEPE — Темно-синее мини-платье",
+    "size": "S",
+    "quantity": 1,
+    "unit_retail_price": 1050.0,
+    "total_revenue": 1050.0,
+    "total_supplier_cost": 420.0,
+    "gross_profit": 630.0,
+    "customer_name": "Анна Ковалева",
+    "city": "Минск, Минская область, Беларусь",
+    "delivery_method": "Доставка курьером",
+    "payment_method": "Картой при получении",
+    "email": "client@monroe.by",
+    "phone": "375445658384",
+    "address": "пр. Победителей, д. 65, кв. 12",
+    "comment": "",
+    "sale_date": "2026-11-24",
+    "payment_status": "CANCELLED",
+    "paid_at": "",
+    "refunded_at": "",
+    "return_status": "NONE",
+    "return_reason": "",
+    "allocations": [
+      {
+        "batch_id": "BATCH-201",
+        "supplier_name": "Tessilform S.p.A. (Флоренция, Италия)",
+        "quantity": 1,
+        "unit_purchase_price": 420.0,
+        "subtotal_cost": 420.0
       }
     ]
   },
