@@ -8,20 +8,19 @@ SERVICES = [
     ("Catalog Service (:8001)", os.path.join("services", "catalog_service", "main.py"), 8001),
     ("Warehouse Service (:8002)", os.path.join("services", "warehouse_service", "main.py"), 8002),
     ("Order Service (:8003)", os.path.join("services", "order_service", "main.py"), 8003),
-    ("Analytics Service (:8004)", os.path.join("services", "analytics_service", "main.py"), 8004),
     ("API Gateway & Web UI (:8000)", os.path.join("gateway_frontend", "main.py"), 8000),
 ]
 
 
 def free_ports_on_windows():
-    """Освобождает порты 8000-8004 и останавливает старые копии микросервисов перед новым запуском."""
+    """Освобождает порты 8000-8003 и останавливает старые копии микросервисов перед новым запуском."""
     if os.name != "nt":
         return
     my_pid = os.getpid()
     try:
         cmd = (
             f"Get-CimInstance Win32_Process -Filter \"Name = 'python.exe'\" | "
-            f"Where-Object {{ $_.ProcessId -ne {my_pid} -and $_.CommandLine -match 'run_all\\.py|catalog_service|warehouse_service|order_service|analytics_service|gateway_frontend' }} | "
+            f"Where-Object {{ $_.ProcessId -ne {my_pid} -and $_.CommandLine -match 'run_all\\.py|catalog_service|warehouse_service|order_service|gateway_frontend' }} | "
             f"ForEach-Object {{ Stop-Process -Id $_.ProcessId -Force -ErrorAction SilentlyContinue }}"
         )
         subprocess.run(["powershell", "-NoProfile", "-Command", cmd], capture_output=True, timeout=6)
@@ -50,7 +49,7 @@ def main():
 
         url = "http://127.0.0.1:8000"
         print("\n" + "=" * 68)
-        print(" Все 5 микросервисов успешно запущены!")
+        print(" Все 4 микросервиса успешно запущены!")
         print(f" Сайт доступен по адресу: {url}")
         print(" Для остановки нажмите Ctrl+C")
         print("=" * 68 + "\n")

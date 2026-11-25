@@ -296,7 +296,7 @@
       "supplier_name": "Tessilform S.p.A.",
       "purchase_price": 410.0,
       "initial_quantity": 8,
-      "remaining_quantity": 6,
+      "remaining_quantity": 5,
       "arrival_date": "2026-11-18",
       "expiry_date": "2027-01-22"
     },
@@ -548,7 +548,7 @@
       "supplier_name": "Официальная поставка бутика MONROE",
       "purchase_price": 225.0,
       "initial_quantity": 5,
-      "remaining_quantity": 5,
+      "remaining_quantity": 4,
       "arrival_date": "2026-11-24",
       "expiry_date": "2027-02-22"
     },

@@ -39,7 +39,6 @@ app.add_middleware(
 CATALOG_URL = os.getenv("CATALOG_SERVICE_URL", "http://127.0.0.1:8001")
 WAREHOUSE_URL = os.getenv("WAREHOUSE_SERVICE_URL", "http://127.0.0.1:8002")
 ORDER_URL = os.getenv("ORDER_SERVICE_URL", "http://127.0.0.1:8003")
-ANALYTICS_URL = os.getenv("ANALYTICS_SERVICE_URL", "http://127.0.0.1:8004")
 
 STATIC_DIR = os.path.join(os.path.dirname(__file__), "static")
 USERS_FILE = os.path.join(os.path.dirname(__file__), "users_db.json")
@@ -268,7 +267,6 @@ def check_microservices_health():
         {"name": "Catalog Service", "code": "catalog", "url": f"{CATALOG_URL}/health", "port": 8001},
         {"name": "Warehouse Service", "code": "warehouse", "url": f"{WAREHOUSE_URL}/health", "port": 8002},
         {"name": "Order Service", "code": "order", "url": f"{ORDER_URL}/health", "port": 8003},
-        {"name": "Analytics Service", "code": "analytics", "url": f"{ANALYTICS_URL}/health", "port": 8004},
     ]
     results = []
     with httpx.Client(timeout=2.5) as client:

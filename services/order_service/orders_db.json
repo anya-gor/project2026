@@ -1,5 +1,72 @@
 [
   {
+    "order_id": "ORD-BA740",
+    "product_id": "prod-6",
+    "product_name": "PATRIZIA PEPE — Кожаная мини-сумка бьюти-кейс",
+    "size": "ONE SIZE",
+    "quantity": 1,
+    "unit_retail_price": 980.0,
+    "total_revenue": 980.0,
+    "total_supplier_cost": 410.0,
+    "gross_profit": 570.0,
+    "customer_name": "hanna",
+    "city": "Минск, Минская область, Беларусь",
+    "delivery_method": "Доставка курьером",
+    "payment_method": "Онлайн картой на сайте",
+    "email": "hanna@monroe.by",
+    "phone": "hanna",
+    "address": "пр. Победителей, д. 65, кв. 12",
+    "comment": "",
+    "sale_date": "2026-11-25",
+    "payment_status": "PAID",
+    "paid_at": "",
+    "return_status": "NONE",
+    "return_reason": "",
+    "allocations": [
+      {
+        "batch_id": "BATCH-225",
+        "supplier_name": "Tessilform S.p.A.",
+        "quantity": 1,
+        "unit_purchase_price": 410.0,
+        "subtotal_cost": 410.0
+      }
+    ]
+  },
+  {
+    "order_id": "ORD-B9A49",
+    "product_id": "prod-32ae11",
+    "product_name": "PATRIZIA PEPE — Пальто из кашемира с цепоцкой мониль",
+    "size": "XS",
+    "quantity": 1,
+    "unit_retail_price": 500.0,
+    "total_revenue": 500.0,
+    "total_supplier_cost": 225.0,
+    "gross_profit": 275.0,
+    "customer_name": "Анна Ковалева",
+    "city": "Минск, Минская область, Беларусь",
+    "delivery_method": "Доставка курьером",
+    "payment_method": "Онлайн картой на сайте",
+    "email": "client@monroe.by",
+    "phone": "375445658384",
+    "address": "пр. Победителей, д. 65, кв. 12",
+    "comment": "",
+    "sale_date": "2026-11-25",
+    "payment_status": "PAID",
+    "paid_at": "",
+    "refunded_at": "",
+    "return_status": "NONE",
+    "return_reason": "",
+    "allocations": [
+      {
+        "batch_id": "BATCH-2BEFC",
+        "supplier_name": "Официальная поставка бутика MONROE",
+        "quantity": 1,
+        "unit_purchase_price": 225.0,
+        "subtotal_cost": 225.0
+      }
+    ]
+  },
+  {
     "order_id": "ORD-82AC5",
     "product_id": "prod-8",
     "product_name": "GIUSEPPE DI MORABITO — Шелковый платок с монограммой",
